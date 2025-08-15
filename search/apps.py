@@ -6,4 +6,4 @@ class SearchConfig(AppConfig):
     name = "search"
 
     def ready(self):
-        from . import signals  # noqa: F401
+        pass  # No signals needed anymore

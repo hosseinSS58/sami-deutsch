@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "بلاگ" %}{% endblock %}
+{% block title %}{% trans "مقالات" %}{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
@@ -10,63 +10,60 @@
     <div class="col-12">
       <div class="d-flex justify-content-between align-items-center">
         <div>
-          <h1 class="h2 mb-2">{% trans "بلاگ آموزشی" %}</h1>
-          <p class="text-muted mb-0">{% trans "آخرین مقالات و نکات آموزشی زبان آلمانی" %}</p>
+          <h1 class="h2 mb-2">{% trans "مقالات آموزشی" %}</h1>
+          <p class="text-muted mb-0">
+            {% trans "مجموعه‌ای از مقالات مفید و کاربردی برای یادگیری بهتر زبان آلمانی" %}
+            {% if total_posts %}
+              <span class="ms-2">({{ total_posts }} {% trans "مقاله" %})</span>
+            {% endif %}
+          </p>
         </div>
         <div class="d-flex gap-2">
-          <a href="{% url 'blog:create' %}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>{% trans "مقاله جدید" %}
+          <a href="/" class="btn btn-outline-primary">
+            <i class="fas fa-home me-2"></i>{% trans "بازگشت به خانه" %}
           </a>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Search and Filters -->
+  <!-- Search and Filters Section -->
   <div class="row mb-4">
     <div class="col-12">
       <div class="card border-0 shadow-sm">
         <div class="card-body">
           <form method="get" class="row g-3">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text bg-transparent border-end-0">
                   <i class="fas fa-search text-muted"></i>
                 </span>
                 <input type="text" class="form-control border-start-0" name="q" 
-                       value="{{ request.GET.q }}" placeholder="{% trans 'جستجو در مقالات...' %}">
+                       value="{{ search_query }}" placeholder="{% trans 'جستجو در مقالات...' %}">
               </div>
             </div>
             <div class="col-md-3">
               <select class="form-select" name="category">
                 <option value="">{% trans "همه دسته‌ها" %}</option>
                 {% for category in categories %}
-                  <option value="{{ category.slug }}" {% if request.GET.category == category.slug %}selected{% endif %}>
+                  <option value="{{ category.slug }}" {% if selected_category == category.slug %}selected{% endif %}>
                     {{ category.name }}
                   </option>
                 {% endfor %}
               </select>
             </div>
             <div class="col-md-3">
-              <select class="form-select" name="status">
-                <option value="">{% trans "همه وضعیت‌ها" %}</option>
-                <option value="published" {% if request.GET.status == 'published' %}selected{% endif %}>
-                  {% trans "منتشر شده" %}
-                </option>
-                <option value="draft" {% if request.GET.status == 'draft' %}selected{% endif %}>
-                  {% trans "پیش‌نویس" %}
+              <select class="form-select" name="featured">
+                <option value="">{% trans "همه مقالات" %}</option>
+                <option value="true" {% if selected_featured == 'true' %}selected{% endif %}>
+                  {% trans "فقط مقالات ویژه" %}
                 </option>
               </select>
             </div>
-            <div class="col-12">
-              <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">
-                  <i class="fas fa-filter me-2"></i>{% trans "اعمال فیلترها" %}
-                </button>
-                <a href="{% url 'blog:list' %}" class="btn btn-outline-secondary">
-                  <i class="fas fa-times me-2"></i>{% trans "پاک کردن" %}
-                </a>
-              </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-search me-2"></i>{% trans "جستجو" %}
+              </button>
             </div>
           </form>
         </div>
@@ -74,140 +71,201 @@
     </div>
   </div>
 
-  <!-- Active Filters -->
-  {% if request.GET.q or request.GET.category or request.GET.status %}
-    <div class="row mb-3">
+  <!-- Active Filters Display -->
+  {% if search_query or selected_category or selected_featured %}
+    <div class="row mb-4">
       <div class="col-12">
-        <div class="d-flex flex-wrap gap-2">
-          <span class="text-muted">{% trans "فیلترهای فعال:" %}</span>
-          {% if request.GET.q %}
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          <span class="text-muted small">{% trans "فیلترهای فعال:" %}</span>
+          {% if search_query %}
             <span class="badge bg-primary">
-              {% trans "جستجو:" %} {{ request.GET.q }}
-              <a href="?{% if request.GET.category %}category={{ request.GET.category }}{% endif %}{% if request.GET.status %}{% if request.GET.category %}&{% endif %}status={{ request.GET.status }}{% endif %}" 
+              {% trans "جستجو" %}: "{{ search_query }}"
+              <a href="?{% if selected_category %}category={{ selected_category }}{% endif %}{% if selected_featured %}{% if selected_category %}&{% endif %}featured={{ selected_featured }}{% endif %}" 
                  class="text-white text-decoration-none ms-2">×</a>
             </span>
           {% endif %}
-          {% if request.GET.category %}
-            <span class="badge bg-info">
-              {% trans "دسته:" %} {{ request.GET.category }}
-              <a href="?{% if request.GET.q %}q={{ request.GET.q }}{% endif %}{% if request.GET.status %}{% if request.GET.q %}&{% endif %}status={{ request.GET.status }}{% endif %}" 
-                 class="text-white text-decoration-none ms-2">×</a>
-            </span>
+          {% if selected_category %}
+            {% for category in categories %}
+              {% if category.slug == selected_category %}
+                <span class="badge bg-info">
+                  {% trans "دسته" %}: {{ category.name }}
+                  <a href="?{% if search_query %}q={{ search_query }}{% endif %}{% if selected_featured %}{% if search_query %}&{% endif %}featured={{ selected_featured }}{% endif %}" 
+                     class="text-white text-decoration-none ms-2">×</a>
+                </span>
+              {% endif %}
+            {% endfor %}
           {% endif %}
-          {% if request.GET.status %}
+          {% if selected_featured %}
             <span class="badge bg-warning">
-              {% trans "وضعیت:" %} {{ request.GET.status }}
-              <a href="?{% if request.GET.q %}q={{ request.GET.q }}{% endif %}{% if request.GET.category %}{% if request.GET.q %}&{% endif %}category={{ request.GET.category }}{% endif %}" 
+              {% trans "مقالات ویژه" %}
+              <a href="?{% if search_query %}q={{ search_query }}{% endif %}{% if selected_category %}{% if search_query %}&{% endif %}category={{ selected_category }}{% endif %}" 
                  class="text-white text-decoration-none ms-2">×</a>
             </span>
           {% endif %}
+          <a href="{% url 'blog:list' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-times me-1"></i>{% trans "پاک کردن همه" %}
+          </a>
         </div>
       </div>
     </div>
   {% endif %}
 
-  <!-- Posts Grid -->
-  <div class="row g-4">
-    {% for post in posts %}
-      <div class="col-lg-4 col-md-6">
-        <div class="card h-100 border-0 shadow-sm hover-lift">
-          {% if post.cover %}
-            <div class="position-relative">
-              <img src="{{ post.cover.url }}" class="card-img-top" alt="{{ post.title }}" 
-                   style="height: 200px; object-fit: cover;" loading="lazy">
-              {% if post.is_featured %}
-                <span class="position-absolute top-0 start-0 badge bg-warning m-2">
-                  <i class="fas fa-star me-1"></i>{% trans "ویژه" %}
-                </span>
+  <!-- Blog Posts Grid -->
+  {% if posts %}
+    <div class="row g-4">
+      {% for post in posts %}
+        <div class="col-lg-4 col-md-6">
+          <div class="post-card card border-0 shadow-sm hover-lift h-100">
+            <div class="post-cover position-relative">
+              {% if post.cover %}
+                <img src="{{ post.cover.url }}" class="card-img-top" alt="{{ post.title }}" loading="lazy">
+              {% else %}
+                <div class="default-cover d-flex align-items-center justify-content-center">
+                  <i class="fas fa-newspaper fa-3x text-muted"></i>
+                </div>
               {% endif %}
-            </div>
-          {% endif %}
-          <div class="card-body d-flex flex-column">
-            <div class="mb-3">
-              {% if post.category %}
-                <span class="badge bg-primary mb-2">{{ post.category.name }}</span>
-              {% endif %}
-              <h5 class="card-title h6 mb-2">{{ post.title }}</h5>
-              <p class="card-text text-muted small mb-2">
-                {{ post.excerpt|default:post.content|truncatewords:20 }}
-              </p>
-            </div>
-            <div class="mt-auto">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <small class="text-muted">
-                  <i class="fas fa-calendar me-1"></i>
-                  {{ post.published_at|date:"Y/m/d" }}
-                </small>
-                <small class="text-muted">
-                  <i class="fas fa-eye me-1"></i>
-                  {{ post.views_count|default:0 }}
-                </small>
+              <div class="post-overlay">
+                <div class="post-badges">
+                  {% if post.is_featured %}
+                    <span class="badge bg-warning">{% trans "ویژه" %}</span>
+                  {% endif %}
+                  {% if post.category %}
+                    <span class="badge" style="background-color: {{ post.category.color }}">{{ post.category.name }}</span>
+                  {% endif %}
+                  {% if post.youtube_video_id %}
+                    <span class="badge bg-danger">
+                      <i class="fab fa-youtube me-1"></i>{% trans "ویدیو" %}
+                    </span>
+                  {% endif %}
+                </div>
+                <a href="{{ post.get_absolute_url }}" class="btn btn-light btn-sm">
+                  <i class="fas fa-eye me-1"></i>{% trans "مطالعه" %}
+                </a>
               </div>
-              <a href="{{ post.get_absolute_url }}" class="btn btn-outline-primary btn-sm w-100">
-                <i class="fas fa-book-open me-2"></i>{% trans "مطالعه" %}
-              </a>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title h6 mb-2 text-truncate" title="{{ post.title }}">{{ post.title }}</h5>
+              <p class="card-text text-muted small mb-3">
+                {{ post.get_excerpt_display|truncatewords:20 }}
+              </p>
+              <div class="post-meta d-flex align-items-center gap-3 text-muted small mb-3">
+                {% if post.published_at %}
+                  <span>
+                    <i class="fas fa-calendar me-1"></i>{{ post.published_at|date:"Y/m/d" }}
+                  </span>
+                {% endif %}
+                {% if post.views_count %}
+                  <span>
+                    <i class="fas fa-eye me-1"></i>{{ post.views_count }} {% trans "بازدید" %}
+                  </span>
+                {% endif %}
+                {% if post.youtube_video_id %}
+                  <span>
+                    <i class="fab fa-youtube me-1"></i>{% trans "ویدیو یوتیوب" %}
+                  </span>
+                {% endif %}
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ post.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                  {% trans "مطالعه" %}
+                </a>
+                <small class="text-muted">{{ post.published_at|date:"Y/m/d" }}</small>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    {% empty %}
-      <div class="col-12">
-        <div class="text-center py-5">
-          <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
-          <h4 class="text-muted">{% trans "مقاله‌ای یافت نشد" %}</h4>
-          <p class="text-muted">{% trans "با تغییر فیلترها یا جستجوی خود، مقاله‌های جدیدی پیدا کنید." %}</p>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
+      {% endfor %}
+    </div>
 
-  <!-- Pagination -->
-  {% if is_paginated %}
-    <div class="row mt-5">
-      <div class="col-12">
-        <nav aria-label="{% trans 'صفحه‌بندی مقالات' %}">
-          <ul class="pagination justify-content-center">
-            {% if page_obj.has_previous %}
-              <li class="page-item">
-                <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
-                  <i class="fas fa-angle-double-right"></i>
-                </a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
-                  <i class="fas fa-angle-right"></i>
-                </a>
-              </li>
-            {% endif %}
-
-            {% for num in page_obj.paginator.page_range %}
-              {% if page_obj.number == num %}
-                <li class="page-item active">
-                  <span class="page-link">{{ num }}</span>
-                </li>
-              {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+    <!-- Pagination -->
+    {% if is_paginated %}
+      <div class="row mt-5">
+        <div class="col-12">
+          <nav aria-label="{% trans 'صفحه‌بندی مقالات' %}">
+            <ul class="pagination justify-content-center">
+              {% if page_obj.has_previous %}
                 <li class="page-item">
-                  <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
-                    {{ num }}
+                  <a class="page-link" href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_featured %}&featured={{ selected_featured }}{% endif %}">
+                    <i class="fas fa-angle-double-right"></i>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_featured %}&featured={{ selected_featured }}{% endif %}">
+                    <i class="fas fa-angle-right"></i>
                   </a>
                 </li>
               {% endif %}
-            {% endfor %}
 
-            {% if page_obj.has_next %}
-              <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
-                  <i class="fas fa-angle-left"></i>
-                </a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
-                  <i class="fas fa-angle-double-left"></i>
-                </a>
-              </li>
-            {% endif %}
-          </ul>
-        </nav>
+              {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                  </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_featured %}&featured={{ selected_featured }}{% endif %}">
+                      {{ num }}
+                    </a>
+                  </li>
+                {% endif %}
+  {% endfor %}
+
+              {% if page_obj.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_featured %}&featured={{ selected_featured }}{% endif %}">
+                    <i class="fas fa-angle-left"></i>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_featured %}&featured={{ selected_featured }}{% endif %}">
+                    <i class="fas fa-angle-double-left"></i>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+      </div>
+    {% endif %}
+
+  {% else %}
+    <!-- No Results -->
+    <div class="row">
+      <div class="col-12">
+        <div class="empty-state text-center py-5">
+          <i class="fas fa-newspaper fa-4x text-muted mb-3"></i>
+          <h3 class="text-muted mb-3">{% trans "مقاله‌ای یافت نشد" %}</h3>
+          <p class="text-muted mb-4">
+            {% trans "متأسفانه هیچ مقاله‌ای برای فیلترهای شما پیدا نشد. لطفاً:" %}
+          </p>
+          <div class="row justify-content-center">
+            <div class="col-md-8">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <ul class="list-unstyled text-start">
+                    <li class="mb-2">
+                      <i class="fas fa-check text-success me-2"></i>
+                      {% trans "کلمات کلیدی خود را بررسی کنید" %}
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check text-success me-2"></i>
+                      {% trans "فیلترهای جستجو را تغییر دهید" %}
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check text-success me-2"></i>
+                      {% trans "از دسته‌بندی‌های مختلف استفاده کنید" %}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4">
+            <a href="{% url 'blog:list' %}" class="btn btn-primary btn-lg">
+              <i class="fas fa-newspaper me-2"></i>{% trans "مشاهده همه مقالات" %}
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   {% endif %}

@@ -31,8 +31,10 @@ class VideoListView(ListView):
         
         # Filter by free/paid
         is_free = self.request.GET.get('is_free')
-        if is_free is not None:
-            queryset = queryset.filter(is_free=is_free == 'true')
+        if is_free == 'true':
+            queryset = queryset.filter(is_free=True)
+        elif is_free == 'false':
+            queryset = queryset.filter(is_free=False)
         
         # Search
         search = self.request.GET.get('search')

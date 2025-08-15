@@ -33,10 +33,6 @@ class VideoAdmin(TranslatableAdmin):
         (_("ترجمه"), {
             "fields": ("title", "slug", "description")
         }),
-        (_("تنظیمات"), {
-            "fields": ("tags",),
-            "classes": ("collapse",)
-        }),
     )
     
     inlines = [VideoImageInline, YouTubeLinkInline]

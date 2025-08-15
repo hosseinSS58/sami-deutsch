@@ -13,64 +13,277 @@
         </ol>
     </nav>
 
-    <!-- Video Header -->
-    <div class="row mb-5">
-        <div class="col-lg-8">
-            <h1 class="display-4 fw-bold text-primary mb-3">{{ video.title }}</h1>
-            <div class="d-flex flex-wrap gap-2 mb-3">
-                <span class="badge bg-info fs-6">{{ video.level }}</span>
-                <span class="badge bg-success fs-6">
-                    {% if video.topic == "grammar" %}{% trans "گرامر" %}
-                    {% elif video.topic == "speaking" %}{% trans "مکالمه" %}
-                    {% elif video.topic == "vocab" %}{% trans "واژگان" %}
-                    {% elif video.topic == "listening" %}{% trans "شنیداری" %}
-                    {% elif video.topic == "reading" %}{% trans "خواندن" %}
-                    {% elif video.topic == "writing" %}{% trans "نوشتن" %}
-                    {% elif video.topic == "culture" %}{% trans "فرهنگ" %}
-                    {% elif video.topic == "pronunciation" %}{% trans "تلفظ" %}
-                    {% else %}{{ video.topic }}{% endif %}
-                </span>
-                <span class="badge bg-{% if video.difficulty == 'beginner' %}success{% elif video.difficulty == 'intermediate' %}warning{% else %}danger{% endif %} fs-6">
-                    {% if video.difficulty == "beginner" %}{% trans "مبتدی" %}
-                    {% elif video.difficulty == "intermediate" %}{% trans "متوسط" %}
-                    {% elif video.difficulty == "advanced" %}{% trans "پیشرفته" %}
-                    {% else %}{{ video.difficulty }}{% endif %}
-                </span>
-                {% if video.is_featured %}
-                <span class="badge bg-warning text-dark fs-6">
-                    <i class="fas fa-star me-1"></i>{% trans "ویژه" %}
-                </span>
-                {% endif %}
-                {% if not video.is_free %}
-                <span class="badge bg-secondary fs-6">
-                    <i class="fas fa-lock me-1"></i>{% trans "پولی" %}
-                </span>
-                {% endif %}
-            </div>
-            <p class="lead text-muted">{{ video.description }}</p>
-        </div>
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <div class="mb-3">
-                        <i class="fas fa-clock text-primary" style="font-size: 2rem;"></i>
+    <!-- Video Cover Section -->
+    {% if video.cover %}
+        <!-- Cover Image with Content Side by Side -->
+        <div class="row mb-3">
+            <div class="col-lg-4">
+                <div class="position-relative rounded overflow-hidden shadow-lg video-detail-cover">
+                    <div class="ratio ratio-16x9">
+                        <img src="{{ video.cover.url }}" class="w-100 h-100" alt="{{ video.title }}" 
+                             style="object-fit: cover;">
                     </div>
-                    <h5 class="card-title">{% trans "مدت زمان" %}</h5>
-                    <p class="card-text fs-4 fw-bold text-primary">{{ video.total_duration_formatted }}</p>
+                    <div class="position-absolute top-0 start-0 m-2">
+                        {% if video.is_featured %}
+                        <span class="badge bg-warning text-dark fs-6 shadow-sm">
+                            <i class="fas fa-star me-1"></i>{% trans "ویژه" %}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div class="position-absolute top-0 end-0 m-2">
+                        {% if not video.is_free %}
+                        <span class="badge bg-secondary fs-6 shadow-sm">
+                            <i class="fas fa-lock me-1"></i>{% trans "پولی" %}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div class="position-absolute bottom-0 start-0 m-2">
+                        <span class="badge bg-primary fs-6 shadow-sm">{{ video.level }}</span>
+                    </div>
+                    <div class="position-absolute bottom-0 end-0 m-2">
+                        <span class="badge bg-dark bg-opacity-75 fs-6 shadow-sm">
+                            <i class="fas fa-clock me-1"></i>{{ video.total_duration_formatted }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="h-100 d-flex flex-column justify-content-center">
+                    <h2 class="h3 fw-bold text-primary mb-3">{{ video.title }}</h2>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="badge bg-info fs-6">{{ video.level }}</span>
+                        <span class="badge bg-success fs-6">
+                            {% if video.topic == "grammar" %}{% trans "گرامر" %}
+                            {% elif video.topic == "speaking" %}{% trans "مکالمه" %}
+                            {% elif video.topic == "vocab" %}{% trans "واژگان" %}
+                            {% elif video.topic == "listening" %}{% trans "شنیداری" %}
+                            {% elif video.topic == "reading" %}{% trans "خواندن" %}
+                            {% elif video.topic == "writing" %}{% trans "نوشتن" %}
+                            {% elif video.topic == "culture" %}{% trans "فرهنگ" %}
+                            {% elif video.topic == "pronunciation" %}{% trans "تلفظ" %}
+                            {% else %}{{ video.topic }}{% endif %}
+                        </span>
+                        <span class="badge bg-{% if video.difficulty == 'beginner' %}success{% elif video.difficulty == 'intermediate' %}warning{% else %}danger{% endif %} fs-6">
+                            {% if video.difficulty == "beginner" %}{% trans "مبتدی" %}
+                            {% elif video.difficulty == "intermediate" %}{% trans "متوسط" %}
+                            {% elif video.difficulty == "advanced" %}{% trans "پیشرفته" %}
+                            {% else %}{{ video.difficulty }}{% endif %}
+                        </span>
+                        {% if video.is_featured %}
+                        <span class="badge bg-warning text-dark fs-6">
+                            <i class="fas fa-star me-1"></i>{% trans "ویژه" %}
+                        </span>
+                        {% endif %}
+                        {% if not video.is_free %}
+                        <span class="badge bg-secondary fs-6">
+                            <i class="fas fa-lock me-1"></i>{% trans "پولی" %}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <p class="text-muted mb-3">{{ video.description|truncatewords:25 }}</p>
+                    
+                    <!-- Tags -->
+                    {% if video.tags.all %}
+                    <div class="mb-3">
+                        <h6 class="mb-2 fw-bold">{% trans "تگ‌ها:" %}</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for tag in video.tags.all %}
+                            <span class="badge rounded-pill" style="background-color: {{ tag.color }}; color: white;">
+                                <i class="fas fa-tag me-1"></i>{{ tag.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
-    </div>
+    {% elif video.tags.all %}
+        <!-- Tag-based Cover with Content Side by Side -->
+        {% with first_tag=video.tags.all|first %}
+        <div class="row mb-3">
+            <div class="col-lg-4">
+                <div class="position-relative rounded overflow-hidden shadow-lg tag-cover">
+                    <div class="ratio ratio-16x9" style="background: linear-gradient(135deg, {{ first_tag.color }} 0%, {{ first_tag.color }}80 100%);">
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <div class="text-center text-white cover-text">
+                                <div class="mb-3">
+                                    <i class="fas fa-video fa-3x mb-2"></i>
+                                    <h3 class="fw-bold mb-2">{{ video.title|truncatechars:50 }}</h3>
+                                    <p class="mb-2">{{ video.description|truncatewords:10 }}</p>
+                                </div>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <span class="badge bg-white text-dark fs-6 px-2 py-1 cover-badge">
+                                        <i class="fas fa-tag me-1"></i>{{ first_tag.name }}
+                                    </span>
+                                    <span class="badge bg-light text-dark fs-6 px-2 py-1 cover-badge">
+                                        <i class="fas fa-clock me-1"></i>{{ video.total_duration_formatted }}
+                                    </span>
+                                    <span class="badge bg-light text-dark fs-6 px-2 py-1 cover-badge">
+                                        <i class="fas fa-signal me-1"></i>{{ video.level }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Overlay Badges -->
+                    <div class="position-absolute top-0 start-0 m-2">
+                        {% if video.is_featured %}
+                        <span class="badge bg-warning text-dark fs-6 shadow-sm cover-badge">
+                            <i class="fas fa-star me-1"></i>{% trans "ویژه" %}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div class="position-absolute top-0 end-0 m-2">
+                        {% if not video.is_free %}
+                        <span class="badge bg-secondary fs-6 shadow-sm cover-badge">
+                            <i class="fas fa-lock me-1"></i>{% trans "پولی" %}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="h-100 d-flex flex-column justify-content-center">
+                    <h2 class="h3 fw-bold text-primary mb-3">{{ video.title }}</h2>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="badge bg-info fs-6">{{ video.level }}</span>
+                        <span class="badge bg-success fs-6">
+                            {% if video.topic == "grammar" %}{% trans "گرامر" %}
+                            {% elif video.topic == "speaking" %}{% trans "مکالمه" %}
+                            {% elif video.topic == "vocab" %}{% trans "واژگان" %}
+                            {% elif video.topic == "listening" %}{% trans "شنیداری" %}
+                            {% elif video.topic == "reading" %}{% trans "خواندن" %}
+                            {% elif video.topic == "writing" %}{% trans "نوشتن" %}
+                            {% elif video.topic == "culture" %}{% trans "فرهنگ" %}
+                            {% elif video.topic == "pronunciation" %}{% trans "تلفظ" %}
+                            {% else %}{{ video.topic }}{% endif %}
+                        </span>
+                        <span class="badge bg-{% if video.difficulty == 'beginner' %}success{% elif video.difficulty == 'intermediate' %}warning{% else %}danger{% endif %} fs-6">
+                            {% if video.difficulty == "beginner" %}{% trans "مبتدی" %}
+                            {% elif video.difficulty == "intermediate" %}{% trans "متوسط" %}
+                            {% elif video.difficulty == "advanced" %}{% trans "پیشرفته" %}
+                            {% else %}{{ video.difficulty }}{% endif %}
+                        </span>
+                        {% if video.is_featured %}
+                        <span class="badge bg-warning text-dark fs-6">
+                            <i class="fas fa-star me-1"></i>{% trans "ویژه" %}
+                        </span>
+                        {% endif %}
+                        {% if not video.is_free %}
+                        <span class="badge bg-secondary fs-6">
+                            <i class="fas fa-lock me-1"></i>{% trans "پولی" %}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <p class="text-muted mb-3">{{ video.description|truncatewords:25 }}</p>
+                    
+                    <!-- Tags -->
+                    <div class="mb-3">
+                        <h6 class="mb-2 fw-bold">{% trans "تگ‌ها:" %}</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for tag in video.tags.all %}
+                            <span class="badge rounded-pill" style="background-color: {{ tag.color }}; color: white;">
+                                <i class="fas fa-tag me-1"></i>{{ tag.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endwith %}
+    {% else %}
+        <!-- Default Cover with Content Side by Side -->
+        <div class="row mb-3">
+            <div class="col-lg-4">
+                <div class="position-relative rounded overflow-hidden shadow-lg">
+                    <div class="ratio ratio-16x9" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <div class="text-center text-white cover-text">
+                                <div class="mb-3">
+                                    <i class="fas fa-video fa-3x mb-2"></i>
+                                    <h3 class="fw-bold mb-2">{{ video.title|truncatechars:50 }}</h3>
+                                    <p class="mb-2">{{ video.description|truncatewords:10 }}</p>
+                                </div>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <span class="badge bg-light text-dark fs-6 px-2 py-1 cover-badge">
+                                        <i class="fas fa-clock me-1"></i>{{ video.total_duration_formatted }}
+                                    </span>
+                                    <span class="badge bg-light text-dark fs-6 px-2 py-1 cover-badge">
+                                        <i class="fas fa-signal me-1"></i>{{ video.level }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Overlay Badges -->
+                    <div class="position-absolute top-0 start-0 m-2">
+                        {% if video.is_featured %}
+                        <span class="badge bg-warning text-dark fs-6 shadow-sm cover-badge">
+                            <i class="fas fa-star me-1"></i>{% trans "ویژه" %}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div class="position-absolute top-0 end-0 m-2">
+                        {% if not video.is_free %}
+                        <span class="badge bg-secondary fs-6 shadow-sm cover-badge">
+                            <i class="fas fa-lock me-1"></i>{% trans "پولی" %}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="h-100 d-flex flex-column justify-content-center">
+                    <h2 class="h3 fw-bold text-primary mb-3">{{ video.title }}</h2>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="badge bg-info fs-6">{{ video.level }}</span>
+                        <span class="badge bg-success fs-6">
+                            {% if video.topic == "grammar" %}{% trans "گرامر" %}
+                            {% elif video.topic == "speaking" %}{% trans "مکالمه" %}
+                            {% elif video.topic == "vocab" %}{% trans "واژگان" %}
+                            {% elif video.topic == "listening" %}{% trans "شنیداری" %}
+                            {% elif video.topic == "reading" %}{% trans "خواندن" %}
+                            {% elif video.topic == "writing" %}{% trans "نوشتن" %}
+                            {% elif video.topic == "culture" %}{% trans "فرهنگ" %}
+                            {% elif video.topic == "pronunciation" %}{% trans "تلفظ" %}
+                            {% else %}{{ video.topic }}{% endif %}
+                        </span>
+                        <span class="badge bg-{% if video.difficulty == 'beginner' %}success{% elif video.difficulty == 'intermediate' %}warning{% else %}danger{% endif %} fs-6">
+                            {% if video.difficulty == "beginner" %}{% trans "مبتدی" %}
+                            {% elif video.difficulty == "intermediate" %}{% trans "متوسط" %}
+                            {% elif video.difficulty == "advanced" %}{% trans "پیشرفته" %}
+                            {% else %}{{ video.difficulty }}{% endif %}
+                        </span>
+                        {% if video.is_featured %}
+                        <span class="badge bg-warning text-dark fs-6">
+                            <i class="fas fa-star me-1"></i>{% trans "ویژه" %}
+                        </span>
+                        {% endif %}
+                        {% if not video.is_free %}
+                        <span class="badge bg-secondary fs-6">
+                            <i class="fas fa-lock me-1"></i>{% trans "پولی" %}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <p class="text-muted mb-3">{{ video.description|truncatewords:25 }}</p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 
     <!-- Main Content Tabs -->
     <div class="row">
         <div class="col-12">
             <ul class="nav nav-tabs" id="videoTabs" role="tablist">
+                {% if video.youtube_links.all %}
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
-                        <i class="fas fa-info-circle me-2"></i>{% trans "نمای کلی" %}
+                    <button class="nav-link active" id="youtube-tab" data-bs-toggle="tab" data-bs-target="#youtube" type="button" role="tab">
+                        <i class="fab fa-youtube me-2"></i>{% trans "ویدیوهای یوتیوب" %} ({{ video.youtube_links.count }})
                     </button>
                 </li>
+                {% endif %}
                 {% if video.images.all %}
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="images-tab" data-bs-toggle="tab" data-bs-target="#images" type="button" role="tab">
@@ -78,90 +291,79 @@
                     </button>
                 </li>
                 {% endif %}
-
-                {% if video.youtube_links.all %}
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="youtube-tab" data-bs-toggle="tab" data-bs-target="#youtube" type="button" role="tab">
-                        <i class="fab fa-youtube me-2"></i>{% trans "یوتیوب" %} ({{ video.youtube_links.count }})
-                    </button>
-                </li>
-                {% endif %}
             </ul>
 
             <div class="tab-content" id="videoTabsContent">
-                <!-- Overview Tab -->
-                <div class="tab-pane fade show active" id="overview" role="tabpanel">
-                    <div class="card border-0 shadow-sm mt-4">
+                <!-- YouTube Tab -->
+                {% if video.youtube_links.all %}
+                <div class="tab-pane fade show active" id="youtube" role="tabpanel">
+                    <div class="card border-0 shadow-sm mt-3">
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <h4 class="mb-3">{% trans "توضیحات کامل" %}</h4>
-                                    <p class="text-muted">{{ video.description }}</p>
-                                    
-                                    <!-- Tags -->
-                                    {% if video.tags.all %}
-                                    <div class="mt-4">
-                                        <h6 class="mb-2">{% trans "تگ‌ها:" %}</h6>
-                                        <div class="d-flex flex-wrap gap-2">
-                                            {% for tag in video.tags.all %}
-                                            <span class="badge rounded-pill" style="background-color: {{ tag.color }}; color: white;">
-                                                {{ tag.name }}
-                                            </span>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card bg-light border-0">
+                            <h4 class="mb-3">{% trans "ویدیوهای یوتیوب مرتبط" %}</h4>
+                            <div class="row g-3">
+                                {% for youtube_link in video.youtube_links.all %}
+                                {% if youtube_link.is_active %}
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="card border-0 shadow-sm h-100 hover-lift">
                                         <div class="card-body">
-                                            <h6 class="card-title">{% trans "اطلاعات تکمیلی" %}</h6>
-                                            <ul class="list-unstyled">
-                                                <li class="mb-2">
-                                                    <i class="fas fa-calendar text-primary me-2"></i>
-                                                    <strong>{% trans "تاریخ ایجاد:" %}</strong><br>
-                                                    <small class="text-muted">{{ video.created_at|date:"Y/m/d" }}</small>
-                                                </li>
-                                                <li class="mb-2">
-                                                    <i class="fas fa-edit text-primary me-2"></i>
-                                                    <strong>{% trans "آخرین به‌روزرسانی:" %}</strong><br>
-                                                    <small class="text-muted">{{ video.updated_at|date:"Y/m/d" }}</small>
-                                                </li>
-                                                <li class="mb-2">
-                                                    <i class="fas fa-tag text-primary me-2"></i>
-                                                    <strong>{% trans "موضوع:" %}</strong><br>
-                                                    <small class="text-muted">
-                                                        {% if video.topic == "grammar" %}{% trans "گرامر" %}
-                                                        {% elif video.topic == "speaking" %}{% trans "مکالمه" %}
-                                                        {% elif video.topic == "vocab" %}{% trans "واژگان" %}
-                                                        {% elif video.topic == "listening" %}{% trans "شنیداری" %}
-                                                        {% elif video.topic == "reading" %}{% trans "خواندن" %}
-                                                        {% elif video.topic == "writing" %}{% trans "نوشتن" %}
-                                                        {% elif video.topic == "culture" %}{% trans "فرهنگ" %}
-                                                        {% elif video.topic == "pronunciation" %}{% trans "تلفظ" %}
-                                                        {% else %}{{ video.topic }}{% endif %}
-                                                    </small>
-                                                </li>
-                                            </ul>
+                                            <div class="mb-2">
+                                                <h6 class="card-title mb-1">{{ youtube_link.title }}</h6>
+                                                {% if youtube_link.description %}
+                                                <small class="text-muted">{{ youtube_link.description|truncatewords:15 }}</small>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- YouTube Embed -->
+                                            {% if youtube_link.youtube_embed_url %}
+                                            <div class="ratio ratio-16x9 mb-2">
+                                                <iframe src="{{ youtube_link.youtube_embed_url }}" 
+                                                        title="{{ youtube_link.title }}"
+                                                        frameborder="0" 
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                                        allowfullscreen
+                                                        class="rounded"></iframe>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            <!-- Duration if available -->
+                                            {% if youtube_link.duration_minutes and youtube_link.duration_minutes > 0 %}
+                                            <div class="text-center mb-2">
+                                                <span class="badge bg-info">
+                                                    <i class="fas fa-clock me-1"></i>{{ youtube_link.duration_minutes }} {% trans "دقیقه" %}
+                                                </span>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <a href="{{ youtube_link.url }}" target="_blank" class="btn btn-outline-danger btn-sm">
+                                                    <i class="fab fa-youtube me-1"></i>{% trans "مشاهده در یوتیوب" %}
+                                                </a>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-external-link-alt me-1"></i>{% trans "لینک خارجی" %}
+                                                </small>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                {% endif %}
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
                 </div>
+                {% endif %}
 
                 <!-- Images Tab -->
                 {% if video.images.all %}
                 <div class="tab-pane fade" id="images" role="tabpanel">
-                    <div class="card border-0 shadow-sm mt-4">
+                    <div class="card border-0 shadow-sm mt-3">
                         <div class="card-body">
-                            <h4 class="mb-4">{% trans "تصاویر مرتبط" %}</h4>
-                            <div class="row g-4">
+                            <h4 class="mb-3">{% trans "تصاویر مرتبط" %}</h4>
+                            <div class="row g-3">
                                 {% for image in video.images.all %}
                                 {% if image.is_active %}
                                 <div class="col-lg-4 col-md-6">
-                                    <div class="card border-0 shadow-sm h-100">
+                                    <div class="card border-0 shadow-sm h-100 hover-lift">
                                         <img src="{{ image.image.url }}" class="card-img-top" alt="{{ image.caption|default:image.video.title }}" 
                                              style="height: 200px; object-fit: cover; cursor: pointer;" 
                                              onclick="openImageModal('{{ image.image.url }}', '{{ image.caption|default:image.video.title }}')">
@@ -179,54 +381,90 @@
                     </div>
                 </div>
                 {% endif %}
+            </div>
+        </div>
+    </div>
 
-
-
-                <!-- YouTube Tab -->
-                {% if video.youtube_links.all %}
-                <div class="tab-pane fade" id="youtube" role="tabpanel">
-                    <div class="card border-0 shadow-sm mt-4">
-                        <div class="card-body">
-                            <h4 class="mb-4">{% trans "ویدیوهای یوتیوب" %}</h4>
-                            <div class="row g-4">
-                                {% for youtube_link in video.youtube_links.all %}
-                                {% if youtube_link.is_active %}
-                                <div class="col-lg-6">
-                                    <div class="card border-0 shadow-sm h-100">
-                                        <div class="card-body">
-                                            <h6 class="card-title">{{ youtube_link.title }}</h6>
-                                            {% if youtube_link.description %}
-                                            <p class="card-text text-muted">{{ youtube_link.description }}</p>
-                                            {% endif %}
-                                            {% if youtube_link.duration_minutes > 0 %}
-                                            <div class="text-center mb-3">
-                                                <span class="badge bg-info">
-                                                    <i class="fas fa-clock me-1"></i>{{ youtube_link.duration_minutes }} دقیقه
-                                                </span>
-                                            </div>
-                                            {% endif %}
-                                            <div class="ratio ratio-16x9 mb-3">
-                                                <iframe src="{{ youtube_link.youtube_embed_url }}" 
-                                                        title="{{ youtube_link.title }}"
-                                                        frameborder="0" 
-                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                                        allowfullscreen></iframe>
-                                            </div>
-                                            <div class="text-center">
-                                                <a href="{{ youtube_link.youtube_url }}" class="btn btn-outline-danger" target="_blank">
-                                                    <i class="fab fa-youtube me-2"></i>{% trans "مشاهده در یوتیوب" %}
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
+    <!-- Video Information Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h4 class="mb-3">{% trans "اطلاعات تکمیلی" %}</h4>
+                            
+                            <!-- Tags -->
+                            {% if video.tags.all %}
+                            <div class="mb-3">
+                                <h6 class="mb-2">{% trans "تگ‌ها:" %}</h6>
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% for tag in video.tags.all %}
+                                    <span class="badge rounded-pill cover-badge" style="background-color: {{ tag.color }}; color: white;">
+                                        <i class="fas fa-tag me-1"></i>{{ tag.name }}
+                                    </span>
+                                    {% endfor %}
                                 </div>
-                                {% endif %}
-                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Description -->
+                            <div class="mb-3">
+                                <h6 class="mb-2">{% trans "توضیحات:" %}</h6>
+                                <p class="text-muted">{{ video.description }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light border-0">
+                                <div class="card-body">
+                                    <h6 class="card-title">{% trans "جزئیات فنی" %}</h6>
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <i class="fas fa-calendar text-primary me-2"></i>
+                                            <strong>{% trans "تاریخ ایجاد:" %}</strong><br>
+                                            <small class="text-muted">{{ video.created_at|date:"Y/m/d" }}</small>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-edit text-primary me-2"></i>
+                                            <strong>{% trans "آخرین به‌روزرسانی:" %}</strong><br>
+                                            <small class="text-muted">{{ video.updated_at|date:"Y/m/d" }}</small>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-tag text-primary me-2"></i>
+                                            <strong>{% trans "موضوع:" %}</strong><br>
+                                            <small class="text-muted">
+                                                {% if video.topic == "grammar" %}{% trans "گرامر" %}
+                                                {% elif video.topic == "speaking" %}{% trans "مکالمه" %}
+                                                {% elif video.topic == "vocab" %}{% trans "واژگان" %}
+                                                {% elif video.topic == "listening" %}{% trans "شنیداری" %}
+                                                {% elif video.topic == "reading" %}{% trans "خواندن" %}
+                                                {% elif video.topic == "writing" %}{% trans "نوشتن" %}
+                                                {% elif video.topic == "culture" %}{% trans "فرهنگ" %}
+                                                {% elif video.topic == "pronunciation" %}{% trans "تلفظ" %}
+                                                {% else %}{{ video.topic }}{% endif %}
+                                            </small>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-signal text-primary me-2"></i>
+                                            <strong>{% trans "سطح:" %}</strong><br>
+                                            <small class="text-muted">{{ video.level }}</small>
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-tachometer-alt text-primary me-2"></i>
+                                            <strong>{% trans "سطح دشواری:" %}</strong><br>
+                                            <small class="text-muted">
+                                                {% if video.difficulty == "beginner" %}{% trans "مبتدی" %}
+                                                {% elif video.difficulty == "intermediate" %}{% trans "متوسط" %}
+                                                {% elif video.difficulty == "advanced" %}{% trans "پیشرفته" %}
+                                                {% else %}{{ video.difficulty }}{% endif %}
+                                            </small>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                {% endif %}
             </div>
         </div>
     </div>

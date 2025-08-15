@@ -1,12 +1,312 @@
 {% extends "base.html" %}
 {% load i18n %}
+
 {% block title %}{{ post.title }}{% endblock %}
+
 {% block content %}
-<article class="prose">
-  <h1 class="h3 mb-3">{{ post.title }}</h1>
-  {% if post.cover %}<img src="{{ post.cover.url }}" class="img-fluid rounded-3 mb-3" loading="lazy">{% endif %}
-  <div>{{ post.content|linebreaks }}</div>
-</article>
+<div class="container-fluid py-4">
+  <!-- Post Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="post-header text-center">
+        <h1 class="display-5 fw-bold mb-3">{{ post.title }}</h1>
+        <div class="post-meta d-flex justify-content-center align-items-center gap-4 text-muted mb-3">
+          {% if post.published_at %}
+            <span>
+              <i class="fas fa-calendar me-2"></i>{{ post.published_at|date:"Y/m/d" }}
+            </span>
+          {% endif %}
+          {% if post.views_count %}
+            <span>
+              <i class="fas fa-eye me-2"></i>{{ post.views_count }} {% trans "بازدید" %}
+            </span>
+          {% endif %}
+          {% if post.category %}
+            <span>
+              <i class="fas fa-tag me-2"></i>{{ post.category.name }}
+            </span>
+          {% endif %}
+        </div>
+        <div class="post-badges d-flex justify-content-center gap-2 mb-3">
+          {% if post.is_featured %}
+            <span class="badge bg-warning fs-6">
+              <i class="fas fa-star me-1"></i>{% trans "ویژه" %}
+            </span>
+          {% endif %}
+          {% if post.youtube_video_id %}
+            <span class="badge bg-danger fs-6">
+              <i class="fab fa-youtube me-1"></i>{% trans "ویدیو یوتیوب" %}
+            </span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post Content and Sidebar -->
+  <div class="row g-4">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+      <!-- Cover Image -->
+      {% if post.cover %}
+        <div class="post-cover mb-4">
+          <img src="{{ post.cover.url }}" class="img-fluid rounded-3 shadow-sm w-100" alt="{{ post.title }}" loading="lazy">
+        </div>
+      {% endif %}
+
+      <!-- YouTube Video Section -->
+      {% if post.youtube_video_id %}
+        <div class="youtube-section mb-4">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light">
+              <h3 class="h5 mb-0">
+                <i class="fab fa-youtube text-danger me-2"></i>{% trans "ویدیو مرتبط" %}
+              </h3>
+            </div>
+            <div class="card-body p-0">
+              <div class="ratio ratio-16x9">
+                <iframe src="{{ post.youtube_embed_url }}" 
+                        title="{{ post.title }}"
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+              </div>
+            </div>
+            <div class="card-footer bg-light">
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">
+                  <i class="fas fa-external-link-alt me-1"></i>{% trans "ویدیو از یوتیوب" %}
+                </small>
+                <a href="{{ post.youtube_watch_url }}" target="_blank" class="btn btn-outline-danger btn-sm">
+                  <i class="fab fa-youtube me-1"></i>{% trans "مشاهده در یوتیوب" %}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Post Content -->
+      <div class="post-content mb-4">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <div class="content-text">
+              {{ post.content|linebreaks }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Post Footer -->
+      <div class="post-footer mb-4">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="post-tags">
+                {% if post.category %}
+                  <span class="badge" style="background-color: {{ post.category.color }}; color: white;">
+                    {{ post.category.name }}
+                  </span>
+                {% endif %}
+              </div>
+              <div class="post-share">
+                <button class="btn btn-outline-primary btn-sm" onclick="sharePost()">
+                  <i class="fas fa-share me-1"></i>{% trans "اشتراک‌گذاری" %}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- Author Info -->
+      <div class="sidebar-widget mb-4">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h4 class="h6 mb-0">
+              <i class="fas fa-user me-2"></i>{% trans "اطلاعات مقاله" %}
+            </h4>
+          </div>
+          <div class="card-body">
+            <div class="info-item d-flex align-items-center mb-3">
+              <i class="fas fa-calendar text-primary me-3"></i>
+              <div>
+                <small class="text-muted d-block">{% trans "تاریخ انتشار" %}</small>
+                <strong>{{ post.published_at|date:"Y/m/d" }}</strong>
+              </div>
+            </div>
+            {% if post.views_count %}
+              <div class="info-item d-flex align-items-center mb-3">
+                <i class="fas fa-eye text-success me-3"></i>
+                <div>
+                  <small class="text-muted d-block">{% trans "تعداد بازدید" %}</small>
+                  <strong>{{ post.views_count }}</strong>
+                </div>
+              </div>
+            {% endif %}
+            {% if post.category %}
+              <div class="info-item d-flex align-items-center mb-3">
+                <i class="fas fa-tag text-info me-3"></i>
+                <div>
+                  <small class="text-muted d-block">{% trans "دسته‌بندی" %}</small>
+                  <strong>{{ post.category.name }}</strong>
+                </div>
+              </div>
+            {% endif %}
+            {% if post.youtube_video_id %}
+              <div class="info-item d-flex align-items-center">
+                <i class="fab fa-youtube text-danger me-3"></i>
+                <div>
+                  <small class="text-muted d-block">{% trans "ویدیو یوتیوب" %}</small>
+                  <strong>{% trans "موجود" %}</strong>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Categories -->
+      {% if categories %}
+        <div class="sidebar-widget mb-4">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light">
+              <h4 class="h6 mb-0">
+                <i class="fas fa-tags me-2"></i>{% trans "دسته‌بندی‌ها" %}
+              </h4>
+            </div>
+            <div class="card-body">
+              <div class="d-flex flex-wrap gap-2">
+                {% for category in categories %}
+                  <a href="?category={{ category.slug }}" class="badge text-decoration-none" 
+                     style="background-color: {{ category.color }}; color: white;">
+                    {{ category.name }}
+                  </a>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Quick Actions -->
+      <div class="sidebar-widget mb-4">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-light">
+            <h4 class="h6 mb-0">
+              <i class="fas fa-bolt me-2"></i>{% trans "عملیات سریع" %}
+            </h4>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-2">
+              <a href="{% url 'blog:list' %}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-list me-2"></i>{% trans "همه مقالات" %}
+              </a>
+              <a href="/" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-home me-2"></i>{% trans "بازگشت به خانه" %}
+              </a>
+              {% if post.youtube_video_id %}
+                <a href="{{ post.youtube_watch_url }}" target="_blank" class="btn btn-outline-danger btn-sm">
+                  <i class="fab fa-youtube me-2"></i>{% trans "مشاهده در یوتیوب" %}
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related Posts -->
+  {% if related_posts %}
+    <div class="row mt-5">
+      <div class="col-12">
+        <div class="related-posts">
+          <h3 class="h4 mb-4">
+            <i class="fas fa-link me-2"></i>{% trans "مقالات مرتبط" %}
+          </h3>
+          <div class="row g-4">
+            {% for related_post in related_posts %}
+              <div class="col-lg-4 col-md-6">
+                <div class="related-post-card card border-0 shadow-sm hover-lift h-100">
+                  <div class="post-cover position-relative">
+                    {% if related_post.cover %}
+                      <img src="{{ related_post.cover.url }}" class="card-img-top" alt="{{ related_post.title }}" loading="lazy">
+                    {% else %}
+                      <div class="default-cover d-flex align-items-center justify-content-center">
+                        <i class="fas fa-newspaper fa-3x text-muted"></i>
+                      </div>
+                    {% endif %}
+                    <div class="post-overlay">
+                      <div class="post-badges">
+                        {% if related_post.is_featured %}
+                          <span class="badge bg-warning">{% trans "ویژه" %}</span>
+                        {% endif %}
+                        {% if related_post.category %}
+                          <span class="badge" style="background-color: {{ related_post.category.color }}">{{ related_post.category.name }}</span>
+                        {% endif %}
+                        {% if related_post.youtube_video_id %}
+                          <span class="badge bg-danger">
+                            <i class="fab fa-youtube me-1"></i>{% trans "ویدیو" %}
+                          </span>
+                        {% endif %}
+                      </div>
+                      <a href="{{ related_post.get_absolute_url }}" class="btn btn-light btn-sm">
+                        <i class="fas fa-eye me-1"></i>{% trans "مطالعه" %}
+                      </a>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="card-title mb-2 text-truncate" title="{{ related_post.title }}">{{ related_post.title }}</h6>
+                    <div class="post-meta d-flex align-items-center gap-3 text-muted small mb-3">
+                      {% if related_post.published_at %}
+                        <span>
+                          <i class="fas fa-calendar me-1"></i>{{ related_post.published_at|date:"Y/m/d" }}
+                        </span>
+                      {% endif %}
+                      {% if related_post.views_count %}
+                        <span>
+                          <i class="fas fa-eye me-1"></i>{{ related_post.views_count }} {% trans "بازدید" %}
+                        </span>
+                      {% endif %}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <a href="{{ related_post.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                        {% trans "مطالعه" %}
+                      </a>
+                      <small class="text-muted">{{ related_post.published_at|date:"Y/m/d" }}</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+function sharePost() {
+  if (navigator.share) {
+    navigator.share({
+      title: '{{ post.title }}',
+      text: '{{ post.get_excerpt_display|truncatewords:20 }}',
+      url: window.location.href
+    });
+  } else {
+    // Fallback: copy to clipboard
+    navigator.clipboard.writeText(window.location.href).then(function() {
+      alert('{% trans "لینک مقاله کپی شد!" %}');
+    });
+  }
+}
+</script>
 {% endblock %}
 
 
