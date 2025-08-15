@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{{ video.title }} - {% trans "ویدیوهای آموزشی آلمانی" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'videos:list' %}">{% trans "ویدیوها" %}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ video.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Video Header -->
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <h1 class="display-4 fw-bold text-primary mb-3">{{ video.title }}</h1>
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <span class="badge bg-info fs-6">{{ video.level }}</span>
+                <span class="badge bg-success fs-6">
+                    {% if video.topic == "grammar" %}{% trans "گرامر" %}
+                    {% elif video.topic == "speaking" %}{% trans "مکالمه" %}
+                    {% elif video.topic == "vocab" %}{% trans "واژگان" %}
+                    {% elif video.topic == "listening" %}{% trans "شنیداری" %}
+                    {% elif video.topic == "reading" %}{% trans "خواندن" %}
+                    {% elif video.topic == "writing" %}{% trans "نوشتن" %}
+                    {% elif video.topic == "culture" %}{% trans "فرهنگ" %}
+                    {% elif video.topic == "pronunciation" %}{% trans "تلفظ" %}
+                    {% else %}{{ video.topic }}{% endif %}
+                </span>
+                <span class="badge bg-{% if video.difficulty == 'beginner' %}success{% elif video.difficulty == 'intermediate' %}warning{% else %}danger{% endif %} fs-6">
+                    {% if video.difficulty == "beginner" %}{% trans "مبتدی" %}
+                    {% elif video.difficulty == "intermediate" %}{% trans "متوسط" %}
+                    {% elif video.difficulty == "advanced" %}{% trans "پیشرفته" %}
+                    {% else %}{{ video.difficulty }}{% endif %}
+                </span>
+                {% if video.is_featured %}
+                <span class="badge bg-warning text-dark fs-6">
+                    <i class="fas fa-star me-1"></i>{% trans "ویژه" %}
+                </span>
+                {% endif %}
+                {% if not video.is_free %}
+                <span class="badge bg-secondary fs-6">
+                    <i class="fas fa-lock me-1"></i>{% trans "پولی" %}
+                </span>
+                {% endif %}
+            </div>
+            <p class="lead text-muted">{{ video.description }}</p>
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-clock text-primary" style="font-size: 2rem;"></i>
+                    </div>
+                    <h5 class="card-title">{% trans "مدت زمان" %}</h5>
+                    <p class="card-text fs-4 fw-bold text-primary">{{ video.total_duration_formatted }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Tabs -->
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs" id="videoTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                        <i class="fas fa-info-circle me-2"></i>{% trans "نمای کلی" %}
+                    </button>
+                </li>
+                {% if video.images.all %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="images-tab" data-bs-toggle="tab" data-bs-target="#images" type="button" role="tab">
+                        <i class="fas fa-images me-2"></i>{% trans "تصاویر" %} ({{ video.images.count }})
+                    </button>
+                </li>
+                {% endif %}
+
+                {% if video.youtube_links.all %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="youtube-tab" data-bs-toggle="tab" data-bs-target="#youtube" type="button" role="tab">
+                        <i class="fab fa-youtube me-2"></i>{% trans "یوتیوب" %} ({{ video.youtube_links.count }})
+                    </button>
+                </li>
+                {% endif %}
+            </ul>
+
+            <div class="tab-content" id="videoTabsContent">
+                <!-- Overview Tab -->
+                <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                    <div class="card border-0 shadow-sm mt-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h4 class="mb-3">{% trans "توضیحات کامل" %}</h4>
+                                    <p class="text-muted">{{ video.description }}</p>
+                                    
+                                    <!-- Tags -->
+                                    {% if video.tags.all %}
+                                    <div class="mt-4">
+                                        <h6 class="mb-2">{% trans "تگ‌ها:" %}</h6>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            {% for tag in video.tags.all %}
+                                            <span class="badge rounded-pill" style="background-color: {{ tag.color }}; color: white;">
+                                                {{ tag.name }}
+                                            </span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card bg-light border-0">
+                                        <div class="card-body">
+                                            <h6 class="card-title">{% trans "اطلاعات تکمیلی" %}</h6>
+                                            <ul class="list-unstyled">
+                                                <li class="mb-2">
+                                                    <i class="fas fa-calendar text-primary me-2"></i>
+                                                    <strong>{% trans "تاریخ ایجاد:" %}</strong><br>
+                                                    <small class="text-muted">{{ video.created_at|date:"Y/m/d" }}</small>
+                                                </li>
+                                                <li class="mb-2">
+                                                    <i class="fas fa-edit text-primary me-2"></i>
+                                                    <strong>{% trans "آخرین به‌روزرسانی:" %}</strong><br>
+                                                    <small class="text-muted">{{ video.updated_at|date:"Y/m/d" }}</small>
+                                                </li>
+                                                <li class="mb-2">
+                                                    <i class="fas fa-tag text-primary me-2"></i>
+                                                    <strong>{% trans "موضوع:" %}</strong><br>
+                                                    <small class="text-muted">
+                                                        {% if video.topic == "grammar" %}{% trans "گرامر" %}
+                                                        {% elif video.topic == "speaking" %}{% trans "مکالمه" %}
+                                                        {% elif video.topic == "vocab" %}{% trans "واژگان" %}
+                                                        {% elif video.topic == "listening" %}{% trans "شنیداری" %}
+                                                        {% elif video.topic == "reading" %}{% trans "خواندن" %}
+                                                        {% elif video.topic == "writing" %}{% trans "نوشتن" %}
+                                                        {% elif video.topic == "culture" %}{% trans "فرهنگ" %}
+                                                        {% elif video.topic == "pronunciation" %}{% trans "تلفظ" %}
+                                                        {% else %}{{ video.topic }}{% endif %}
+                                                    </small>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Images Tab -->
+                {% if video.images.all %}
+                <div class="tab-pane fade" id="images" role="tabpanel">
+                    <div class="card border-0 shadow-sm mt-4">
+                        <div class="card-body">
+                            <h4 class="mb-4">{% trans "تصاویر مرتبط" %}</h4>
+                            <div class="row g-4">
+                                {% for image in video.images.all %}
+                                {% if image.is_active %}
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="card border-0 shadow-sm h-100">
+                                        <img src="{{ image.image.url }}" class="card-img-top" alt="{{ image.caption|default:image.video.title }}" 
+                                             style="height: 200px; object-fit: cover; cursor: pointer;" 
+                                             onclick="openImageModal('{{ image.image.url }}', '{{ image.caption|default:image.video.title }}')">
+                                        <div class="card-body">
+                                            {% if image.caption %}
+                                            <p class="card-text text-center">{{ image.caption }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+
+
+                <!-- YouTube Tab -->
+                {% if video.youtube_links.all %}
+                <div class="tab-pane fade" id="youtube" role="tabpanel">
+                    <div class="card border-0 shadow-sm mt-4">
+                        <div class="card-body">
+                            <h4 class="mb-4">{% trans "ویدیوهای یوتیوب" %}</h4>
+                            <div class="row g-4">
+                                {% for youtube_link in video.youtube_links.all %}
+                                {% if youtube_link.is_active %}
+                                <div class="col-lg-6">
+                                    <div class="card border-0 shadow-sm h-100">
+                                        <div class="card-body">
+                                            <h6 class="card-title">{{ youtube_link.title }}</h6>
+                                            {% if youtube_link.description %}
+                                            <p class="card-text text-muted">{{ youtube_link.description }}</p>
+                                            {% endif %}
+                                            {% if youtube_link.duration_minutes > 0 %}
+                                            <div class="text-center mb-3">
+                                                <span class="badge bg-info">
+                                                    <i class="fas fa-clock me-1"></i>{{ youtube_link.duration_minutes }} دقیقه
+                                                </span>
+                                            </div>
+                                            {% endif %}
+                                            <div class="ratio ratio-16x9 mb-3">
+                                                <iframe src="{{ youtube_link.youtube_embed_url }}" 
+                                                        title="{{ youtube_link.title }}"
+                                                        frameborder="0" 
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                                        allowfullscreen></iframe>
+                                            </div>
+                                            <div class="text-center">
+                                                <a href="{{ youtube_link.youtube_url }}" class="btn btn-outline-danger" target="_blank">
+                                                    <i class="fab fa-youtube me-2"></i>{% trans "مشاهده در یوتیوب" %}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Videos -->
+    {% if related_videos %}
+    <div class="mt-5">
+        <h3 class="mb-4">{% trans "ویدیوهای مرتبط" %}</h3>
+        <div class="row g-4">
+            {% for related_video in related_videos %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    {% if related_video.cover %}
+                    <img src="{{ related_video.cover.url }}" class="card-img-top" alt="{{ related_video.title }}" style="height: 150px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h6 class="card-title">{{ related_video.title }}</h6>
+                        <div class="d-flex gap-2 mb-2">
+                            <span class="badge bg-info">{{ related_video.level }}</span>
+                            <span class="badge bg-success">{{ related_video.topic }}</span>
+                        </div>
+                        <a href="{{ related_video.get_absolute_url }}" class="btn btn-outline-primary btn-sm w-100">
+                            {% trans "مشاهده" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="" class="img-fluid" style="max-height: 70vh;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+.nav-tabs .nav-link {
+    border-radius: 0.5rem 0.5rem 0 0;
+    border: none;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: var(--link-color);
+    color: var(--link-color);
+}
+
+.nav-tabs .nav-link.active {
+    background: linear-gradient(135deg, var(--german-black), #1a1a1a);
+    border-color: var(--german-gold);
+    color: var(--german-gold);
+}
+
+.card {
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.1) !important;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .card:hover {
+        transform: none;
+    }
+}
+</style>
+
+<!-- JavaScript -->
+<script>
+function openImageModal(imageUrl, caption) {
+    document.getElementById('modalImage').src = imageUrl;
+    document.getElementById('imageModalTitle').textContent = caption;
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+}
+</script>
+{% endblock %}

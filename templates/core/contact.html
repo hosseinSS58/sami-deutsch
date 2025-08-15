@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load i18n form_extras %}
+{% block title %}{% trans "تماس با ما" %}{% endblock %}
+{% block content %}
+<h1 class="mb-3">{% trans "تماس با ما" %}</h1>
+<form class="row g-3" method="post">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  <div class="col-md-6">
+    <label class="form-label" for="id_name">{% trans "نام" %}</label>
+    {{ form.name|add_class:'form-control' }}
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="id_email">{% trans "ایمیل" %}</label>
+    {{ form.email|add_class:'form-control' }}
+  </div>
+  <div class="col-12">
+    <label class="form-label" for="id_message">{% trans "پیام" %}</label>
+    {{ form.message|add_class:'form-control' }}
+  </div>
+  <div class="col-12">
+    <button class="btn btn-primary">{% trans "ارسال" %}</button>
+  </div>
+  <p class="text-muted small mt-2">{% trans "شبکه‌های اجتماعی" %}: Instagram, YouTube</p>
+{% endblock %}
+
+

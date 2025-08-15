@@ -1,0 +1,346 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "فروشگاه" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Header Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h2 mb-2">{% trans "فروشگاه آموزشی" %}</h1>
+          <p class="text-muted mb-0">{% trans "پکیج‌ها و منابع آموزشی با کیفیت" %}</p>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'shop:cart' %}" class="btn btn-outline-primary">
+            <i class="fas fa-shopping-cart me-2"></i>{% trans "سبد خرید" %}
+            {% if cart_items_count %}
+              <span class="badge bg-primary ms-1">{{ cart_items_count }}</span>
+            {% endif %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <form method="get" class="row g-3">
+            <div class="col-md-4">
+              <div class="input-group">
+                <span class="input-group-text bg-transparent border-end-0">
+                  <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control border-start-0" name="q" 
+                       value="{{ request.GET.q }}" placeholder="{% trans 'جستجو در محصولات...' %}">
+              </div>
+            </div>
+            <div class="col-md-2">
+              <select class="form-select" name="category">
+                <option value="">{% trans "همه دسته‌ها" %}</option>
+                {% for category in categories %}
+                  <option value="{{ category.slug }}" {% if request.GET.category == category.slug %}selected{% endif %}>
+                    {{ category.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-2">
+              <select class="form-select" name="price_range">
+                <option value="">{% trans "محدوده قیمت" %}</option>
+                <option value="0-50000" {% if request.GET.price_range == '0-50000' %}selected{% endif %}>
+                  {% trans "تا 50 هزار تومان" %}
+                </option>
+                <option value="50000-100000" {% if request.GET.price_range == '50000-100000' %}selected{% endif %}>
+                  {% trans "50 تا 100 هزار تومان" %}
+                </option>
+                <option value="100000-200000" {% if request.GET.price_range == '100000-200000' %}selected{% endif %}>
+                  {% trans "100 تا 200 هزار تومان" %}
+                </option>
+                <option value="200000+" {% if request.GET.price_range == '200000+' %}selected{% endif %}>
+                  {% trans "بیش از 200 هزار تومان" %}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <select class="form-select" name="sort">
+                <option value="">{% trans "مرتب‌سازی" %}</option>
+                <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>
+                  {% trans "جدیدترین" %}
+                </option>
+                <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>
+                  {% trans "ارزان‌ترین" %}
+                </option>
+                <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>
+                  {% trans "گران‌ترین" %}
+                </option>
+                <option value="popular" {% if request.GET.sort == 'popular' %}selected{% endif %}>
+                  {% trans "محبوب‌ترین" %}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="on_sale" id="on_sale" 
+                       {% if request.GET.on_sale %}checked{% endif %}>
+                <label class="form-check-label" for="on_sale">
+                  {% trans "تخفیف دار" %}
+                </label>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-filter me-2"></i>{% trans "اعمال فیلترها" %}
+                </button>
+                <a href="{% url 'shop:list' %}" class="btn btn-outline-secondary">
+                  <i class="fas fa-times me-2"></i>{% trans "پاک کردن" %}
+                </a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Filters -->
+  {% if request.GET.q or request.GET.category or request.GET.price_range or request.GET.sort or request.GET.on_sale %}
+    <div class="row mb-3">
+      <div class="col-12">
+        <div class="d-flex flex-wrap gap-2">
+          <span class="text-muted">{% trans "فیلترهای فعال:" %}</span>
+          {% if request.GET.q %}
+            <span class="badge bg-primary">
+              {% trans "جستجو:" %} {{ request.GET.q }}
+              <a href="?{% if request.GET.category %}category={{ request.GET.category }}{% endif %}{% if request.GET.price_range %}{% if request.GET.category %}&{% endif %}price_range={{ request.GET.price_range }}{% endif %}{% if request.GET.sort %}{% if request.GET.category or request.GET.price_range %}&{% endif %}sort={{ request.GET.sort }}{% endif %}{% if request.GET.on_sale %}{% if request.GET.category or request.GET.price_range or request.GET.sort %}&{% endif %}on_sale=on{% endif %}" 
+                 class="text-white text-decoration-none ms-2">×</a>
+            </span>
+          {% endif %}
+          {% if request.GET.category %}
+            <span class="badge bg-info">
+              {% trans "دسته:" %} {{ request.GET.category }}
+              <a href="?{% if request.GET.q %}q={{ request.GET.q }}{% endif %}{% if request.GET.price_range %}{% if request.GET.q %}&{% endif %}price_range={{ request.GET.price_range }}{% endif %}{% if request.GET.sort %}{% if request.GET.q or request.GET.price_range %}&{% endif %}sort={{ request.GET.sort }}{% endif %}{% if request.GET.on_sale %}{% if request.GET.q or request.GET.price_range or request.GET.sort %}&{% endif %}on_sale=on{% endif %}" 
+                 class="text-white text-decoration-none ms-2">×</a>
+            </span>
+          {% endif %}
+          {% if request.GET.price_range %}
+            <span class="badge bg-warning">
+              {% trans "قیمت:" %} {{ request.GET.price_range }}
+              <a href="?{% if request.GET.q %}q={{ request.GET.q }}{% endif %}{% if request.GET.category %}{% if request.GET.q %}&{% endif %}category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}{% if request.GET.q or request.GET.category %}&{% endif %}sort={{ request.GET.sort }}{% endif %}{% if request.GET.on_sale %}{% if request.GET.q or request.GET.category or request.GET.sort %}&{% endif %}on_sale=on{% endif %}" 
+                 class="text-white text-decoration-none ms-2">×</a>
+            </span>
+          {% endif %}
+          {% if request.GET.sort %}
+            <span class="badge bg-success">
+              {% trans "مرتب‌سازی:" %} {{ request.GET.sort }}
+              <a href="?{% if request.GET.q %}q={{ request.GET.q }}{% endif %}{% if request.GET.category %}{% if request.GET.q %}&{% endif %}category={{ request.GET.category }}{% endif %}{% if request.GET.price_range %}{% if request.GET.q or request.GET.category %}&{% endif %}price_range={{ request.GET.price_range }}{% endif %}{% if request.GET.on_sale %}{% if request.GET.q or request.GET.category or request.GET.price_range %}&{% endif %}on_sale=on{% endif %}" 
+                 class="text-white text-decoration-none ms-2">×</a>
+            </span>
+          {% endif %}
+          {% if request.GET.on_sale %}
+            <span class="badge bg-danger">
+              {% trans "تخفیف دار" %}
+              <a href="?{% if request.GET.q %}q={{ request.GET.q }}{% endif %}{% if request.GET.category %}{% if request.GET.q %}&{% endif %}category={{ request.GET.category }}{% endif %}{% if request.GET.price_range %}{% if request.GET.q or request.GET.category %}&{% endif %}price_range={{ request.GET.price_range }}{% endif %}{% if request.GET.sort %}{% if request.GET.q or request.GET.category or request.GET.price_range %}&{% endif %}sort={{ request.GET.sort }}{% endif %}" 
+                 class="text-white text-decoration-none ms-2">×</a>
+            </span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Products Grid -->
+  <div class="row g-4">
+    {% for product in products %}
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <div class="card h-100 border-0 shadow-sm hover-lift">
+          {% if product.cover %}
+            <div class="position-relative">
+              <img src="{{ product.cover.url }}" class="card-img-top" alt="{{ product.name }}" 
+                   style="height: 200px; object-fit: cover;" loading="lazy">
+              {% if product.is_featured %}
+                <span class="position-absolute top-0 start-0 badge bg-warning m-2">
+                  <i class="fas fa-star me-1"></i>{% trans "ویژه" %}
+                </span>
+              {% endif %}
+              {% if product.discount_percent %}
+                <span class="position-absolute top-0 end-0 badge bg-danger m-2">
+                  {{ product.discount_percent }}% {% trans "تخفیف" %}
+                </span>
+              {% endif %}
+            </div>
+          {% endif %}
+          <div class="card-body d-flex flex-column">
+            <div class="mb-3">
+              {% if product.category %}
+                <span class="badge bg-primary mb-2">{{ product.category.name }}</span>
+              {% endif %}
+              <h5 class="card-title h6 mb-2">{{ product.name }}</h5>
+              <p class="card-text text-muted small mb-2">
+                {{ product.description|truncatewords:15 }}
+              </p>
+            </div>
+            <div class="mt-auto">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  {% if product.discount_percent %}
+                    <small class="text-decoration-line-through text-muted">
+                      {{ product.original_price|floatformat:0 }} {% trans "تومان" %}
+                    </small>
+                  {% endif %}
+                  <div class="fw-bold text-primary">
+                    {{ product.price|floatformat:0 }} {% trans "تومان" %}
+                  </div>
+                </div>
+                <small class="text-muted">
+                  <i class="fas fa-eye me-1"></i>
+                  {{ product.views_count|default:0 }}
+                </small>
+              </div>
+              <div class="d-grid gap-2">
+                <a href="{{ product.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                  <i class="fas fa-eye me-2"></i>{% trans "مشاهده" %}
+                </a>
+                <button class="btn btn-success btn-sm add-to-cart" data-product-id="{{ product.id }}">
+                  <i class="fas fa-cart-plus me-2"></i>{% trans "افزودن به سبد" %}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="text-center py-5">
+          <i class="fas fa-shopping-bag fa-3x text-muted mb-3"></i>
+          <h4 class="text-muted">{% trans "محصولی یافت نشد" %}</h4>
+          <p class="text-muted">{% trans "با تغییر فیلترها یا جستجوی خود، محصولات جدیدی پیدا کنید." %}</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if is_paginated %}
+    <div class="row mt-5">
+      <div class="col-12">
+        <nav aria-label="{% trans 'صفحه‌بندی محصولات' %}">
+          <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.price_range %}&price_range={{ request.GET.price_range }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.on_sale %}&on_sale=on{% endif %}">
+                  <i class="fas fa-angle-double-right"></i>
+                </a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.price_range %}&price_range={{ request.GET.price_range }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.on_sale %}&on_sale=on{% endif %}">
+                  <i class="fas fa-angle-right"></i>
+                </a>
+              </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+              {% if page_obj.number == num %}
+                <li class="page-item active">
+                  <span class="page-link">{{ num }}</span>
+                </li>
+              {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.price_range %}&price_range={{ request.GET.price_range }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.on_sale %}&on_sale=on{% endif %}">
+                    {{ num }}
+                  </a>
+                </li>
+              {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.price_range %}&price_range={{ request.GET.price_range }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.on_sale %}&on_sale=on{% endif %}">
+                  <i class="fas fa-angle-left"></i>
+                </a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.price_range %}&price_range={{ request.GET.price_range }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.on_sale %}&on_sale=on{% endif %}">
+                  <i class="fas fa-angle-double-left"></i>
+                </a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Add to Cart Modal -->
+<div class="modal fade" id="addToCartModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{% trans "افزودن به سبد خرید" %}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>{% trans "محصول با موفقیت به سبد خرید اضافه شد!" %}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "ادامه خرید" %}</button>
+        <a href="{% url 'shop:cart' %}" class="btn btn-primary">{% trans "مشاهده سبد خرید" %}</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const addToCartButtons = document.querySelectorAll('.add-to-cart');
+  
+  addToCartButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const productId = this.dataset.productId;
+      
+      // Add to cart logic here
+      fetch('/shop/add-to-cart/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+          product_id: productId,
+          quantity: 1
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Show success modal
+          const modal = new bootstrap.Modal(document.getElementById('addToCartModal'));
+          modal.show();
+          
+          // Update cart count
+          const cartCount = document.querySelector('.badge');
+          if (cartCount) {
+            cartCount.textContent = data.cart_count;
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    });
+  });
+});
+</script>
+{% endblock %}
+
+
+
+
+

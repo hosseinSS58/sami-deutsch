@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "نتیجه تعیین سطح" %}{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+  <h1 class="mb-3">{% trans "نتیجه تعیین سطح" %}</h1>
+  {% if recommended_level %}
+    <p class="lead">{% trans "سطح پیشنهادی شما" %}: <strong>{{ recommended_level }}</strong></p>
+    {% if request.session.assessment_start %}
+      <p class="text-muted">{% trans "زمان صرف‌شده" %}: {{ request.session.assessment_start|default:0 }}</p>
+    {% endif %}
+    <a class="btn btn-primary" href="/shop/?level={{ recommended_level }}">{% trans "پکیج‌های مناسب شما" %}</a>
+  {% else %}
+    <p class="text-muted">{% trans "ابتدا آزمون را انجام دهید" %}</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+

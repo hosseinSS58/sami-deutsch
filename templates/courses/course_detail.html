@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-md-6">
+    {% if course.youtube_id %}
+      <div class="ratio ratio-16x9 rounded-3 overflow-hidden shadow-sm">
+        <iframe src="https://www.youtube.com/embed/{{ course.youtube_id }}" title="YouTube video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+    {% elif course.cover %}
+      <img src="{{ course.cover.url }}" class="img-fluid rounded-3" loading="lazy">
+    {% endif %}
+  </div>
+  <div class="col-md-6">
+    <h1 class="h3">{{ course.title }}</h1>
+    <p class="text-muted">{{ course.get_level_display }} • {{ course.get_topic_display }}</p>
+    <p>{{ course.description }}</p>
+  </div>
+</div>
+{% endblock %}
+
+
+
+
+

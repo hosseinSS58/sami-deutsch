@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load i18n form_extras %}
+{% block title %}{% trans "ثبت‌نام" %}{% endblock %}
+{% block content %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center py-5">
+  <div class="card shadow-lg border-0" style="max-width: 680px; width:100%;">
+    <div class="card-body p-4 p-md-5">
+      <div class="text-center mb-3">
+        <div class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width:56px;height:56px;background: linear-gradient(135deg, var(--brand), #0b5ed7);">
+          <i class="fa fa-user-plus text-white"></i>
+        </div>
+      </div>
+      <h1 class="h4 text-center mb-2">{% trans "ایجاد حساب جدید" %}</h1>
+      <p class="text-muted text-center mb-4">{% trans "اطلاعات حساب و پروفایل خود را تکمیل کنید" %}</p>
+
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger small">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="row g-3">
+          {% for field in form %}
+            <div class="col-md-6">
+              <label class="form-label" for="id_{{ field.name }}">{{ field.label }}</label>
+              {{ field|add_class:'form-control' }}
+              {% for err in field.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+
+        <button class="btn btn-primary btn-lg mt-4 w-100">{% trans "ایجاد حساب" %}</button>
+      </form>
+
+      <hr class="my-4"/>
+      <div class="text-center">
+        <span class="text-muted small">{% trans "قبلاً ثبت‌نام کرده‌اید؟" %}</span>
+        <a class="small" href="{% url 'accounts:login' %}">{% trans "ورود" %}</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+
+
+

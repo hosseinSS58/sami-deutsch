@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "آزمون تعیین سطح" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Header Section -->
+  <div class="row mb-5">
+    <div class="col-12 text-center">
+      <div class="py-5">
+        <i class="fas fa-clipboard-check fa-4x text-primary mb-4"></i>
+        <h1 class="h2 mb-3">{% trans "آزمون تعیین سطح زبان آلمانی" %}</h1>
+        <p class="lead text-muted mb-4">{% trans "با شرکت در این آزمون، سطح دقیق مهارت‌های زبان آلمانی خود را شناسایی کنید" %}</p>
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+              <div class="card-body p-4">
+                <h5 class="card-title mb-3">{% trans "ویژگی‌های آزمون:" %}</h5>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                      <i class="fas fa-clock text-primary me-3"></i>
+                      <span>{% trans "زمان: 30 دقیقه" %}</span>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                      <i class="fas fa-question-circle text-primary me-3"></i>
+                      <span>{% trans "تعداد سوال: 50" %}</span>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                      <i class="fas fa-chart-line text-primary me-3"></i>
+                      <span>{% trans "سطح‌بندی: A1 تا C1" %}</span>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                      <i class="fas fa-certificate text-primary me-3"></i>
+                      <span>{% trans "گواهی پایان" %}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assessment Types -->
+  <div class="row g-4 mb-5">
+    <div class="col-12">
+      <h3 class="h4 mb-4 text-center">{% trans "انواع آزمون‌های موجود" %}</h3>
+    </div>
+    
+    <div class="col-lg-4 col-md-6">
+      <div class="card h-100 border-0 shadow-sm hover-lift">
+        <div class="card-body text-center p-4">
+          <div class="mb-3">
+            <i class="fas fa-language fa-3x text-primary"></i>
+          </div>
+          <h5 class="card-title">{% trans "آزمون عمومی" %}</h5>
+          <p class="card-text text-muted">
+            {% trans "آزمون جامع برای تعیین سطح کلی مهارت‌های زبان آلمانی شامل گرامر، واژگان و درک مطلب" %}
+          </p>
+          <div class="mt-3">
+            <span class="badge bg-success me-2">{% trans "30 دقیقه" %}</span>
+            <span class="badge bg-info">{% trans "50 سوال" %}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="card h-100 border-0 shadow-sm hover-lift">
+        <div class="card-body text-center p-4">
+          <div class="mb-3">
+            <i class="fas fa-microphone fa-3x text-warning"></i>
+          </div>
+          <h5 class="card-title">{% trans "آزمون مکالمه" %}</h5>
+          <p class="card-text text-muted">
+            {% trans "تمرکز بر مهارت‌های گفتاری و تلفظ با سوالات تعاملی و ضبط صدا" %}
+          </p>
+          <div class="mt-3">
+            <span class="badge bg-success me-2">{% trans "20 دقیقه" %}</span>
+            <span class="badge bg-info">{% trans "25 سوال" %}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="card h-100 border-0 shadow-sm hover-lift">
+        <div class="card-body text-center p-4">
+          <div class="mb-3">
+            <i class="fas fa-headphones fa-3x text-danger"></i>
+          </div>
+          <h5 class="card-title">{% trans "آزمون شنیداری" %}</h5>
+          <p class="card-text text-muted">
+            {% trans "ارزیابی مهارت‌های شنیداری با فایل‌های صوتی متنوع و سوالات مربوطه" %}
+          </p>
+          <div class="mt-3">
+            <span class="badge bg-success me-2">{% trans "25 دقیقه" %}</span>
+            <span class="badge bg-info">{% trans "30 سوال" %}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Instructions -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>{% trans "نکات مهم قبل از شروع آزمون" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <ul class="list-unstyled">
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i>
+                  {% trans "محیط آرام و بدون سر و صدا انتخاب کنید" %}
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i>
+                  {% trans "اینترنت پایدار داشته باشید" %}
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i>
+                  {% trans "زمان کافی برای تکمیل آزمون اختصاص دهید" %}
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <ul class="list-unstyled">
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i>
+                  {% trans "سوالات را با دقت بخوانید" %}
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i>
+                  {% trans "پاسخ‌ها را قبل از ارسال بررسی کنید" %}
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i>
+                  {% trans "در صورت مشکل با پشتیبانی تماس بگیرید" %}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start Assessment -->
+  <div class="row">
+    <div class="col-12 text-center">
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="{% url 'assessments:take' %}" class="btn btn-primary btn-lg">
+          <i class="fas fa-play me-2"></i>{% trans "شروع آزمون" %}
+        </a>
+        <a href="{% url 'assessments:history' %}" class="btn btn-outline-secondary btn-lg">
+          <i class="fas fa-history me-2"></i>{% trans "تاریخچه آزمون‌ها" %}
+        </a>
+        <a href="{% url 'core:contact' %}" class="btn btn-outline-info btn-lg">
+          <i class="fas fa-question-circle me-2"></i>{% trans "راهنمایی" %}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Results -->
+  {% if recent_results %}
+    <div class="row mt-5">
+      <div class="col-12">
+        <h4 class="mb-4">{% trans "آخرین نتایج آزمون‌ها" %}</h4>
+        <div class="row g-3">
+          {% for result in recent_results %}
+            <div class="col-md-6 col-lg-4">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="card-title mb-0">{{ result.assessment.title }}</h6>
+                    <span class="badge bg-{% if result.score >= 80 %}success{% elif result.score >= 60 %}warning{% else %}danger{% endif %}">
+                      {{ result.score }}%
+                    </span>
+                  </div>
+                  <p class="text-muted small mb-2">
+                    <i class="fas fa-calendar me-1"></i>
+                    {{ result.completed_at|date:"Y/m/d" }}
+                  </p>
+                  <p class="text-muted small mb-0">
+                    <i class="fas fa-clock me-1"></i>
+                    {% trans "زمان:" %} {{ result.duration_minutes }} {% trans "دقیقه" %}
+                  </p>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+

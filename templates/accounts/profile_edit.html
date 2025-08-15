@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load i18n form_extras %}
+{% block title %}{% trans "ویرایش پروفایل" %}{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-body text-center">
+        <h5 class="card-title mb-3">{% trans "آواتار" %}</h5>
+        <div class="mb-3">
+          {% if form.instance.avatar %}
+            <img id="avatarPreview" src="{{ form.instance.avatar.url }}" class="rounded-circle" style="width:140px;height:140px;object-fit:cover;"/>
+          {% else %}
+            <div id="avatarFallback" class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width:140px;height:140px;">{{ request.user.username|first|upper }}</div>
+            <img id="avatarPreview" src="#" class="rounded-circle d-none" style="width:140px;height:140px;object-fit:cover;"/>
+          {% endif %}
+        </div>
+        <div class="text-start">
+          <label class="form-label" for="id_avatar">{% trans "آپلود تصویر جدید" %}</label>
+          {{ form.avatar|add_class:'form-control' }}
+          <div class="form-text">{% trans "فرمت‌های مجاز: JPG, PNG. حداکثر 2MB" %}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title mb-3">{% trans "اطلاعات حساب" %}</h5>
+        <form method="post" enctype="multipart/form-data" novalidate>
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="id_phone">{% trans "تلفن" %}</label>
+              {{ form.phone|add_class:'form-control' }}
+              {% for e in form.phone.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="id_level">{% trans "سطح" %}</label>
+              {{ form.level|add_class:'form-select' }}
+              {% for e in form.level.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="id_website">{% trans "وبسایت" %}</label>
+              {{ form.website|add_class:'form-control' }}
+              {% for e in form.website.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="id_bio">{% trans "بیو" %}</label>
+              {{ form.bio|add_class:'form-control' }}
+              {% for e in form.bio.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+            </div>
+            <div class="col-12">
+              <div class="form-check">
+                {{ form.newsletter_opt_in|add_class:'form-check-input' }}
+                <label class="form-check-label" for="id_newsletter_opt_in">{% trans "عضویت در خبرنامه" %}</label>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary">{% trans "ذخیره تغییرات" %}</button>
+            <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary">{% trans "انصراف" %}</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const fileInput = document.getElementById('id_avatar');
+  if (fileInput){
+    fileInput.addEventListener('change', (e) => {
+      const [file] = e.target.files || [];
+      if (file){
+        const url = URL.createObjectURL(file);
+        const img = document.getElementById('avatarPreview');
+        const fb = document.getElementById('avatarFallback');
+        if (fb) fb.classList.add('d-none');
+        if (img){ img.src = url; img.classList.remove('d-none'); }
+      }
+    });
+  }
+</script>
+{% endblock %}
+
+

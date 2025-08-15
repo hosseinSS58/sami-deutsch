@@ -1,0 +1,264 @@
+/* Advanced Styles - Enhanced UI Components */
+
+/* Enhanced Cards with Hover Effects */
+.card {
+    transition: all 0.3s ease;
+    border: 1px solid var(--card-border);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem var(--card-shadow) !important;
+}
+
+/* Enhanced Buttons */
+.btn {
+    transition: all 0.2s ease;
+    border-radius: var(--card-radius);
+    font-weight: 500;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.15);
+}
+
+/* Enhanced Navigation */
+.navbar {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.navbar .nav-link {
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.navbar .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--navbar-text);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.navbar .nav-link:hover::after {
+    width: 100%;
+}
+
+/* Enhanced Form Controls */
+.form-control {
+    border-radius: var(--card-radius);
+    border: 1px solid var(--card-border);
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: var(--link-color);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Enhanced Tables */
+.table {
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    box-shadow: 0 0.125rem 0.25rem var(--card-shadow);
+}
+
+.table thead th {
+    background-color: var(--section-bg);
+    border-bottom: 2px solid var(--card-border);
+    color: var(--text-primary);
+}
+
+/* Enhanced Alerts */
+.alert {
+    border-radius: var(--card-radius);
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem var(--card-shadow);
+}
+
+/* Enhanced Badges */
+.badge {
+    border-radius: calc(var(--card-radius) * 2);
+    font-weight: 500;
+}
+
+/* Enhanced Dropdowns */
+.dropdown-menu {
+    border-radius: var(--card-radius);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 0.5rem 1rem var(--card-shadow);
+    border: none;
+}
+
+.dropdown-item:hover {
+    background-color: var(--section-bg);
+}
+
+/* Enhanced Modals */
+.modal-content {
+    border-radius: var(--card-radius);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 1rem 3rem var(--card-shadow);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--card-border);
+    background-color: var(--section-bg);
+}
+
+/* Enhanced Pagination */
+.pagination .page-link {
+    border-radius: var(--card-radius);
+    border: 1px solid var(--card-border);
+    color: var(--link-color);
+    transition: all 0.2s ease;
+}
+
+.pagination .page-link:hover {
+    background-color: var(--section-bg);
+    border-color: var(--link-color);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--link-color);
+    border-color: var(--link-color);
+}
+
+/* Enhanced Progress Bars */
+.progress {
+    border-radius: var(--card-radius);
+    background-color: var(--section-bg);
+}
+
+.progress-bar {
+    border-radius: var(--card-radius);
+}
+
+/* Enhanced List Groups */
+.list-group-item {
+    border-radius: var(--card-radius);
+    border: 1px solid var(--card-border);
+    transition: all 0.2s ease;
+}
+
+.list-group-item:hover {
+    background-color: var(--section-bg);
+}
+
+/* Enhanced Breadcrumbs */
+.breadcrumb {
+    background-color: var(--section-bg);
+    border-radius: var(--card-radius);
+    padding: 0.75rem 1rem;
+}
+
+/* Enhanced Tooltips */
+.tooltip .tooltip-inner {
+    border-radius: var(--card-radius);
+    background-color: var(--text-primary);
+}
+
+/* Enhanced Popovers */
+.popover {
+    border-radius: var(--card-radius);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 0.5rem 1rem var(--card-shadow);
+}
+
+/* Enhanced Carousel */
+.carousel {
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    box-shadow: 0 0.5rem 1rem var(--card-shadow);
+}
+
+/* Enhanced Accordion */
+.accordion-item {
+    border: 1px solid var(--card-border);
+    border-radius: var(--card-radius);
+}
+
+.accordion-button {
+    background-color: var(--section-bg);
+    color: var(--text-primary);
+    border-radius: var(--card-radius);
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: var(--link-color);
+    color: var(--btn-primary-text);
+}
+
+/* Enhanced Tabs */
+.nav-tabs .nav-link {
+    border-radius: var(--card-radius) var(--card-radius) 0 0;
+    border: 1px solid var(--card-border);
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: var(--link-color);
+    color: var(--link-color);
+}
+
+.nav-tabs .nav-link.active {
+    background-color: var(--link-color);
+    border-color: var(--link-color);
+    color: var(--btn-primary-text);
+}
+
+/* Enhanced Spinners */
+.spinner-border {
+    color: var(--link-color);
+}
+
+/* Enhanced Close Buttons */
+.btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Enhanced Focus States */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Enhanced Hover States for Interactive Elements */
+a:hover,
+.btn:hover,
+.nav-link:hover {
+    text-decoration: none;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+    .card:hover {
+        transform: none;
+    }
+    
+    .btn:hover {
+        transform: none;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .navbar,
+    .footer,
+    .btn {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+}

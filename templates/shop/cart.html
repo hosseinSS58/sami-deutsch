@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "سبد خرید" %}{% endblock %}
+{% block content %}
+<h1 class="mb-3">{% trans "سبد خرید" %}</h1>
+{% if items %}
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{% trans "محصول" %}</th>
+          <th style="width:120px">{% trans "تعداد" %}</th>
+          <th style="width:160px">{% trans "قیمت واحد" %}</th>
+          <th style="width:160px">{% trans "جمع جزء" %}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+          <tr>
+            <td><a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a></td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.unit_price|floatformat:0 }}</td>
+            <td>{{ item.line_total|floatformat:0 }}</td>
+            <td>
+              <form method="post" action="{% url 'shop:remove_from_cart' %}">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                <button class="btn btn-sm btn-outline-danger">{% trans "حذف" %}</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="d-flex justify-content-between">
+    <div class="fw-bold">{% trans "مجموع" %}: {{ total|floatformat:0 }}</div>
+    <a class="btn btn-success" href="{% url 'shop:checkout' %}">{% trans "ادامه به تسویه" %}</a>
+  </div>
+{% else %}
+  <p class="text-muted">{% trans "سبد خرید خالی است" %}</p>
+{% endif %}
+{% endblock %}
+
+

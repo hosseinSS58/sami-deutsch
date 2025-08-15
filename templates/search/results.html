@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "نتایج جستجو" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Header Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h2 mb-2">{% trans "نتایج جستجو" %}</h1>
+          <p class="text-muted mb-0">
+            {% trans "جستجو برای" %}: <strong>"{{ query }}"</strong>
+            {% if total_results %}
+              <span class="ms-2">({{ total_results }} {% trans "نتیجه" %})</span>
+            {% endif %}
+          </p>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'search:search' %}" class="btn btn-outline-primary">
+            <i class="fas fa-search me-2"></i>{% trans "جستجوی جدید" %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Filters -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <form method="get" class="row g-3">
+            <div class="col-md-4">
+              <div class="input-group">
+                <span class="input-group-text bg-transparent border-end-0">
+                  <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control border-start-0" name="q" 
+                       value="{{ query }}" placeholder="{% trans 'جستجو...' %}">
+              </div>
+            </div>
+            <div class="col-md-3">
+              <select class="form-select" name="type">
+                <option value="">{% trans "همه انواع" %}</option>
+                <option value="videos" {% if request.GET.type == 'videos' %}selected{% endif %}>
+                  {% trans "ویدیوها" %}
+                </option>
+                <option value="posts" {% if request.GET.type == 'posts' %}selected{% endif %}>
+                  {% trans "مقالات" %}
+                </option>
+                <option value="products" {% if request.GET.type == 'products' %}selected{% endif %}>
+                  {% trans "محصولات" %}
+                </option>
+                <option value="assessments" {% if request.GET.type == 'assessments' %}selected{% endif %}>
+                  {% trans "آزمون‌ها" %}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <select class="form-select" name="level">
+                <option value="">{% trans "همه سطوح" %}</option>
+                <option value="A1" {% if request.GET.level == 'A1' %}selected{% endif %}>A1</option>
+                <option value="A2" {% if request.GET.level == 'A2' %}selected{% endif %}>A2</option>
+                <option value="B1" {% if request.GET.level == 'B1' %}selected{% endif %}>B1</option>
+                <option value="B2" {% if request.GET.level == 'B2' %}selected{% endif %}>B2</option>
+                <option value="C1" {% if request.GET.level == 'C1' %}selected{% endif %}>C1</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-search me-2"></i>{% trans "جستجو" %}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Results -->
+  {% if results %}
+    <div class="row g-4">
+      {% for result in results %}
+        <div class="col-12">
+          <div class="card border-0 shadow-sm hover-lift">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                  <div class="mb-3">
+                    {% if result.type == 'videos' %}
+                      <i class="fas fa-video fa-3x text-primary"></i>
+                    {% elif result.type == 'posts' %}
+                      <i class="fas fa-newspaper fa-3x text-success"></i>
+                    {% elif result.type == 'products' %}
+                      <i class="fas fa-shopping-bag fa-3x text-warning"></i>
+                    {% elif result.type == 'assessments' %}
+                      <i class="fas fa-clipboard-check fa-3x text-danger"></i>
+                    {% else %}
+                      <i class="fas fa-file fa-3x text-secondary"></i>
+                    {% endif %}
+                  </div>
+                  <span class="badge bg-{% if result.type == 'videos' %}primary{% elif result.type == 'posts' %}success{% elif result.type == 'products' %}warning{% elif result.type == 'assessments' %}danger{% else %}secondary{% endif %}">
+                    {% if result.type == 'videos' %}{% trans "ویدیو" %}
+                    {% elif result.type == 'posts' %}{% trans "مقاله" %}
+                    {% elif result.type == 'products' %}{% trans "محصول" %}
+                    {% elif result.type == 'assessments' %}{% trans "آزمون" %}
+                    {% else %}{{ result.type }}{% endif %}
+                  </span>
+                </div>
+                <div class="col-md-8">
+                  <h5 class="card-title mb-2">
+                    <a href="{{ result.url }}" class="text-decoration-none text-dark">
+                      {{ result.title }}
+                    </a>
+                  </h5>
+                  <p class="card-text text-muted mb-2">
+                    {{ result.excerpt|default:result.content|truncatewords:30 }}
+                  </p>
+                  <div class="d-flex flex-wrap gap-2 mb-2">
+                    {% if result.level %}
+                      <span class="badge bg-info">{{ result.level }}</span>
+                    {% endif %}
+                    {% if result.topic %}
+                      <span class="badge bg-secondary">{{ result.topic }}</span>
+                    {% endif %}
+                    {% if result.category %}
+                      <span class="badge bg-primary">{{ result.category }}</span>
+                    {% endif %}
+                  </div>
+                  <div class="d-flex gap-3 text-muted small">
+                    {% if result.created_at %}
+                      <span>
+                        <i class="fas fa-calendar me-1"></i>
+                        {{ result.created_at|date:"Y/m/d" }}
+                      </span>
+                    {% endif %}
+                    {% if result.views_count %}
+                      <span>
+                        <i class="fas fa-eye me-1"></i>
+                        {{ result.views_count }} {% trans "بازدید" %}
+                      </span>
+                    {% endif %}
+                    {% if result.duration_minutes %}
+                      <span>
+                        <i class="fas fa-clock me-1"></i>
+                        {{ result.duration_minutes }} {% trans "دقیقه" %}
+                      </span>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="col-md-2 text-center">
+                  <a href="{{ result.url }}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-external-link-alt me-2"></i>{% trans "مشاهده" %}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+      <div class="row mt-5">
+        <div class="col-12">
+          <nav aria-label="{% trans 'صفحه‌بندی نتایج جستجو' %}">
+            <ul class="pagination justify-content-center">
+              {% if page_obj.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?q={{ query }}&page=1{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.level %}&level={{ request.GET.level }}{% endif %}">
+                    <i class="fas fa-angle-double-right"></i>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?q={{ query }}&page={{ page_obj.previous_page_number }}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.level %}&level={{ request.GET.level }}{% endif %}">
+                    <i class="fas fa-angle-right"></i>
+                  </a>
+                </li>
+              {% endif %}
+
+              {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                  </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                  <li class="page-item">
+                    <a class="page-link" href="?q={{ query }}&page={{ num }}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.level %}&level={{ request.GET.level }}{% endif %}">
+                      {{ num }}
+                    </a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+
+              {% if page_obj.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?q={{ query }}&page={{ page_obj.next_page_number }}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.level %}&level={{ request.GET.level }}{% endif %}">
+                    <i class="fas fa-angle-left"></i>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?q={{ query }}&page={{ page_obj.paginator.num_pages }}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.level %}&level={{ request.GET.level }}{% endif %}">
+                    <i class="fas fa-angle-double-left"></i>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+      </div>
+    {% endif %}
+
+  {% else %}
+    <!-- No Results -->
+    <div class="row">
+      <div class="col-12">
+        <div class="text-center py-5">
+          <i class="fas fa-search fa-4x text-muted mb-4"></i>
+          <h3 class="text-muted mb-3">{% trans "نتیجه‌ای یافت نشد" %}</h3>
+          <p class="text-muted mb-4">
+            {% trans "متأسفانه هیچ نتیجه‌ای برای جستجوی شما پیدا نشد. لطفاً:" %}
+          </p>
+          <div class="row justify-content-center">
+            <div class="col-md-8">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <ul class="list-unstyled text-start">
+                    <li class="mb-2">
+                      <i class="fas fa-check text-success me-2"></i>
+                      {% trans "کلمات کلیدی خود را بررسی کنید" %}
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check text-success me-2"></i>
+                      {% trans "از کلمات ساده‌تر استفاده کنید" %}
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check text-success me-2"></i>
+                      {% trans "فیلترهای جستجو را تغییر دهید" %}
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check text-success me-2"></i>
+                      {% trans "از مترادف‌ها استفاده کنید" %}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4">
+            <a href="{% url 'search:search' %}" class="btn btn-primary btn-lg">
+              <i class="fas fa-search me-2"></i>{% trans "جستجوی جدید" %}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+
+
+
+
+
+

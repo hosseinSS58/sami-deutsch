@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block content %}
+<article class="prose">
+  <h1 class="h3 mb-3">{{ post.title }}</h1>
+  {% if post.cover %}<img src="{{ post.cover.url }}" class="img-fluid rounded-3 mb-3" loading="lazy">{% endif %}
+  <div>{{ post.content|linebreaks }}</div>
+</article>
+{% endblock %}
+
+
+
+
+
+
+

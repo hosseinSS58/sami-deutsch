@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "دوره‌ها" %}{% endblock %}
+{% block content %}
+<h1 class="mb-3">{% trans "دوره‌ها" %}</h1>
+<div class="row g-3">
+  {% for c in courses %}
+    <div class="col-md-4">
+      <div class="card h-100">
+        {% if c.cover %}<img src="{{ c.cover.url }}" class="card-img-top" loading="lazy">{% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ c.title }}</h5>
+          <p class="card-text text-muted">{{ c.get_level_display }} • {{ c.get_topic_display }}</p>
+          <a href="{{ c.get_absolute_url }}" class="btn btn-outline-primary">{% trans "مشاهده" %}</a>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-muted">{% trans "موردی یافت نشد" %}</p>
+  {% endfor %}
+</div>
+{% endblock %}
+
+
+
+
+

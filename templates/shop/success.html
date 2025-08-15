@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "سفارش ثبت شد" %}{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+  <h1 class="mb-3">{% trans "سفارش شما با موفقیت ثبت شد" %}</h1>
+  <p class="lead">{% trans "شماره سفارش" %}: #{{ order_id }}</p>
+  <a href="/" class="btn btn-primary mt-3">{% trans "بازگشت به خانه" %}</a>
+{% endblock %}
+
+
+

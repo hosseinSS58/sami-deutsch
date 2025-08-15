@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "ویدیوهای آموزشی آلمانی" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <h1 class="display-4 fw-bold text-primary mb-3">
+                {% trans "ویدیوهای آموزشی آلمانی" %}
+            </h1>
+            <p class="lead text-muted">
+                {% trans "مجموعه‌ای از بهترین ویدیوهای آموزشی برای یادگیری زبان آلمانی" %}
+            </p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <div class="d-flex gap-2 justify-content-lg-end">
+                <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse">
+                    <i class="fas fa-filter me-2"></i>{% trans "فیلترها" %}
+                </button>
+                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#searchCollapse">
+                    <i class="fas fa-search me-2"></i>{% trans "جستجو" %}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="collapse mb-4" id="searchCollapse">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-8">
+                        <input type="text" class="form-control form-control-lg" name="search" 
+                               placeholder="{% trans 'جستجو در ویدیوها...' %}" 
+                               value="{{ current_filters.search|default:'' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-search me-2"></i>{% trans "جستجو" %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="collapse mb-4" id="filtersCollapse">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <!-- Search field (hidden when filters are collapsed) -->
+                    {% if current_filters.search %}
+                    <input type="hidden" name="search" value="{{ current_filters.search }}">
+                    {% endif %}
+                    
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">{% trans "سطح" %}</label>
+                        <select name="level" class="form-select">
+                            <option value="">{% trans "همه سطوح" %}</option>
+                            {% for level in levels %}
+                            <option value="{{ level }}" {% if current_filters.level == level %}selected{% endif %}>
+                                {{ level }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">{% trans "موضوع" %}</label>
+                        <select name="topic" class="form-select">
+                            <option value="">{% trans "همه موضوعات" %}</option>
+                            {% for topic in topics %}
+                            <option value="{{ topic }}" {% if current_filters.topic == topic %}selected{% endif %}>
+                                {% if topic == "grammar" %}{% trans "گرامر" %}
+                                {% elif topic == "speaking" %}{% trans "مکالمه" %}
+                                {% elif topic == "vocab" %}{% trans "واژگان" %}
+                                {% elif topic == "listening" %}{% trans "شنیداری" %}
+                                {% elif topic == "reading" %}{% trans "خواندن" %}
+                                {% elif topic == "writing" %}{% trans "نوشتن" %}
+                                {% elif topic == "culture" %}{% trans "فرهنگ" %}
+                                {% elif topic == "pronunciation" %}{% trans "تلفظ" %}
+                                {% else %}{{ topic }}{% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">{% trans "سطح دشواری" %}</label>
+                        <select name="difficulty" class="form-select">
+                            <option value="">{% trans "همه سطوح" %}</option>
+                            {% for difficulty in difficulties %}
+                            <option value="{{ difficulty }}" {% if current_filters.difficulty == difficulty %}selected{% endif %}>
+                                {% if difficulty == "beginner" %}{% trans "مبتدی" %}
+                                {% elif difficulty == "intermediate" %}{% trans "متوسط" %}
+                                {% elif difficulty == "advanced" %}{% trans "پیشرفته" %}
+                                {% else %}{{ difficulty }}{% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">{% trans "نوع" %}</label>
+                        <select name="is_free" class="form-select">
+                            <option value="">{% trans "همه" %}</option>
+                            <option value="true" {% if current_filters.is_free == 'true' %}selected{% endif %}>
+                                {% trans "رایگان" %}
+                            </option>
+                            <option value="false" {% if current_filters.is_free == 'false' %}selected{% endif %}>
+                                {% trans "پولی" %}
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-12">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter me-2"></i>{% trans "اعمال فیلترها" %}
+                            </button>
+                            <a href="{% url 'videos:list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>{% trans "پاک کردن" %}
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Filters -->
+    {% if current_filters.level or current_filters.topic or current_filters.difficulty or current_filters.is_free or current_filters.search %}
+    <div class="mb-4">
+        <div class="d-flex flex-wrap gap-2">
+            <span class="text-muted">{% trans "فیلترهای فعال:" %}</span>
+            {% if current_filters.search %}
+            <span class="badge bg-primary">
+                {% trans "جستجو:" %} {{ current_filters.search }}
+                <a href="?{% for key, value in current_filters.items %}{% if key != 'search' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}" 
+                   class="text-white text-decoration-none ms-2">×</a>
+            </span>
+            {% endif %}
+            {% if current_filters.level %}
+            <span class="badge bg-info">
+                {% trans "سطح:" %} {{ current_filters.level }}
+                <a href="?{% for key, value in current_filters.items %}{% if key != 'level' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}" 
+                   class="text-white text-decoration-none ms-2">×</a>
+            </span>
+            {% endif %}
+            {% if current_filters.topic %}
+            <span class="badge bg-success">
+                {% trans "موضوع:" %} 
+                {% if current_filters.topic == "grammar" %}{% trans "گرامر" %}
+                {% elif current_filters.topic == "speaking" %}{% trans "مکالمه" %}
+                {% elif current_filters.topic == "vocab" %}{% trans "واژگان" %}
+                {% elif current_filters.topic == "listening" %}{% trans "شنیداری" %}
+                {% elif current_filters.topic == "reading" %}{% trans "خواندن" %}
+                {% elif current_filters.topic == "writing" %}{% trans "نوشتن" %}
+                {% elif current_filters.topic == "culture" %}{% trans "فرهنگ" %}
+                {% elif current_filters.topic == "pronunciation" %}{% trans "تلفظ" %}
+                {% else %}{{ current_filters.topic }}{% endif %}
+                <a href="?{% for key, value in current_filters.items %}{% if key != 'topic' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}" 
+                   class="text-white text-decoration-none ms-2">×</a>
+            </span>
+            {% endif %}
+            {% if current_filters.difficulty %}
+            <span class="badge bg-warning">
+                {% trans "دشواری:" %} 
+                {% if current_filters.difficulty == "beginner" %}{% trans "مبتدی" %}
+                {% elif current_filters.difficulty == "intermediate" %}{% trans "متوسط" %}
+                {% elif current_filters.difficulty == "advanced" %}{% trans "پیشرفته" %}
+                {% else %}{{ current_filters.difficulty }}{% endif %}
+                <a href="?{% for key, value in current_filters.items %}{% if key != 'difficulty' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}" 
+                   class="text-white text-decoration-none ms-2">×</a>
+            </span>
+            {% endif %}
+            {% if current_filters.is_free %}
+            <span class="badge bg-secondary">
+                {% trans "نوع:" %} 
+                {% if current_filters.is_free == 'true' %}{% trans "رایگان" %}{% else %}{% trans "پولی" %}{% endif %}
+                <a href="?{% for key, value in current_filters.items %}{% if key != 'is_free' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}" 
+                   class="text-white text-decoration-none ms-2">×</a>
+            </span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Videos Grid -->
+    {% if videos %}
+    <div class="row g-4">
+        {% for video in videos %}
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 video-card border-0 shadow-sm">
+                {% if video.cover %}
+                <div class="position-relative">
+                    <img src="{{ video.cover.url }}" class="card-img-top" alt="{{ video.title }}" style="height: 200px; object-fit: cover;">
+                    {% if video.is_featured %}
+                    <span class="position-absolute top-0 start-0 badge bg-warning text-dark m-2">
+                        <i class="fas fa-star me-1"></i>{% trans "ویژه" %}
+                    </span>
+                    {% endif %}
+                    {% if not video.is_free %}
+                    <span class="position-absolute top-0 end-0 badge bg-secondary m-2">
+                        <i class="fas fa-lock me-1"></i>{% trans "پولی" %}
+                    </span>
+                    {% endif %}
+                    <div class="position-absolute bottom-0 end-0 m-2">
+                        <span class="badge bg-dark bg-opacity-75">
+                            <i class="fas fa-clock me-1"></i>{{ video.total_duration_formatted }}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="card-body d-flex flex-column">
+                    <div class="mb-3">
+                        <h5 class="card-title fw-bold text-primary mb-2">{{ video.title }}</h5>
+                        <p class="card-text text-muted small">{{ video.description|truncatewords:20 }}</p>
+                    </div>
+                    
+                    <div class="mt-auto">
+                        <!-- Tags -->
+                        {% if video.tags.all %}
+                        <div class="mb-3">
+                            {% for tag in video.tags.all|slice:":3" %}
+                            <span class="badge rounded-pill me-1" style="background-color: {{ tag.color }}; color: white;">
+                                {{ tag.name }}
+                            </span>
+                            {% endfor %}
+                            {% if video.tags.count > 3 %}
+                            <span class="badge bg-secondary rounded-pill">+{{ video.tags.count|add:"-3" }}</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Meta Info -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex gap-2">
+                                <span class="badge bg-info">{{ video.level }}</span>
+                                <span class="badge bg-success">
+                                    {% if video.topic == "grammar" %}{% trans "گرامر" %}
+                                    {% elif video.topic == "speaking" %}{% trans "مکالمه" %}
+                                    {% elif video.topic == "vocab" %}{% trans "واژگان" %}
+                                    {% elif video.topic == "listening" %}{% trans "شنیداری" %}
+                                    {% elif video.topic == "reading" %}{% trans "خواندن" %}
+                                    {% elif video.topic == "writing" %}{% trans "نوشتن" %}
+                                    {% elif video.topic == "culture" %}{% trans "فرهنگ" %}
+                                    {% elif video.topic == "pronunciation" %}{% trans "تلفظ" %}
+                                    {% else %}{{ video.topic }}{% endif %}
+                                </span>
+                            </div>
+                            <span class="badge bg-{% if video.difficulty == 'beginner' %}success{% elif video.difficulty == 'intermediate' %}warning{% else %}danger{% endif %}">
+                                {% if video.difficulty == "beginner" %}{% trans "مبتدی" %}
+                                {% elif video.difficulty == "intermediate" %}{% trans "متوسط" %}
+                                {% elif video.difficulty == "advanced" %}{% trans "پیشرفته" %}
+                                {% else %}{{ video.difficulty }}{% endif %}
+                            </span>
+                        </div>
+                        
+                        <!-- Media Count -->
+                        {% if video.images.all or video.youtube_links.all %}
+                        <div class="text-muted small mb-3">
+                            {% if video.images.all %}
+                            <i class="fas fa-images me-1"></i>{{ video.images.count }} تصویر
+                            {% endif %}
+                            {% if video.youtube_links.all %}
+                            <i class="fab fa-youtube ms-3 me-1"></i>{{ video.youtube_links.count }} یوتیوب
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Action Button -->
+                        <a href="{{ video.get_absolute_url }}" class="btn btn-primary w-100">
+                            <i class="fas fa-play me-2"></i>{% trans "مشاهده ویدیو" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav class="mt-5" aria-label="{% trans 'صفحه‌بندی ویدیوها' %}">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- No Videos Found -->
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="fas fa-video-slash text-muted" style="font-size: 4rem;"></i>
+        </div>
+        <h4 class="text-muted mb-3">{% trans "ویدیویی یافت نشد" %}</h4>
+        <p class="text-muted mb-4">{% trans "با تغییر فیلترها یا عبارت جستجو، دوباره تلاش کنید." %}</p>
+        <a href="{% url 'videos:list' %}" class="btn btn-primary">
+            <i class="fas fa-refresh me-2"></i>{% trans "پاک کردن فیلترها" %}
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Custom CSS for Video Cards -->
+<style>
+.video-card {
+    transition: all 0.3s ease;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.video-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.15) !important;
+}
+
+.video-card .card-img-top {
+    transition: all 0.3s ease;
+}
+
+.video-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+.card-title {
+    line-height: 1.3;
+    min-height: 2.6em;
+}
+
+.card-text {
+    line-height: 1.5;
+    min-height: 3em;
+}
+
+@media (max-width: 768px) {
+    .video-card:hover {
+        transform: none;
+    }
+    
+    .video-card:hover .card-img-top {
+        transform: none;
+    }
+}
+</style>
+{% endblock %}

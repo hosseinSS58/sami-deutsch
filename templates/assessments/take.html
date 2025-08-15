@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load i18n form_extras %}
+{% block title %}{% trans "آزمون" %}{% endblock %}
+{% block content %}
+<div class="container mx-auto">
+  <h1 class="mb-3">{% trans "آزمون" %}</h1>
+  <div x-data="quiz()" class="col-md-10">
+    <div class="progress mb-3" style="height: 8px;">
+      <div class="progress-bar" role="progressbar" :style="`width:${progress}%`"></div>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label">{% trans "نام" %}</label>
+          {{ form.full_name }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">{% trans "ایمیل" %}</label>
+          {{ form.email }}
+        </div>
+      </div>
+      {% for field in question_fields %}
+          <div x-show="current === {{ forloop.counter0 }}">
+            <div class="card mb-3">
+              <div class="card-body">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+              </div>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-outline-secondary" @click="prev()" :disabled="current===0">{% trans "قبلی" %}</button>
+              <button type="button" class="btn btn-primary" @click="next(total)" x-show="current < total - 1">{% trans "بعدی" %}</button>
+              <button class="btn btn-success" x-show="current === total - 1">{% trans "ثبت پاسخ‌ها" %}</button>
+            </div>
+          </div>
+      {% endfor %}
+    </form>
+  </div>
+</div>
+
+<script>
+function quiz(){
+  return {
+    current: 0,
+    total: {{ question_fields|length|default:0 }},
+    get progress(){ return Math.round(((this.current+1)/Math.max(this.total,1))*100); },
+    next(){ if(this.current < this.total-1) this.current++; },
+    prev(){ if(this.current>0) this.current--; }
+  }
+}
+</script>
+{% endblock %}
+
+

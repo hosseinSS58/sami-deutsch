@@ -1,0 +1,181 @@
+/* Dynamic Styles - Generated from Site Settings */
+:root {
+    /* Brand Colors */
+    --brand-primary: var(--site-primary-color, #0d6efd);
+    
+    /* Header & Navigation */
+    --navbar-bg: var(--site-navbar-bg-color, #0d6efd);
+    --navbar-text: var(--site-navbar-text-color, #ffffff);
+    --navbar-hover: var(--site-navbar-hover-color, #0b5ed7);
+    
+    /* Buttons */
+    --btn-primary-bg: var(--site-button-primary-bg, #0d6efd);
+    --btn-primary-text: var(--site-button-primary-text, #ffffff);
+    --btn-secondary-bg: var(--site-button-secondary-bg, #6c757d);
+    --btn-secondary-text: var(--site-button-secondary-text, #ffffff);
+    --btn-outline-color: var(--site-button-outline-color, #0d6efd);
+    
+    /* Cards & Content */
+    --card-bg: var(--site-card-bg-color, #ffffff);
+    --card-border: var(--site-card-border-color, #dee2e6);
+    --card-shadow: var(--site-card-shadow-color, rgba(0,0,0,0.1));
+    
+    /* Text Colors */
+    --text-primary: var(--site-text-primary-color, #0f172a);
+    --text-secondary: var(--site-text-secondary-color, #6c757d);
+    --text-muted: var(--site-text-muted-color, #adb5bd);
+    
+    /* Backgrounds */
+    --body-bg: var(--site-body-bg-color, #ffffff);
+    --section-bg: var(--site-section-bg-color, #f8f9fa);
+    --footer-bg: var(--site-footer-bg-color, #212529);
+    --footer-text: var(--site-footer-text-color, #ffffff);
+    
+    /* Links */
+    --link-color: var(--site-link-color, #0d6efd);
+    --link-hover: var(--site-link-hover-color, #0a58ca);
+    
+    /* Status Colors */
+    --success-color: var(--site-success-color, #198754);
+    --error-color: var(--site-error-color, #dc3545);
+    --warning-color: var(--site-warning-color, #ffc107);
+    --info-color: var(--site-info-color, #0dcaf0);
+    
+    /* Typography */
+    --heading-font: var(--site-heading-font-family, 'Vazirmatn');
+    --body-font: var(--site-body-font-family, 'Vazirmatn');
+    --base-font-size: var(--site-base-font-size, 16px);
+    
+    /* Layout */
+    --container-max-width: var(--site-container-max-width, 1200px);
+    --section-padding: var(--site-section-padding, 4rem);
+    --card-radius: var(--site-card-border-radius, 0.375rem);
+}
+
+/* Apply dynamic styles */
+body {
+    background-color: var(--body-bg);
+    font-family: var(--body-font), system-ui, -apple-system, sans-serif;
+    font-size: var(--base-font-size);
+    color: var(--text-primary);
+}
+
+/* Header & Navigation */
+.navbar {
+    background: var(--navbar-bg) !important;
+}
+
+.navbar .nav-link,
+.navbar .navbar-brand {
+    color: var(--navbar-text) !important;
+}
+
+.navbar .nav-link:hover {
+    color: var(--navbar-hover) !important;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--btn-primary-bg) !important;
+    border-color: var(--btn-primary-bg) !important;
+    color: var(--btn-primary-text) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--navbar-hover) !important;
+    border-color: var(--navbar-hover) !important;
+}
+
+.btn-secondary {
+    background-color: var(--btn-secondary-bg) !important;
+    border-color: var(--btn-secondary-bg) !important;
+    color: var(--btn-secondary-text) !important;
+}
+
+.btn-outline-primary {
+    color: var(--btn-outline-color) !important;
+    border-color: var(--btn-outline-color) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--btn-outline-color) !important;
+    color: var(--btn-primary-text) !important;
+}
+
+/* Cards */
+.card {
+    background-color: var(--card-bg) !important;
+    border-color: var(--card-border) !important;
+    border-radius: var(--card-radius) !important;
+    box-shadow: 0 0.125rem 0.25rem var(--card-shadow) !important;
+}
+
+/* Text Colors */
+.text-primary {
+    color: var(--text-primary) !important;
+}
+
+.text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+/* Links */
+a {
+    color: var(--link-color);
+}
+
+a:hover {
+    color: var(--link-hover);
+}
+
+/* Status Colors */
+.text-success {
+    color: var(--success-color) !important;
+}
+
+.text-danger {
+    color: var(--error-color) !important;
+}
+
+.text-warning {
+    color: var(--warning-color) !important;
+}
+
+.text-info {
+    color: var(--info-color) !important;
+}
+
+/* Backgrounds */
+.bg-light {
+    background-color: var(--section-bg) !important;
+}
+
+/* Footer */
+footer {
+    background-color: var(--footer-bg) !important;
+    color: var(--footer-text) !important;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--heading-font), var(--body-font), system-ui, sans-serif;
+}
+
+/* Container */
+.container {
+    max-width: var(--container-max-width);
+}
+
+/* Sections */
+section {
+    padding: var(--section-padding) 0;
+}
+
+/* Custom CSS from admin */
+.custom-css {
+    /* This will be populated by the custom_css field */
+}

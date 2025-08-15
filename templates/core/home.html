@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% load i18n form_extras %}
+{% block title %}{% trans "خانه" %}{% endblock %}
+{% block content %}
+<!-- Slider Hero -->
+<section class="mb-5">
+  {% with ar=home_slider.aspect_ratio|default:'21x9' %}
+  <div id="heroCarousel" class="carousel slide" data-bs-ride="{{ home_slider.autoplay|yesno:'carousel,false' }}" data-bs-interval="{{ home_slider.interval_ms }}" data-bs-pause="{{ home_slider.pause_on_hover|yesno:'hover,false' }}">
+    {% if home_slider.show_indicators %}
+    <div class="carousel-indicators">
+      {% for s in slides %}
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <div class="carousel-inner rounded-4 shadow">
+      {% for s in slides %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <div class="ratio ratio-{{ ar }} position-relative overflow-hidden rounded-4">
+          <img src="{{ s.image.url }}" class="d-block w-100 h-100 object-fit-cover" alt="{{ s.title }}">
+          <div class="position-absolute start-0 top-0 w-100 h-100 d-flex align-items-{{ s.overlay_v_align }} justify-content-{{ s.overlay_h_align }} p-4 p-md-5">
+            <div class="rounded-3" style="background-color: {{ s.caption_bg_color|rgba:s.caption_bg_opacity }}">
+              <div class="p-3 p-md-4 text-{{ s.text_align }}" style="color: {{ s.text_color }}">
+                <h5 class="display-6 fw-bold mb-2" style="color: {{ s.text_color }}">{{ s.title }}</h5>
+                <p class="mb-3" style="color: {{ s.text_color }}">{{ s.subtitle }}</p>
+                {% if s.cta_text and s.cta_url %}
+                  <a href="{{ s.cta_url }}" class="btn btn-lg" style="background-color: {{ s.button_bg_color }}; color: {{ s.button_text_color }}; border-color: {{ s.button_bg_color }}">{{ s.cta_text }}</a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% if home_slider.show_arrows %}
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+    {% endif %}
+  </div>
+  {% endwith %}
+</section>
+
+<!-- Featured Videos -->
+<section class="mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 m-0">{% trans "ویدیوهای جدید" %}</h2>
+    <a href="/videos/" class="btn btn-sm btn-outline-primary">{% trans "همه ویدیوها" %}</a>
+  </div>
+  <div class="row g-3">
+    {% for v in latest_videos %}
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+          {% if v.cover %}
+            <img src="{{ v.cover.url }}" class="card-img-top" loading="lazy"/>
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ v.title }}</h5>
+            <p class="text-muted small">{{ v.level }} • 
+              {% if v.topic == "grammar" %}{% trans "گرامر" %}
+              {% elif v.topic == "speaking" %}{% trans "مکالمه" %}
+              {% elif v.topic == "vocab" %}{% trans "واژگان" %}
+              {% elif v.topic == "listening" %}{% trans "شنیداری" %}
+              {% elif v.topic == "reading" %}{% trans "خواندن" %}
+              {% elif v.topic == "writing" %}{% trans "نوشتن" %}
+              {% elif v.topic == "culture" %}{% trans "فرهنگ" %}
+              {% elif v.topic == "pronunciation" %}{% trans "تلفظ" %}
+              {% else %}{{ v.topic }}{% endif %}
+            </p>
+            <a href="{{ v.get_absolute_url }}" class="btn btn-outline-primary btn-sm">{% trans "مشاهده" %}</a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-muted">{% trans "موردی موجود نیست" %}</p>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Featured Packages -->
+<section class="mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 m-0">{% trans "پکیج‌های جدید" %}</h2>
+    <a href="/shop/" class="btn btn-sm btn-outline-primary">{% trans "همه پکیج‌ها" %}</a>
+  </div>
+  <div class="row g-3">
+    {% for p in latest_products %}
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+          {% if p.cover %}<img src="{{ p.cover.url }}" class="card-img-top" loading="lazy"/>{% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ p.name }}</h5>
+            <p class="text-muted small">{{ p.price|floatformat:0 }} {% trans "تومان" %}</p>
+            <a href="{{ p.get_absolute_url }}" class="btn btn-outline-primary btn-sm">{% trans "مشاهده" %}</a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-muted">{% trans "موردی موجود نیست" %}</p>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Blog -->
+<section class="mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 m-0">{% trans "از بلاگ" %}</h2>
+    <a href="/blog/" class="btn btn-sm btn-outline-primary">{% trans "همه مقالات" %}</a>
+  </div>
+  <div class="row g-2">
+    {% for post in latest_posts %}
+      <div class="col-6 col-md-4 col-lg-3">
+        <div class="card h-100 shadow-sm">
+          {% if post.cover %}<img src="{{ post.cover.url }}" class="card-img-top object-fit-cover" style="height: 140px;" loading="lazy"/>{% endif %}
+          <div class="card-body py-2">
+            <h6 class="card-title mb-2 fs-6 text-truncate" title="{{ post.title }}">{{ post.title }}</h6>
+            <a href="{{ post.get_absolute_url }}" class="btn btn-outline-primary btn-sm">{% trans "مطالعه" %}</a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-muted">{% trans "موردی موجود نیست" %}</p>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Newsletter -->
+{% if site_settings.show_newsletter %}
+<section class="mb-5 p-4 rounded-4 border">
+  <div class="row align-items-center g-3">
+    <div class="col-lg-6">
+      <h3 class="h5 mb-2">{% trans "عضو خبرنامه شوید" %}</h3>
+      <p class="text-muted small m-0">{% trans "تازه‌ترین درس‌ها و تخفیف‌ها را زودتر دریافت کنید" %}</p>
+    </div>
+    <div class="col-lg-6">
+      <form class="d-flex gap-2">
+        <input class="form-control" type="email" placeholder="{% trans 'ایمیل شما' %}">
+        <button class="btn btn-primary">{% trans "عضویت" %}</button>
+      </form>
+    </div>
+  </div>
+ </section>
+{% endif %}
+{% endblock %}
+
+
