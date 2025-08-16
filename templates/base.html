@@ -1,9 +1,10 @@
-{% load i18n static %}
+{% load static %}
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
   <title>{% block title %}Sami Language{% endblock %}</title>
   <meta name="description" content="{{ site_settings.meta_description|default:'آموزش زبان با دوره‌ها، ویدئوها و مقالات کاربردی.' }}">
   <meta property="og:title" content="Sami Language">
@@ -17,11 +18,13 @@
     <link href="{% static 'css/dynamic-styles.css' %}" rel="stylesheet">
     <link href="{% static 'css/advanced-styles.css' %}" rel="stylesheet">
     <link href="{% static 'css/animations.css' %}" rel="stylesheet">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;800&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
   
   <!-- Dynamic CSS Variables from Site Settings -->
   <style>
@@ -99,24 +102,24 @@
               {% endfor %}
             {% else %}
               {% if site_settings.show_default_nav_links %}
-                <li class="nav-item"><a class="nav-link" href="/">{% trans "خانه" %}</a></li>
-                <li class="nav-item"><a class="nav-link" href="/videos/">{% trans "ویدیوها" %}</a></li>
-                <li class="nav-item"><a class="nav-link" href="/shop/">{% trans "فروشگاه" %}</a></li>
-                <li class="nav-item"><a class="nav-link" href="/blog/">{% trans "بلاگ" %}</a></li>
-                <li class="nav-item"><a class="nav-link" href="/assess/">{% trans "تعیین سطح" %}</a></li>
-                <li class="nav-item"><a class="nav-link" href="/contact/">{% trans "تماس" %}</a></li>
+                <li class="nav-item"><a class="nav-link" href="/">خانه</a></li>
+                <li class="nav-item"><a class="nav-link" href="/videos/">ویدیوها</a></li>
+                <li class="nav-item"><a class="nav-link" href="/shop/">فروشگاه</a></li>
+                <li class="nav-item"><a class="nav-link" href="/blog/">بلاگ</a></li>
+                <li class="nav-item"><a class="nav-link" href="/assess/">تعیین سطح</a></li>
+                <li class="nav-item"><a class="nav-link" href="/contact/">تماس</a></li>
               {% else %}
                 {% for link in nav_links %}
                   <li class="nav-item"><a class="nav-link" href="{{ link.url }}">{{ link.title }}</a></li>
                 {% empty %}
-                  <li class="nav-item"><a class="nav-link" href="/">{% trans "خانه" %}</a></li>
+                  <li class="nav-item"><a class="nav-link" href="/">خانه</a></li>
                 {% endfor %}
               {% endif %}
             {% endif %}
           </ul>
 
           <form class="d-none d-lg-flex position-relative me-3" role="search" action="/search/" x-data="{s:[],q:''}">
-            <input class="form-control" type="search" placeholder="{% trans 'جستجو' %}" name="q" x-model="q" x-on:input.debounce.200ms="fetch('/search/suggest/?q='+encodeURIComponent(q)).then(r=>r.json()).then(d=>s=d.suggestions)">
+            <input class="form-control" type="search" placeholder="جستجو" name="q" x-model="q" x-on:input.debounce.200ms="fetch('/search/suggest/?q='+encodeURIComponent(q)).then(r=>r.json()).then(d=>s=d.suggestions)">
             <div class="position-absolute bg-white shadow rounded w-100 mt-5" x-show="s.length && q" style="top:0; z-index: 1000;">
               <ul class="list-group list-group-flush">
                 <template x-for="it in s" :key="it">
@@ -127,34 +130,22 @@
           </form>
 
           <div class="d-flex align-items-center gap-2">
-            <form method="post" action="{% url 'set_language' %}" class="d-none d-xl-block">
-              {% csrf_token %}
-              <input name="next" type="hidden" value="{{ request.path }}">
-              <select name="language" class="form-select form-select-sm" onchange="this.form.submit()">
-                {% get_current_language as LANGUAGE_CODE %}
-                {% get_available_languages as LANGUAGES %}
-                {% for lang in LANGUAGES %}
-                  <option value="{{ lang.0 }}" {% if lang.0 == LANGUAGE_CODE %}selected{% endif %}>{{ lang.1 }}</option>
-                {% endfor %}
-              </select>
-            </form>
-
             {% if user.is_authenticated %}
               <div class="dropdown">
-                <a class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">{% trans "حساب کاربری" %}</a>
+                <a class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">حساب کاربری</a>
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3">
-                  <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">{% trans "پروفایل" %}</a></li>
+                  <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">پروفایل</a></li>
                   <li>
                     <form method="post" action="{% url 'accounts:logout' %}">
                       {% csrf_token %}
-                      <button class="dropdown-item" type="submit">{% trans "خروج" %}</button>
+                      <button class="dropdown-item" type="submit">خروج</button>
                     </form>
                   </li>
                 </ul>
               </div>
             {% else %}
-              <a class="btn btn-outline-primary" href="/accounts/login/">{% trans "ورود" %}</a>
-              <a class="btn btn-primary" href="/accounts/signup/">{% trans "ثبت‌نام" %}</a>
+              <a class="btn btn-outline-primary" href="/accounts/login/">ورود</a>
+              <a class="btn btn-primary" href="/accounts/signup/">ثبت‌نام</a>
             {% endif %}
           </div>
         </div>
@@ -169,42 +160,30 @@
       </div>
       <div class="offcanvas-body d-flex flex-column gap-3">
         <form class="d-flex position-relative" role="search" action="/search/" x-data="{s:[],q:''}">
-          <input class="form-control" type="search" placeholder="{% trans 'جستجو' %}" name="q" x-model="q" x-on:input.debounce.200ms="fetch('/search/suggest/?q='+encodeURIComponent(q)).then(r=>r.json()).then(d=>s=d.suggestions)">
+          <input class="form-control" type="search" placeholder="جستجو" name="q" x-model="q" x-on:input.debounce.200ms="fetch('/search/suggest/?q='+encodeURIComponent(q)).then(r=>r.json()).then(d=>s=d.suggestions)">
         </form>
         <ul class="list-unstyled m-0">
-          <li class="mb-2"><a class="text-decoration-none" href="/">{% trans "خانه" %}</a></li>
-          <li class="mb-2"><a class="text-decoration-none" href="/videos/">{% trans "ویدیوها" %}</a></li>
-          <li class="mb-2"><a class="text-decoration-none" href="/shop/">{% trans "فروشگاه" %}</a></li>
-          <li class="mb-2"><a class="text-decoration-none" href="/blog/">{% trans "بلاگ" %}</a></li>
-          <li class="mb-2"><a class="text-decoration-none" href="/assess/">{% trans "تعیین سطح" %}</a></li>
-          <li class="mb-2"><a class="text-decoration-none" href="/contact/">{% trans "تماس" %}</a></li>
+          <li class="mb-2"><a class="text-decoration-none" href="/">خانه</a></li>
+          <li class="mb-2"><a class="text-decoration-none" href="/videos/">ویدیوها</a></li>
+          <li class="mb-2"><a class="text-decoration-none" href="/shop/">فروشگاه</a></li>
+          <li class="mb-2"><a class="text-decoration-none" href="/blog/">بلاگ</a></li>
+          <li class="mb-2"><a class="text-decoration-none" href="/contact/">تعیین سطح</a></li>
+          <li class="mb-2"><a class="text-decoration-none" href="/contact/">تماس</a></li>
           {% for link in nav_links %}
             <li class="mb-2"><a class="text-decoration-none" href="{{ link.url }}">{{ link.title }}</a></li>
           {% endfor %}
         </ul>
-        <div>
-          <form method="post" action="{% url 'set_language' %}">
-            {% csrf_token %}
-            <input name="next" type="hidden" value="{{ request.path }}">
-            <select name="language" class="form-select" onchange="this.form.submit()">
-              {% get_current_language as LANGUAGE_CODE %}
-              {% get_available_languages as LANGUAGES %}
-              {% for lang in LANGUAGES %}
-                <option value="{{ lang.0 }}" {% if lang.0 == LANGUAGE_CODE %}selected{% endif %}>{{ lang.1 }}</option>
-              {% endfor %}
-            </select>
-          </form>
-        </div>
+        
         <div class="mt-auto">
           {% if user.is_authenticated %}
-            <a class="btn w-100 btn-outline-primary mb-2" href="{% url 'accounts:profile' %}">{% trans "پروفایل" %}</a>
+            <a class="btn w-100 btn-outline-primary mb-2" href="{% url 'accounts:profile' %}">پروفایل</a>
             <form method="post" action="{% url 'accounts:logout' %}">
               {% csrf_token %}
-              <button class="btn w-100 btn-primary" type="submit">{% trans "خروج" %}</button>
+              <button class="btn w-100 btn-primary" type="submit">خروج</button>
             </form>
           {% else %}
-            <a class="btn w-100 btn-outline-primary mb-2" href="/accounts/login/">{% trans "ورود" %}</a>
-            <a class="btn w-100 btn-primary" href="/accounts/signup/">{% trans "ثبت‌نام" %}</a>
+            <a class="btn w-100 btn-outline-primary mb-2" href="/accounts/login/">ورود</a>
+            <a class="btn w-100 btn-primary" href="/accounts/signup/">ثبت‌نام</a>
           {% endif %}
         </div>
       </div>

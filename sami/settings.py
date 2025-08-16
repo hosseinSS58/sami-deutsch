@@ -33,7 +33,7 @@ SECRET_KEY = env("SECRET_KEY", default="django-insecure-dev-secret-key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG", default=True)
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"]) 
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1", "192.168.1.100"]) 
 
 
 # Application definition
@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     # Third-party
     "crispy_forms",
     "crispy_bootstrap5",
-    "parler",
     "django_filters",
     "payments",
 
@@ -69,7 +68,6 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -130,23 +128,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 ############################
-# Internationalization (i18n)
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
+# Time Zone
 ############################
 
-LANGUAGE_CODE = env("LANGUAGE_CODE", default="fa")
-
-LANGUAGES = [
-    ("fa", "فارسی"),
-    ("en", "English"),
-    ("de", "Deutsch"),
-]
-
-LOCALE_PATHS = [BASE_DIR / "locale"]
-
 TIME_ZONE = env("TIME_ZONE", default="UTC")
-USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 
 
@@ -174,22 +159,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-############################
-# Parler (multilingual content)
-############################
 
-PARLER_DEFAULT_LANGUAGE_CODE = "fa"
-PARLER_LANGUAGES = {
-    None: (
-        {"code": "fa"},
-        {"code": "en"},
-        {"code": "de"},
-    ),
-    "default": {
-        "fallbacks": ["fa", "en"],
-        "hide_untranslated": False,
-    },
-}
 
 ############################
 # Search / MeiliSearch

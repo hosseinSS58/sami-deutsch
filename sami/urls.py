@@ -24,7 +24,7 @@ from .sitemaps import StaticViewSitemap, CourseSitemap, PostSitemap, ProductSite
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("i18n/", include("django.conf.urls.i18n")),
+
     path("sitemap.xml", sitemap, {"sitemaps": {
         "static": StaticViewSitemap,
         "courses": CourseSitemap,
