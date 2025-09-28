@@ -18,9 +18,9 @@ class PostListView(ListView):
         search_query = self.request.GET.get("q", "").strip()
         if search_query:
             queryset = queryset.filter(
-                Q(translations__title__icontains=search_query) |
-                Q(translations__content__icontains=search_query) |
-                Q(translations__excerpt__icontains=search_query)
+                Q(title__icontains=search_query) |
+                Q(content__icontains=search_query) |
+                Q(excerpt__icontains=search_query)
             ).distinct()
         
         # Category filter
@@ -49,19 +49,14 @@ class PostDetailView(DetailView):
     model = Post
     template_name = "blog/post_detail.html"
     context_object_name = "post"
+    slug_url_kwarg = "slug"
 
     def get_object(self, queryset=None):
         slug = self.kwargs.get("slug")
-        lang = getattr(self.request, "LANGUAGE_CODE", None)
-        qs = Post.objects.all().select_related("category")
-        if lang:
-            obj = qs.filter(translations__language_code=lang, translations__slug=slug).first()
-            if obj:
-                return obj
-        obj = qs.filter(translations__slug=slug).first()
-        if obj:
-            return obj
-        raise Http404(_("مقاله یافت نشد"))
+        obj = Post.objects.filter(slug=slug).select_related("category").first()
+        if not obj:
+            raise Http404(_("مقاله یافت نشد"))
+        return obj
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

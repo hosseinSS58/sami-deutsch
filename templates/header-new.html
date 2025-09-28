@@ -1,0 +1,298 @@
+{% load static %}
+
+<!-- Modern Header Design -->
+<style>
+/* Force white background for ALL mobile elements */
+@media (max-width: 1024px) {
+  .modern-header,
+  .header-container,
+  .header-logo,
+  .header-actions,
+  .user-section,
+  .auth-buttons,
+  .mobile-nav,
+  .mobile-nav-content,
+  .mobile-nav-header,
+  .mobile-nav-body,
+  .mobile-auth,
+  .search-modal-content,
+  .search-header,
+  .search-body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+  }
+  
+  .mobile-nav-header {
+    background: #f8f9fa !important;
+  }
+  
+  .search-header {
+    background: #f8f9fa !important;
+  }
+  
+  /* Force dark text */
+  .modern-header,
+  .header-container,
+  .mobile-nav,
+  .mobile-nav-content,
+  .mobile-nav-body,
+  .mobile-auth,
+  .search-modal-content,
+  .search-header,
+  .search-body,
+  .mobile-link,
+  .mobile-nav-header h3,
+  .search-header h3 {
+    color: #212529 !important;
+  }
+  
+  /* Force light borders */
+  .modern-header,
+  .mobile-nav,
+  .mobile-nav-header,
+  .mobile-auth,
+  .search-modal-content,
+  .search-header {
+    border-color: #e9ecef !important;
+  }
+  
+  /* User Dropdown Mobile Fix */
+  .user-dropdown {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    background: #ffffff !important;
+    border: 1px solid #e9ecef !important;
+    z-index: 1001 !important;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease !important;
+  }
+  
+  .user-dropdown.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+  }
+  
+  .user-dropdown .dropdown-item {
+    background: transparent !important;
+    color: #212529 !important;
+  }
+  
+  .user-dropdown .dropdown-item:hover {
+    background: rgba(13, 110, 253, 0.1) !important;
+    color: #0d6efd !important;
+  }
+}
+</style>
+<header class="modern-header" role="banner">
+  <div class="header-container">
+    
+    <!-- Logo Section -->
+    <div class="header-logo">
+      <a href="/" class="logo-link" aria-label="Sami Deutsch - آموزش زبان آلمانی">
+        <div class="logo-icon">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <div class="logo-text">
+          <span class="logo-title">Sami Deutsch</span>
+          <span class="logo-subtitle">آموزش زبان آلمانی</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="header-navigation" role="navigation" aria-label="منوی اصلی">
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="/" class="nav-link active">
+            <i class="fas fa-home"></i>
+            <span>خانه</span>
+          </a>
+        </li>
+        <li class="nav-item dropdown">
+          <a href="/videos/" class="nav-link dropdown-toggle">
+            <i class="fas fa-video"></i>
+            <span>ویدیوها</span>
+            <i class="fas fa-chevron-down dropdown-icon"></i>
+          </a>
+          <div class="dropdown-menu">
+            <a href="/videos/beginner/" class="dropdown-item">
+              <i class="fas fa-play-circle"></i>
+              <span>سطح A1-A2</span>
+            </a>
+            <a href="/videos/intermediate/" class="dropdown-item">
+              <i class="fas fa-play-circle"></i>
+              <span>سطح B1-B2</span>
+            </a>
+            <a href="/videos/advanced/" class="dropdown-item">
+              <i class="fas fa-play-circle"></i>
+              <span>سطح C1-C2</span>
+            </a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a href="/videos/" class="nav-link dropdown-toggle">
+            <i class="fas fa-video"></i>
+            <span>ویدیوها</span>
+            <i class="fas fa-chevron-down dropdown-icon"></i>
+          </a>
+          <div class="dropdown-menu">
+            <a href="/videos/?level=beginner" class="dropdown-item">
+              <i class="fas fa-play-circle"></i>
+              <span>مبتدی</span>
+            </a>
+            <a href="/videos/?level=intermediate" class="dropdown-item">
+              <i class="fas fa-graduation-cap"></i>
+              <span>متوسط</span>
+            </a>
+            <a href="/videos/?level=advanced" class="dropdown-item">
+              <i class="fas fa-trophy"></i>
+              <span>پیشرفته</span>
+            </a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a href="/blog/" class="nav-link">
+            <i class="fas fa-newspaper"></i>
+            <span>وبلاگ</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/assessments/" class="nav-link">
+            <i class="fas fa-clipboard-check"></i>
+            <span>آزمون‌ها</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      
+      <!-- Search Button -->
+      <button class="action-btn search-btn" type="button" aria-label="جستجو">
+        <i class="fas fa-search"></i>
+      </button>
+
+      <!-- User Section -->
+      <div class="user-section">
+        {% if user.is_authenticated %}
+          <!-- Authenticated User -->
+          <div class="user-profile">
+            <button class="user-btn" type="button" aria-label="پروفایل کاربر">
+              <div class="user-avatar">
+                {% if user.profile.avatar %}
+                  <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}">
+                {% else %}
+                  <i class="fas fa-user"></i>
+                {% endif %}
+              </div>
+              <span class="user-name">{{ user.username|default:"کاربر" }}</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            
+            <!-- User Dropdown -->
+            <div class="user-dropdown">
+              <a href="/accounts/profile/" class="dropdown-item">
+                <i class="fas fa-user-circle"></i>
+                <span>پروفایل</span>
+              </a>
+              <a href="/accounts/settings/" class="dropdown-item">
+                <i class="fas fa-cog"></i>
+                <span>تنظیمات</span>
+              </a>
+              <a href="/accounts/progress/" class="dropdown-item">
+                <i class="fas fa-chart-line"></i>
+                <span>پیشرفت</span>
+              </a>
+              <div class="dropdown-divider"></div>
+              <form method="post" action="{% url 'accounts:logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item logout-btn">
+                  <i class="fas fa-sign-out-alt"></i>
+                  <span>خروج</span>
+                </button>
+              </form>
+            </div>
+          </div>
+        {% else %}
+          <!-- Guest User -->
+          <div class="auth-buttons">
+            <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary">
+              <i class="fas fa-sign-in-alt"></i>
+              <span>ورود</span>
+            </a>
+            <a href="{% url 'accounts:signup' %}" class="btn btn-primary">
+              <i class="fas fa-user-plus"></i>
+              <span>ثبت‌نام</span>
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-toggle" type="button" aria-label="منوی موبایل">
+        <span class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation -->
+  <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-content">
+      <div class="mobile-nav-header">
+        <h3>منوی اصلی</h3>
+        <button class="mobile-close" type="button" aria-label="بستن منو">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="mobile-nav-body">
+        <ul class="mobile-menu">
+          <li><a href="/" class="mobile-link"><i class="fas fa-home"></i>خانه</a></li>
+          <li><a href="/videos/" class="mobile-link"><i class="fas fa-video"></i>ویدیوها</a></li>
+          <li><a href="/blog/" class="mobile-link"><i class="fas fa-newspaper"></i>وبلاگ</a></li>
+          <li><a href="/assessments/" class="mobile-link"><i class="fas fa-clipboard-check"></i>آزمون‌ها</a></li>
+        </ul>
+        <div class="mobile-auth">
+          {% if not user.is_authenticated %}
+            <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary w-100 mb-2">ورود</a>
+            <a href="{% url 'accounts:signup' %}" class="btn btn-primary w-100">ثبت‌نام</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Search Modal -->
+<div class="search-modal" id="searchModal">
+  <div class="search-modal-content">
+    <div class="search-header">
+      <h3>جستجو در سایت</h3>
+      <button class="search-close" type="button" aria-label="بستن جستجو">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="search-body">
+      <form class="search-form" action="/search/" method="get">
+        <div class="search-input-group">
+          <input type="search" name="q" class="search-input" placeholder="آنچه را که می‌خواهید پیدا کنید..." autocomplete="off">
+          <button type="submit" class="search-submit">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Header Spacer -->
+<div class="header-spacer"></div>

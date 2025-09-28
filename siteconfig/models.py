@@ -25,9 +25,60 @@ class SiteSettings(SingletonModel):
     show_default_nav_links = models.BooleanField(default=True)
 
     # Home hero
-    hero_title = models.CharField(max_length=120, blank=True, default="آموزش آلمانی، سریع و اصولی")
-    hero_subtitle = models.CharField(max_length=200, blank=True, default="دوره‌های سطح‌بندی شده، تمرین‌های تعاملی و آزمون تعیین سطح هوشمند")
-    hero_video_url = models.URLField(blank=True, default="https://www.youtube.com/embed/hHW1oY26kxQ")
+    hero_title = models.CharField(max_length=120, blank=True, default="آموزش زبان آلمانی", verbose_name=_("عنوان اصلی هیرو"))
+    hero_subtitle = models.CharField(max_length=200, blank=True, default="از پایه تا پیشرفته", verbose_name=_("زیرعنوان هیرو"))
+    hero_description = models.TextField(blank=True, default="با بهترین روش‌های آموزشی، زبان آلمانی را به صورت خودخوان و کاربردی یاد بگیرید. از سطح A1 تا C1، با ویدیوهای آموزشی، مقالات تخصصی و آزمون‌های استاندارد.", verbose_name=_("توضیحات هیرو"))
+    hero_primary_button_text = models.CharField(max_length=50, blank=True, default="شروع یادگیری", verbose_name=_("متن دکمه اصلی"))
+    hero_primary_button_url = models.CharField(max_length=200, blank=True, default="/videos/", verbose_name=_("لینک دکمه اصلی"))
+    hero_secondary_button_text = models.CharField(max_length=50, blank=True, default="تعیین سطح", verbose_name=_("متن دکمه ثانویه"))
+    hero_secondary_button_url = models.CharField(max_length=200, blank=True, default="/assessments/", verbose_name=_("لینک دکمه ثانویه"))
+    hero_image = models.ImageField(upload_to="hero/", blank=True, null=True, verbose_name=_("تصویر هیرو"))
+    hero_icon = models.CharField(max_length=50, blank=True, default="fas fa-graduation-cap", verbose_name=_("آیکون هیرو"))
+    hero_icon_size = models.CharField(max_length=20, blank=True, default="fa-8x", verbose_name=_("اندازه آیکون"))
+    hero_icon_color = models.CharField(max_length=7, blank=True, default="#0d6efd", verbose_name=_("رنگ آیکون"))
+    hero_bg_color = models.CharField(max_length=7, blank=True, default="#f8f9fa", verbose_name=_("رنگ پس‌زمینه هیرو"))
+    hero_text_color = models.CharField(max_length=7, blank=True, default="#0f172a", verbose_name=_("رنگ متن هیرو"))
+    hero_subtitle_color = models.CharField(max_length=7, blank=True, default="#6c757d", verbose_name=_("رنگ زیرعنوان"))
+    hero_description_color = models.CharField(max_length=7, blank=True, default="#6c757d", verbose_name=_("رنگ توضیحات"))
+    show_hero_floating_elements = models.BooleanField(default=True, verbose_name=_("نمایش عناصر شناور"))
+    show_hero_stats = models.BooleanField(default=True, verbose_name=_("نمایش آمار"))
+    show_hero_newsletter = models.BooleanField(default=True, verbose_name=_("نمایش خبرنامه"))
+    hero_video_url = models.URLField(blank=True, default="https://www.youtube.com/embed/hHW1oY26kxQ", verbose_name=_("لینک ویدیو هیرو"))
+    show_hero_video = models.BooleanField(default=False, verbose_name=_("نمایش ویدیو هیرو"))
+    
+    # Hero Stats
+    hero_stats_videos_title = models.CharField(max_length=50, blank=True, default="ویدیوی آموزشی", verbose_name=_("عنوان آمار ویدیوها"))
+    hero_stats_videos_count = models.PositiveIntegerField(default=100, verbose_name=_("تعداد ویدیوها"))
+    hero_stats_videos_icon = models.CharField(max_length=50, blank=True, default="fas fa-video", verbose_name=_("آیکون ویدیوها"))
+    hero_stats_videos_color = models.CharField(max_length=7, blank=True, default="#0d6efd", verbose_name=_("رنگ آمار ویدیوها"))
+    
+    hero_stats_posts_title = models.CharField(max_length=50, blank=True, default="مقاله تخصصی", verbose_name=_("عنوان آمار مقالات"))
+    hero_stats_posts_count = models.PositiveIntegerField(default=50, verbose_name=_("تعداد مقالات"))
+    hero_stats_posts_icon = models.CharField(max_length=50, blank=True, default="fas fa-newspaper", verbose_name=_("آیکون مقالات"))
+    hero_stats_posts_color = models.CharField(max_length=7, blank=True, default="#198754", verbose_name=_("رنگ آمار مقالات"))
+    
+    hero_stats_products_title = models.CharField(max_length=50, blank=True, default="پکیج آموزشی", verbose_name=_("عنوان آمار محصولات"))
+    hero_stats_products_count = models.PositiveIntegerField(default=25, verbose_name=_("تعداد محصولات"))
+    hero_stats_products_icon = models.CharField(max_length=50, blank=True, default="fas fa-shopping-bag", verbose_name=_("آیکون محصولات"))
+    hero_stats_products_color = models.CharField(max_length=7, blank=True, default="#ffc107", verbose_name=_("رنگ آمار محصولات"))
+    
+    hero_stats_students_title = models.CharField(max_length=50, blank=True, default="دانشجو", verbose_name=_("عنوان آمار دانشجویان"))
+    hero_stats_students_count = models.PositiveIntegerField(default=1000, verbose_name=_("تعداد دانشجویان"))
+    hero_stats_students_icon = models.CharField(max_length=50, blank=True, default="fas fa-users", verbose_name=_("آیکون دانشجویان"))
+    hero_stats_students_color = models.CharField(max_length=7, blank=True, default="#0dcaf0", verbose_name=_("رنگ آمار دانشجویان"))
+    
+    # Hero Floating Elements
+    hero_floating_element_1_title = models.CharField(max_length=50, blank=True, default="ویدیوهای آموزشی", verbose_name=_("عنوان عنصر شناور 1"))
+    hero_floating_element_1_icon = models.CharField(max_length=50, blank=True, default="fas fa-video", verbose_name=_("آیکون عنصر شناور 1"))
+    hero_floating_element_1_color = models.CharField(max_length=7, blank=True, default="#198754", verbose_name=_("رنگ عنصر شناور 1"))
+    
+    hero_floating_element_2_title = models.CharField(max_length=50, blank=True, default="مقالات تخصصی", verbose_name=_("عنوان عنصر شناور 2"))
+    hero_floating_element_2_icon = models.CharField(max_length=50, blank=True, default="fas fa-book", verbose_name=_("آیکون عنصر شناور 2"))
+    hero_floating_element_2_color = models.CharField(max_length=7, blank=True, default="#0dcaf0", verbose_name=_("رنگ عنصر شناور 2"))
+    
+    hero_floating_element_3_title = models.CharField(max_length=50, blank=True, default="آزمون‌های استاندارد", verbose_name=_("عنوان عنصر شناور 3"))
+    hero_floating_element_3_icon = models.CharField(max_length=50, blank=True, default="fas fa-trophy", verbose_name=_("آیکون عنصر شناور 3"))
+    hero_floating_element_3_color = models.CharField(max_length=7, blank=True, default="#ffc107", verbose_name=_("رنگ عنصر شناور 3"))
     show_newsletter = models.BooleanField(default=True)
 
     # Color Scheme - Header & Navigation

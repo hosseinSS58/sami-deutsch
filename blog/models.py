@@ -1,7 +1,5 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from parler.models import TranslatableModel, TranslatedFields
-from django.utils.translation import get_language
 
 
 class Category(models.Model):
@@ -19,13 +17,11 @@ class Category(models.Model):
         return self.name
 
 
-class Post(TranslatableModel):
-    translations = TranslatedFields(
-        title=models.CharField(max_length=250, verbose_name=_("عنوان")),
-        slug=models.SlugField(max_length=270, unique=True, allow_unicode=True),
-        content=models.TextField(verbose_name=_("محتوا")),
-        excerpt=models.TextField(max_length=500, blank=True, null=True, verbose_name=_("خلاصه")),
-    )
+class Post(models.Model):
+    title = models.CharField(max_length=250, verbose_name=_("عنوان"), default="")
+    slug = models.SlugField(max_length=270, unique=True, allow_unicode=True, default="")
+    content = models.TextField(verbose_name=_("محتوا"), default="")
+    excerpt = models.TextField(max_length=500, blank=True, null=True, verbose_name=_("خلاصه"))
     cover = models.ImageField(upload_to="blog/covers/", blank=True, null=True, verbose_name=_("عکس کاور"))
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("دسته‌بندی"))
     youtube_video_id = models.CharField(max_length=20, blank=True, null=True, verbose_name=_("شناسه ویدیو یوتیوب"))
@@ -39,22 +35,15 @@ class Post(TranslatableModel):
         ordering = ["-published_at"]
 
     def __str__(self) -> str:
-        return self.safe_translation_getter("title", any_language=True) or f"Post {self.pk}"
+        return self.title
 
     def get_absolute_url(self):
         from django.urls import reverse
-        lang = get_language()
-        slug_val = self.safe_translation_getter("slug", language_code=lang)
-        if not slug_val:
-            slug_val = self.safe_translation_getter("slug", any_language=True)
-        return reverse("blog:detail", kwargs={"slug": slug_val})
+        return reverse("blog:detail", kwargs={"slug": self.slug})
 
     @property
     def slug_current(self) -> str:
-        slug = self.safe_translation_getter("slug", language_code=getattr(self, "_current_language", None))
-        if not slug:
-            slug = self.safe_translation_getter("slug", any_language=True) or ""
-        return slug
+        return self.slug
     
     @property
     def youtube_embed_url(self):
@@ -79,5 +68,5 @@ class Post(TranslatableModel):
         """Return excerpt or first 200 characters of content"""
         if self.excerpt:
             return self.excerpt
-        content = self.safe_translation_getter("content", any_language=True) or ""
+        content = self.content or ""
         return content[:200] + "..." if len(content) > 200 else content

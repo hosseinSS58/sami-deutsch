@@ -1,0 +1,297 @@
+/* ===== MOBILE ENHANCEMENTS ===== */
+/* بهبودهای اضافی برای موبایل */
+
+/* Viewport Meta Tag Support */
+@supports (height: 100dvh) {
+  .mobile-nav {
+    height: 100dvh;
+  }
+}
+
+/* Safe Area Support for iOS */
+@supports (padding: max(0px)) {
+  .modern-header {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+  
+  .mobile-nav {
+    padding-top: max(0px, env(safe-area-inset-top));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+}
+
+/* iOS Safari Specific Fixes */
+@supports (-webkit-touch-callout: none) {
+  .mobile-nav {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .mobile-link {
+    -webkit-tap-highlight-color: rgba(13, 110, 253, 0.1);
+  }
+  
+  .action-btn,
+  .user-btn,
+  .mobile-toggle {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Android Chrome Specific */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .mobile-nav {
+    overscroll-behavior: contain;
+  }
+  
+  .mobile-nav-body {
+    overscroll-behavior-y: contain;
+  }
+}
+
+/* Focus Management for Mobile */
+@media (max-width: 1024px) {
+  .mobile-nav:focus-within {
+    outline: none;
+  }
+  
+  .mobile-link:focus {
+    outline: 2px solid var(--header-primary);
+    outline-offset: -2px;
+    background: rgba(13, 110, 253, 0.1);
+  }
+  
+  .action-btn:focus,
+  .user-btn:focus,
+  .mobile-toggle:focus {
+    outline: 2px solid var(--header-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* Performance Optimizations */
+@media (max-width: 1024px) {
+  .modern-header {
+    will-change: transform;
+  }
+  
+  .mobile-nav {
+    will-change: transform;
+  }
+  
+  .mobile-toggle {
+    will-change: transform;
+  }
+}
+
+/* Battery Saving Mode */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-nav,
+  .mobile-toggle,
+  .hamburger span,
+  .mobile-link {
+    will-change: auto;
+  }
+}
+
+/* High Contrast Mode Mobile */
+@media (prefers-contrast: high) and (max-width: 1024px) {
+  .mobile-nav {
+    border-left: 2px solid #000000;
+  }
+  
+  .mobile-link {
+    border: 1px solid #000000;
+    margin-bottom: 1px;
+  }
+  
+  .mobile-link:hover {
+    background: #000000;
+    color: #ffffff;
+  }
+  
+  .action-btn,
+  .user-btn,
+  .mobile-toggle {
+    border: 2px solid #000000;
+  }
+}
+
+/* Print Styles for Mobile */
+@media print and (max-width: 1024px) {
+  .modern-header {
+    position: static;
+    box-shadow: none;
+    border-bottom: 2px solid #000000;
+    height: auto;
+    padding: 0.5rem 0;
+  }
+  
+  .mobile-toggle,
+  .action-btn,
+  .user-section,
+  .mobile-nav {
+    display: none;
+  }
+  
+  .header-container {
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .logo-text {
+    display: flex;
+  }
+  
+  .header-navigation {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .nav-menu {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .nav-link {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #000000;
+    text-align: center;
+  }
+}
+
+/* Accessibility Improvements */
+@media (max-width: 1024px) {
+  /* Skip links for mobile */
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: var(--header-primary);
+    color: white;
+    padding: 8px;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 1000;
+    transition: top 0.3s;
+  }
+  
+  .skip-link:focus {
+    top: 6px;
+  }
+  
+  /* Screen reader only text */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  
+  /* Focus indicators */
+  .mobile-link:focus-visible,
+  .action-btn:focus-visible,
+  .user-btn:focus-visible,
+  .mobile-toggle:focus-visible {
+    outline: 3px solid var(--header-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* Loading States for Mobile */
+@media (max-width: 1024px) {
+  .modern-header.loading .mobile-toggle {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+  
+  .modern-header.loading .mobile-toggle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid transparent;
+    border-top: 2px solid var(--header-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+}
+
+/* Error States for Mobile */
+@media (max-width: 1024px) {
+  .modern-header.error {
+    border-bottom: 3px solid var(--header-danger);
+  }
+  
+  .modern-header.error .mobile-toggle {
+    background: var(--header-danger);
+    color: white;
+  }
+  
+  .modern-header.error .mobile-toggle:hover {
+    background: #b02a37;
+  }
+}
+
+/* Success States for Mobile */
+@media (max-width: 1024px) {
+  .modern-header.success {
+    border-bottom: 3px solid var(--header-success);
+  }
+  
+  .modern-header.success .mobile-toggle {
+    background: var(--header-success);
+    color: white;
+  }
+  
+  .modern-header.success .mobile-toggle:hover {
+    background: #146c43;
+  }
+}
+
+/* Network Status Indicators */
+@media (max-width: 1024px) {
+  .modern-header.offline::before {
+    content: 'آفلاین';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--header-warning);
+    color: #000;
+    text-align: center;
+    padding: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 999;
+  }
+  
+  .modern-header.online::before {
+    content: 'آنلاین';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--header-success);
+    color: white;
+    text-align: center;
+    padding: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 999;
+  }
+}

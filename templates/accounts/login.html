@@ -1,50 +1,53 @@
 {% extends "base.html" %}
-{% load i18n form_extras %}
-{% block title %}{% trans "ورود" %}{% endblock %}
+{% load form_extras %}
+{% block title %}ورود{% endblock %}
 {% block content %}
 <div class="min-vh-100 d-flex align-items-center justify-content-center py-5">
-  <div class="card shadow-lg border-0" style="max-width: 480px; width:100%;">
-    <div class="card-body p-4 p-md-5">
-      <div class="text-center mb-3">
-        <div class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width:56px;height:56px;background: linear-gradient(135deg, var(--brand), #0b5ed7);">
-          <i class="fa fa-user text-white"></i>
-        </div>
+  <div class="form-card" style="max-width: 480px; width:100%;">
+    <div class="form-card-header">
+      <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:56px;height:56px;background: rgba(255,255,255,0.2);">
+        <i class="fa fa-user text-white"></i>
       </div>
-      <h1 class="h4 text-center mb-2">{% trans "خوش آمدید" %}</h1>
-      <p class="text-muted text-center mb-4">{% trans "برای ادامه وارد حساب خود شوید" %}</p>
-
+      <h1 class="h4 mb-2">خوش آمدید</h1>
+      <p class="mb-0 opacity-75">برای ادامه وارد حساب خود شوید</p>
+    </div>
+    
+    <div class="form-card-body">
       <form method="post" novalidate>
         {% csrf_token %}
 
         {% if form.non_field_errors %}
-          <div class="alert alert-danger small">{{ form.non_field_errors }}</div>
+          <div class="alert alert-danger">{{ form.non_field_errors }}</div>
         {% endif %}
 
         {% for field in form %}
-          <div class="mb-3">
+          <div class="form-group">
             <label class="form-label" for="id_{{ field.name }}">{{ field.label }}</label>
             {% if field.field.widget.input_type == 'checkbox' %}
-              <div class="form-check">{{ field }} <label class="form-check-label" for="id_{{ field.name }}">{{ field.help_text }}</label></div>
+              <div class="form-check">
+                {{ field }}
+                <label class="form-check-label" for="id_{{ field.name }}">{{ field.help_text }}</label>
+              </div>
             {% else %}
               {{ field|add_class:'form-control form-control-lg' }}
               {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
             {% endif %}
-            {% for err in field.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+            {% for err in field.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
           </div>
         {% endfor %}
 
-        <button class="btn btn-primary btn-lg w-100 mb-2">{% trans "ورود" %}</button>
-        <p class="text-muted text-center small m-0">{% trans "می‌توانید با ایمیل یا نام کاربری وارد شوید" %}</p>
+        <button class="btn btn-primary btn-lg w-100 mb-2">ورود</button>
+        <p class="text-muted text-center small m-0">می‌توانید با ایمیل یا نام کاربری وارد شوید</p>
       </form>
 
       <hr class="my-4"/>
       <div class="text-center">
-        <span class="text-muted small">{% trans "حساب کاربری ندارید؟" %}</span>
-        <a class="small" href="{% url 'accounts:signup' %}">{% trans "ایجاد حساب" %}</a>
+        <span class="text-muted small">حساب کاربری ندارید؟</span>
+        <a class="small" href="{% url 'accounts:signup' %}">ایجاد حساب</a>
       </div>
     </div>
   </div>
-  </div>
+</div>
 {% endblock %}
 
 

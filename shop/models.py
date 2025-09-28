@@ -1,15 +1,11 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from parler.models import TranslatableModel, TranslatedFields
-from django.utils.translation import get_language
 
 
-class Product(TranslatableModel):
-    translations = TranslatedFields(
-        name=models.CharField(max_length=200, verbose_name=_("نام")),
-        slug=models.SlugField(max_length=220, unique=True, allow_unicode=True),
-        description=models.TextField(blank=True, verbose_name=_("توضیحات")),
-    )
+class Product(models.Model):
+    name = models.CharField(max_length=200, verbose_name=_("نام"), default="")
+    slug = models.SlugField(max_length=220, unique=True, allow_unicode=True, default="")
+    description = models.TextField(blank=True, verbose_name=_("توضیحات"), default="")
     price = models.PositiveIntegerField(verbose_name=_("قیمت به تومان"))
     is_active = models.BooleanField(default=True)
     cover = models.ImageField(upload_to="products/covers/", blank=True, null=True)
@@ -21,22 +17,15 @@ class Product(TranslatableModel):
         ordering = ["-created_at"]
 
     def __str__(self) -> str:
-        return self.safe_translation_getter("name", any_language=True) or f"Product {self.pk}"
+        return self.name
 
     def get_absolute_url(self):
         from django.urls import reverse
-        lang = get_language()
-        slug_val = self.safe_translation_getter("slug", language_code=lang)
-        if not slug_val:
-            slug_val = self.safe_translation_getter("slug", any_language=True)
-        return reverse("shop:detail", kwargs={"slug": slug_val})
+        return reverse("shop:detail", kwargs={"slug": self.slug})
 
     @property
     def slug_current(self) -> str:
-        slug = self.safe_translation_getter("slug", language_code=getattr(self, "_current_language", None))
-        if not slug:
-            slug = self.safe_translation_getter("slug", any_language=True) or ""
-        return slug
+        return self.slug
 
 
 class Order(models.Model):

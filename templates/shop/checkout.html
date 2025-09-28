@@ -1,13 +1,61 @@
 {% extends "base.html" %}
-{% load i18n %}
-{% block title %}{% trans "تسویه حساب" %}{% endblock %}
+{% block title %}تسویه حساب{% endblock %}
 {% block content %}
-<h1 class="mb-3">{% trans "تسویه حساب" %}</h1>
-<form method="post" class="col-md-8">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button class="btn btn-primary">{% trans "ثبت سفارش" %}</button>
-</form>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:56px;height:56px;background: rgba(255,255,255,0.2);">
+            <i class="fa fa-credit-card text-white"></i>
+          </div>
+          <h1 class="h3 mb-2">تسویه حساب</h1>
+          <p class="mb-0 opacity-75">اطلاعات تحویل خود را تکمیل کنید</p>
+        </div>
+        
+        <div class="form-card-body">
+          <form method="post" novalidate>
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+            
+            <div class="form-grid form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="id_full_name">نام کامل</label>
+                {{ form.full_name|add_class:'form-control' }}
+                {% for err in form.full_name.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="id_email">ایمیل</label>
+                {{ form.email|add_class:'form-control' }}
+                {% for err in form.email.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="id_phone">شماره تلفن (اختیاری)</label>
+              {{ form.phone|add_class:'form-control' }}
+              {% for err in form.phone.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="id_address">آدرس تحویل (اختیاری)</label>
+              {{ form.address|add_class:'form-control' }}
+              {% for err in form.address.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+            </div>
+            
+            <div class="text-center">
+              <button class="btn btn-primary btn-lg">ثبت سفارش</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 

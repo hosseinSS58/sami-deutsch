@@ -2,8 +2,8 @@ from django.http import JsonResponse
 from django.views.generic import ListView, View
 from django.db.models import Q
 from django.shortcuts import render
-from courses.models import Video
-from blog.models import Post
+from courses.models import Video, VideoTag
+from blog.models import Post, Category
 from shop.models import Product
 
 
@@ -21,8 +21,9 @@ class SearchView(ListView):
         
         # جستجو در ویدیوها
         videos = Video.objects.filter(
-            Q(translations__title__icontains=query) |
-            Q(translations__description__icontains=query)
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(tags__name__icontains=query)
         ).distinct()
         
         for video in videos:
@@ -35,13 +36,15 @@ class SearchView(ListView):
                 'topic': video.get_topic_display(),
                 'created_at': video.created_at,
                 'views_count': getattr(video, 'views_count', 0),
-                'duration_minutes': video.duration_minutes
+                'duration_minutes': video.duration_minutes,
+                'tags': list(video.tags.values_list('name', flat=True))
             })
         
         # جستجو در مقالات
         posts = Post.objects.filter(
-            Q(translations__title__icontains=query) |
-            Q(translations__content__icontains=query)
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(category__name__icontains=query)
         ).distinct()
         
         for post in posts:
@@ -52,13 +55,14 @@ class SearchView(ListView):
                 'url': post.get_absolute_url(),
                 'category': post.category.name if post.category else None,
                 'created_at': post.published_at,
-                'views_count': getattr(post, 'views_count', 0)
+                'views_count': getattr(post, 'views_count', 0),
+                'tags': [post.category.name] if post.category else []
             })
         
         # جستجو در محصولات
         products = Product.objects.filter(
-            Q(translations__name__icontains=query) |
-            Q(translations__description__icontains=query)
+            Q(name__icontains=query) |
+            Q(description__icontains=query)
         ).distinct()
         
         for product in products:
@@ -67,10 +71,29 @@ class SearchView(ListView):
                 'title': product.name,
                 'excerpt': product.description,
                 'url': product.get_absolute_url(),
-                'category': product.category.name if product.category else None,
+                'category': 'محصول',
                 'created_at': product.created_at,
-                'views_count': getattr(product, 'views_count', 0)
+                'views_count': 0,
+                'tags': ['محصول آموزشی']
             })
+        
+        # جستجو در تگ‌های ویدیو
+        video_tags = VideoTag.objects.filter(name__icontains=query)
+        for tag in video_tags:
+            videos_with_tag = tag.videos.all()[:3]  # حداکثر 3 ویدیو برای هر تگ
+            for video in videos_with_tag:
+                results.append({
+                    'type': 'videos',
+                    'title': f"{video.title} (تگ: {tag.name})",
+                    'excerpt': f"ویدیو با تگ {tag.name}",
+                    'url': video.get_absolute_url(),
+                    'level': video.level,
+                    'topic': video.get_topic_display(),
+                    'created_at': video.created_at,
+                    'views_count': getattr(video, 'views_count', 0),
+                    'duration_minutes': video.duration_minutes,
+                    'tags': [tag.name] + list(video.tags.exclude(id=tag.id).values_list('name', flat=True))
+                })
         
         # مرتب‌سازی بر اساس تاریخ
         results.sort(key=lambda x: x['created_at'], reverse=True)
@@ -92,21 +115,28 @@ class SuggestionView(View):
         if query:
             # پیشنهادات از ویدیوها
             video_titles = Video.objects.filter(
-                translations__title__icontains=query
-            ).values_list('translations__title', flat=True)[:3]
+                Q(title__icontains=query) |
+                Q(description__icontains=query)
+            ).values_list('title', flat=True)[:3]
             suggestions.extend(video_titles)
             
             # پیشنهادات از مقالات
             post_titles = Post.objects.filter(
-                translations__title__icontains=query
-            ).values_list('translations__title', flat=True)[:3]
+                Q(title__icontains=query) |
+                Q(content__icontains=query)
+            ).values_list('title', flat=True)[:3]
             suggestions.extend(post_titles)
             
             # پیشنهادات از محصولات
             product_names = Product.objects.filter(
-                translations__name__icontains=query
-            ).values_list('translations__name', flat=True)[:3]
+                Q(name__icontains=query) |
+                Q(description__icontains=query)
+            ).values_list('name', flat=True)[:3]
             suggestions.extend(product_names)
+            
+            # پیشنهادات از تگ‌ها
+            tag_names = VideoTag.objects.filter(name__icontains=query).values_list('name', flat=True)[:3]
+            suggestions.extend(tag_names)
         
         # حذف موارد تکراری و محدود کردن به 10 مورد
         unique_suggestions = list(dict.fromkeys(suggestions))[:10]

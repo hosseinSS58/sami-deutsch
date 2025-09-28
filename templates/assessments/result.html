@@ -2,17 +2,178 @@
 {% load i18n %}
 {% block title %}{% trans "نتیجه تعیین سطح" %}{% endblock %}
 {% block content %}
-<div class="text-center py-5">
-  <h1 class="mb-3">{% trans "نتیجه تعیین سطح" %}</h1>
-  {% if recommended_level %}
-    <p class="lead">{% trans "سطح پیشنهادی شما" %}: <strong>{{ recommended_level }}</strong></p>
-    {% if request.session.assessment_start %}
-      <p class="text-muted">{% trans "زمان صرف‌شده" %}: {{ request.session.assessment_start|default:0 }}</p>
-    {% endif %}
-    <a class="btn btn-primary" href="/shop/?level={{ recommended_level }}">{% trans "پکیج‌های مناسب شما" %}</a>
-  {% else %}
-    <p class="text-muted">{% trans "ابتدا آزمون را انجام دهید" %}</p>
-  {% endif %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="text-center mb-5">
+        <h1 class="mb-3">{% trans "نتیجه تعیین سطح" %}</h1>
+        {% if submission %}
+          <div class="alert alert-success">
+            <i class="fas fa-check-circle fa-2x mb-3"></i>
+            <h4>{% trans "آزمون با موفقیت تکمیل شد!" %}</h4>
+          </div>
+        {% endif %}
+      </div>
+
+      {% if submission %}
+        <!-- Results Summary -->
+        <div class="row g-4 mb-5">
+          <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body text-center">
+                <i class="fas fa-trophy fa-3x text-warning mb-3"></i>
+                <h5 class="card-title">{% trans "سطح پیشنهادی" %}</h5>
+                <h2 class="text-primary">{{ recommended_level }}</h2>
+                <p class="text-muted small">{% trans "بر اساس عملکرد شما" %}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                <h5 class="card-title">{% trans "نمره شما" %}</h5>
+                <h2 class="text-success">{{ percentage }}%</h2>
+                <p class="text-muted small">{{ score|floatformat:1 }} از {{ total_weight|floatformat:1 }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detailed Results -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-info-circle me-2"></i>{% trans "جزئیات آزمون" %}
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="d-flex justify-content-between">
+                  <span>{% trans "زمان صرف‌شده:" %}</span>
+                  <strong>{{ duration_minutes }} {% trans "دقیقه" %}</strong>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex justify-content-between">
+                  <span>{% trans "تاریخ آزمون:" %}</span>
+                  <strong>{{ created_at|date:"Y/m/d H:i" }}</strong>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex justify-content-between">
+                  <span>{% trans "نسبت پاسخ‌های صحیح:" %}</span>
+                  <strong>{{ ratio|floatformat:2 }}</strong>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex justify-content-between">
+                  <span>{% trans "آزمون:" %}</span>
+                  <strong>{{ submission.assessment.title }}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Level Description -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fas fa-graduation-cap me-2"></i>{% trans "توضیح سطح" %}
+            </h5>
+          </div>
+          <div class="card-body">
+            {% if recommended_level == "A1" %}
+              <p class="mb-0">{% trans "سطح A1: مبتدی - شما می‌توانید عبارات ساده و روزمره را درک کرده و استفاده کنید." %}</p>
+            {% elif recommended_level == "A2" %}
+              <p class="mb-0">{% trans "سطح A2: مبتدی پیشرفته - شما می‌توانید در موقعیت‌های ساده و روزمره ارتباط برقرار کنید." %}</p>
+            {% elif recommended_level == "B1" %}
+              <p class="mb-0">{% trans "سطح B1: متوسط - شما می‌توانید در اکثر موقعیت‌ها به طور مستقل ارتباط برقرار کنید." %}</p>
+            {% elif recommended_level == "B2" %}
+              <p class="mb-0">{% trans "سطح B2: متوسط پیشرفته - شما می‌توانید در موقعیت‌های پیچیده به طور مستقل ارتباط برقرار کنید." %}</p>
+            {% elif recommended_level == "C1" %}
+              <p class="mb-0">{% trans "سطح C1: پیشرفته - شما می‌توانید در موقعیت‌های پیچیده و تخصصی به طور روان ارتباط برقرار کنید." %}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Recommended Videos -->
+        {% if recommended_videos %}
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fas fa-video me-2"></i>{% trans "ویدیوهای پیشنهادی برای سطح" %} {{ recommended_level }}
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              {% for video in recommended_videos %}
+              <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <h6 class="card-title mb-0">{{ video.title }}</h6>
+                      {% if video.is_free %}
+                        <span class="badge bg-success">{% trans "رایگان" %}</span>
+                      {% else %}
+                        <span class="badge bg-warning">{% trans "پولی" %}</span>
+                      {% endif %}
+                    </div>
+                    <p class="card-text text-muted small mb-2">{{ video.description|truncatechars:80 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <small class="text-muted">
+                        <i class="fas fa-clock me-1"></i>{{ video.duration_minutes }} {% trans "دقیقه" %}
+                      </small>
+                      <small class="text-muted">
+                        <i class="fas fa-tag me-1"></i>{{ video.get_topic_display }}
+                      </small>
+                    </div>
+                    <div class="mt-2">
+                      <a href="{{ video.get_absolute_url }}" class="btn btn-outline-primary btn-sm w-100">
+                        <i class="fas fa-play me-1"></i>{% trans "مشاهده" %}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="text-center">
+          <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a class="btn btn-primary btn-lg" href="/shop/?level={{ recommended_level }}">
+              <i class="fas fa-shopping-cart me-2"></i>{% trans "پکیج‌های مناسب شما" %}
+            </a>
+            <a class="btn btn-outline-secondary btn-lg" href="{% url 'assessments:intro' %}">
+              <i class="fas fa-redo me-2"></i>{% trans "آزمون مجدد" %}
+            </a>
+            <a class="btn btn-outline-info btn-lg" href="{% url 'core:contact' %}">
+              <i class="fas fa-question-circle me-2"></i>{% trans "راهنمایی" %}
+            </a>
+          </div>
+        </div>
+
+      {% else %}
+        <div class="text-center">
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+            <h4>{% trans "هیچ نتیجه‌ای یافت نشد" %}</h4>
+            <p class="mb-0">{% trans "ابتدا آزمون را انجام دهید تا نتایج شما نمایش داده شود." %}</p>
+          </div>
+          <a class="btn btn-primary btn-lg" href="{% url 'assessments:intro' %}">
+            <i class="fas fa-play me-2"></i>{% trans "شروع آزمون" %}
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}
 

@@ -8,6 +8,7 @@ urlpatterns = [
     path("", HomeView.as_view(), name="home"),
     path("about/", AboutView.as_view(), name="about"),
     path("contact/", ContactView.as_view(), name="contact"),
+    path("test-header/", TemplateView.as_view(template_name="test-header.html"), name="test_header"),
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
 ]
 

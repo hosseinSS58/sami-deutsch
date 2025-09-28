@@ -32,12 +32,12 @@ urlpatterns = [
         "shop": ProductSitemap,
     }}, name="django.contrib.sitemaps.views.sitemap"),
     path("", include("core.urls")),
-    path("videos/", include("courses.urls")),
+    path("videos/", include("courses.urls")),  # Videos use the same views as courses
     path("blog/", include("blog.urls")),
     path("shop/", include("shop.urls")),
     path("accounts/", include("accounts.urls")),
     path("search/", include("search.urls")),
-    path("assess/", include("assessments.urls")),
+    path("assessments/", include("assessments.urls")),
 ]
 
 if settings.DEBUG:

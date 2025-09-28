@@ -1,0 +1,80 @@
+{
+  "name": "Sami Deutsch - آموزش زبان آلمانی",
+  "short_name": "Sami Deutsch",
+  "description": "آموزش زبان آلمانی با دوره‌ها، ویدئوها و مقالات کاربردی",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0d6efd",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "fa",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/static/img/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/img/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "language", "learning"],
+  "screenshots": [
+    {
+      "src": "/static/img/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/static/img/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "ویدیوها",
+      "short_name": "ویدیوها",
+      "description": "مشاهده ویدیوهای آموزشی",
+      "url": "/videos/",
+      "icons": [
+        {
+          "src": "/static/img/icon-video.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "فروشگاه",
+      "short_name": "فروشگاه",
+      "description": "مشاهده پکیج‌های آموزشی",
+      "url": "/shop/",
+      "icons": [
+        {
+          "src": "/static/img/icon-shop.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "بلاگ",
+      "short_name": "بلاگ",
+      "description": "مطالعه مقالات آموزشی",
+      "url": "/blog/",
+      "icons": [
+        {
+          "src": "/static/img/icon-blog.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,6 @@
 from django.views.generic import ListView, DetailView
 from django.http import Http404
 from django.db.models import Q, Count
-from django.utils.translation import get_language
 from .models import Video, VideoTag
 
 
@@ -40,8 +39,8 @@ class VideoListView(ListView):
         search = self.request.GET.get('search')
         if search:
             queryset = queryset.filter(
-                Q(translations__title__icontains=search) |
-                Q(translations__description__icontains=search)
+                Q(title__icontains=search) |
+                Q(description__icontains=search)
             )
         
         return queryset.select_related().prefetch_related('tags', 'images', 'youtube_links')
@@ -71,22 +70,14 @@ class VideoDetailView(DetailView):
     model = Video
     template_name = "videos/video_detail.html"
     context_object_name = "video"
+    slug_url_kwarg = "slug"
 
     def get_object(self, queryset=None):
         slug = self.kwargs.get("slug")
-        lang = get_language()
-        qs = Video.objects.all()
-        
-        if lang:
-            obj = qs.filter(translations__language_code=lang, translations__slug=slug).first()
-            if obj:
-                return obj
-        
-        obj = qs.filter(translations__slug=slug).first()
-        if obj:
-            return obj
-        
-        raise Http404("Video not found")
+        obj = Video.objects.filter(slug=slug).first()
+        if not obj:
+            raise Http404("Video not found")
+        return obj
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

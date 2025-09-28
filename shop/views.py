@@ -15,19 +15,14 @@ class ProductDetailView(DetailView):
     model = Product
     template_name = "shop/product_detail.html"
     context_object_name = "product"
+    slug_url_kwarg = "slug"
 
     def get_object(self, queryset=None):
         slug = self.kwargs.get("slug")
-        lang = getattr(self.request, "LANGUAGE_CODE", None)
-        qs = Product.objects.filter(is_active=True)
-        if lang:
-            obj = qs.filter(translations__language_code=lang, translations__slug=slug).first()
-            if obj:
-                return obj
-        obj = qs.filter(translations__slug=slug).first()
-        if obj:
-            return obj
-        raise Http404("Product not found")
+        obj = Product.objects.filter(slug=slug, is_active=True).first()
+        if not obj:
+            raise Http404("Product not found")
+        return obj
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

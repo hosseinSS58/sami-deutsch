@@ -1,27 +1,69 @@
 {% extends "base.html" %}
-{% load i18n form_extras %}
-{% block title %}{% trans "تماس با ما" %}{% endblock %}
+{% load form_extras %}
+{% block title %}تماس با ما{% endblock %}
 {% block content %}
-<h1 class="mb-3">{% trans "تماس با ما" %}</h1>
-<form class="row g-3" method="post">
-  {% csrf_token %}
-  {{ form.non_field_errors }}
-  <div class="col-md-6">
-    <label class="form-label" for="id_name">{% trans "نام" %}</label>
-    {{ form.name|add_class:'form-control' }}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:56px;height:56px;background: rgba(255,255,255,0.2);">
+            <i class="fa fa-envelope text-white"></i>
+          </div>
+          <h1 class="h3 mb-2">تماس با ما</h1>
+          <p class="mb-0 opacity-75">پیام خود را برای ما ارسال کنید</p>
+        </div>
+        
+        <div class="form-card-body">
+          <form method="post" novalidate>
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+            
+            <div class="form-grid form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="id_name">نام</label>
+                {{ form.name|add_class:'form-control' }}
+                {% for err in form.name.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="id_email">ایمیل</label>
+                {{ form.email|add_class:'form-control' }}
+                {% for err in form.email.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="id_message">پیام</label>
+              {{ form.message|add_class:'form-control' }}
+              {% for err in form.message.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+            </div>
+            
+            <div class="text-center">
+              <button class="btn btn-primary btn-lg">ارسال پیام</button>
+            </div>
+          </form>
+          
+          <hr class="my-4"/>
+          <div class="text-center">
+            <p class="text-muted mb-2">شبکه‌های اجتماعی</p>
+            <div class="d-flex justify-content-center gap-3">
+              <a href="#" class="btn btn-outline-primary btn-sm">
+                <i class="fab fa-instagram me-2"></i>Instagram
+              </a>
+              <a href="#" class="btn btn-outline-danger btn-sm">
+                <i class="fab fa-youtube me-2"></i>YouTube
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="col-md-6">
-    <label class="form-label" for="id_email">{% trans "ایمیل" %}</label>
-    {{ form.email|add_class:'form-control' }}
-  </div>
-  <div class="col-12">
-    <label class="form-label" for="id_message">{% trans "پیام" %}</label>
-    {{ form.message|add_class:'form-control' }}
-  </div>
-  <div class="col-12">
-    <button class="btn btn-primary">{% trans "ارسال" %}</button>
-  </div>
-  <p class="text-muted small mt-2">{% trans "شبکه‌های اجتماعی" %}: Instagram, YouTube</p>
+</div>
 {% endblock %}
 
 

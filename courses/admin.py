@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from parler.admin import TranslatableAdmin
 from .models import Video, VideoImage, YouTubeLink, VideoTag
 
 
@@ -17,21 +16,18 @@ class YouTubeLinkInline(admin.TabularInline):
 
 
 @admin.register(Video)
-class VideoAdmin(TranslatableAdmin):
-    list_display = ("__str__", "level", "topic", "difficulty", "duration_minutes", "is_featured", "is_free", "created_at")
+class VideoAdmin(admin.ModelAdmin):
+    list_display = ("title", "level", "topic", "difficulty", "duration_minutes", "is_featured", "is_free", "created_at")
     list_editable = ("is_featured", "is_free", "difficulty")
-    search_fields = ("translations__title", "translations__description")
+    search_fields = ("title", "description")
     list_filter = ("level", "topic", "difficulty", "is_featured", "is_free", "created_at")
     
     fieldsets = (
         (_("اطلاعات اصلی"), {
             "fields": (
-                "level", "topic", "difficulty", "cover", "duration_minutes",
-                "is_featured", "is_free"
+                "title", "slug", "description", "level", "topic", "difficulty", 
+                "cover", "duration_minutes", "is_featured", "is_free"
             )
-        }),
-        (_("ترجمه"), {
-            "fields": ("title", "slug", "description")
         }),
     )
     

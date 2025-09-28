@@ -1,13 +1,13 @@
 from django.contrib import admin
-from parler.admin import TranslatableAdmin
 from .models import Product, Order, OrderItem
 
 
 @admin.register(Product)
-class ProductAdmin(TranslatableAdmin):
-    list_display = ("__str__", "price", "is_active", "created_at")
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ("name", "price", "is_active", "created_at")
     list_filter = ("is_active",)
-    search_fields = ("translations__name", "translations__description")
+    search_fields = ("name", "description")
+    prepopulated_fields = {"slug": ("name",)}
 
 
 @admin.register(Order)

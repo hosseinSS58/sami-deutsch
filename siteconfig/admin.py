@@ -6,7 +6,72 @@ from .models import SiteSettings, NavLink, FooterLink, HomeFeature, HomeSlider, 
 class SiteSettingsAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Brand & Basic", {"fields": ("brand_name", "logo", "primary_color", "meta_description", "footer_text", "show_default_nav_links")}),
-        ("Hero Section", {"fields": ("hero_title", "hero_subtitle", "hero_video_url", "show_newsletter")}),
+        ("Hero Section - Main Content", {
+            "fields": (
+                "hero_title", 
+                "hero_subtitle", 
+                "hero_description",
+                "hero_primary_button_text",
+                "hero_primary_button_url",
+                "hero_secondary_button_text",
+                "hero_secondary_button_url",
+                "hero_image",
+                "hero_icon",
+                "hero_icon_size",
+                "hero_icon_color"
+            )
+        }),
+        ("Hero Section - Colors", {
+            "fields": (
+                "hero_bg_color",
+                "hero_text_color",
+                "hero_subtitle_color",
+                "hero_description_color"
+            )
+        }),
+        ("Hero Section - Stats", {
+            "fields": (
+                "show_hero_stats",
+                "hero_stats_videos_title",
+                "hero_stats_videos_count",
+                "hero_stats_videos_icon",
+                "hero_stats_videos_color",
+                "hero_stats_posts_title",
+                "hero_stats_posts_count",
+                "hero_stats_posts_icon",
+                "hero_stats_posts_color",
+                "hero_stats_products_title",
+                "hero_stats_products_count",
+                "hero_stats_products_icon",
+                "hero_stats_products_color",
+                "hero_stats_students_title",
+                "hero_stats_students_count",
+                "hero_stats_students_icon",
+                "hero_stats_students_color"
+            )
+        }),
+        ("Hero Section - Floating Elements", {
+            "fields": (
+                "show_hero_floating_elements",
+                "hero_floating_element_1_title",
+                "hero_floating_element_1_icon",
+                "hero_floating_element_1_color",
+                "hero_floating_element_2_title",
+                "hero_floating_element_2_icon",
+                "hero_floating_element_2_color",
+                "hero_floating_element_3_title",
+                "hero_floating_element_3_icon",
+                "hero_floating_element_3_color"
+            )
+        }),
+        ("Hero Section - Video & Newsletter", {
+            "fields": (
+                "show_hero_video",
+                "hero_video_url",
+                "show_hero_newsletter",
+                "show_newsletter"
+            )
+        }),
         ("Header & Navigation Colors", {"fields": ("navbar_bg_color", "navbar_text_color", "navbar_hover_color")}),
         ("Button Colors", {"fields": ("button_primary_bg", "button_primary_text", "button_secondary_bg", "button_secondary_text", "button_outline_color")}),
         ("Card & Content Colors", {"fields": ("card_bg_color", "card_border_color", "card_shadow_color")}),
@@ -18,6 +83,10 @@ class SiteSettingsAdmin(admin.ModelAdmin):
         ("Layout & Spacing", {"fields": ("container_max_width", "section_padding", "card_border_radius")}),
         ("Custom CSS", {"fields": ("custom_css",), "classes": ("collapse",)}),
     )
+    
+    def has_add_permission(self, request):
+        # Only allow one instance
+        return not SiteSettings.objects.exists()
 
 
 @admin.register(NavLink)

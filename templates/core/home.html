@@ -1,50 +1,56 @@
 {% extends "base.html" %}
-{% load i18n form_extras %}
-{% block title %}{% trans "خانه" %}{% endblock %}
+{% load form_extras %}
+{% block title %}خانه{% endblock %}
 {% block content %}
 
 <!-- Hero Section -->
-<section class="hero-section mb-5">
+<section class="hero-section mb-5" style="background-color: {{ site_settings.hero_bg_color|default:'#f8f9fa' }};">
   <div class="container-fluid">
     <div class="row align-items-center min-vh-75">
-      <div class="col-lg-6">
+      <div class="col-lg-6 col-12">
         <div class="hero-content pe-lg-5">
-          <h1 class="display-4 fw-bold mb-4 text-gradient">
-            {% trans "آموزش زبان آلمانی" %}
-            <span class="d-block text-primary">{% trans "از پایه تا پیشرفته" %}</span>
+          <h1 class="display-4 fw-bold mb-4 text-gradient" style="color: {{ site_settings.hero_text_color|default:'#0f172a' }};">
+            {{ site_settings.hero_title|default:"آموزش زبان آلمانی" }}
+            <span class="d-block" style="color: {{ site_settings.hero_subtitle_color|default:'#0d6efd' }};">{{ site_settings.hero_subtitle|default:"از پایه تا پیشرفته" }}</span>
           </h1>
-          <p class="lead text-muted mb-4">
-            {% trans "با بهترین روش‌های آموزشی، زبان آلمانی را به صورت خودخوان و کاربردی یاد بگیرید. از سطح A1 تا C1، با ویدیوهای آموزشی، مقالات تخصصی و آزمون‌های استاندارد." %}
+          <p class="lead mb-4" style="color: {{ site_settings.hero_description_color|default:'#6c757d' }};">
+            {{ site_settings.hero_description|default:"با بهترین روش‌های آموزشی، زبان آلمانی را به صورت خودخوان و کاربردی یاد بگیرید. از سطح A1 تا C1، با ویدیوهای آموزشی، مقالات تخصصی و آزمون‌های استاندارد." }}
           </p>
           <div class="d-flex flex-wrap gap-3">
-            <a href="/videos/" class="btn btn-primary btn-lg px-4 py-3">
-              <i class="fas fa-play me-2"></i>{% trans "شروع یادگیری" %}
+            <a href="{{ site_settings.hero_primary_button_url|default:'/videos/' }}" class="btn btn-primary btn-lg px-4 py-3">
+              <i class="fas fa-play me-2"></i>{{ site_settings.hero_primary_button_text|default:"شروع یادگیری" }}
             </a>
-            <a href="/assessments/" class="btn btn-outline-primary btn-lg px-4 py-3">
-              <i class="fas fa-clipboard-check me-2"></i>{% trans "تعیین سطح" %}
+            <a href="{{ site_settings.hero_secondary_button_url|default:'/assessments/' }}" class="btn btn-outline-primary btn-lg px-4 py-3">
+              <i class="fas fa-clipboard-check me-2"></i>{{ site_settings.hero_secondary_button_text|default:"تعیین سطح" }}
             </a>
           </div>
         </div>
       </div>
-      <div class="col-lg-6">
+      <div class="col-lg-6 col-12">
         <div class="hero-image text-center">
           <div class="position-relative">
             <div class="hero-bg-gradient"></div>
-            <i class="fas fa-graduation-cap fa-8x text-primary hero-icon"></i>
-            <div class="floating-elements">
+            {% if site_settings.hero_image %}
+              <img src="{{ site_settings.hero_image.url }}" alt="Hero Image" class="img-fluid hero-custom-image" style="max-height: 400px;">
+            {% else %}
+              <i class="{{ site_settings.hero_icon|default:'fas fa-graduation-cap' }} {{ site_settings.hero_icon_size|default:'fa-8x' }} hero-icon" style="color: {{ site_settings.hero_icon_color|default:'#0d6efd' }};"></i>
+            {% endif %}
+            {% if site_settings.show_hero_floating_elements %}
+            <div class="floating-elements d-none d-lg-block">
               <div class="floating-card floating-card-1">
-                <i class="fas fa-video text-success"></i>
-                <span class="small">{% trans "ویدیوهای آموزشی" %}</span>
+                <i class="{{ site_settings.hero_floating_element_1_icon|default:'fas fa-video' }}" style="color: {{ site_settings.hero_floating_element_1_color|default:'#198754' }};"></i>
+                <span class="small">{{ site_settings.hero_floating_element_1_title|default:"ویدیوهای آموزشی" }}</span>
               </div>
               <div class="floating-card floating-card-2">
-                <i class="fas fa-book text-info"></i>
-                <span class="small">{% trans "مقالات تخصصی" %}</span>
+                <i class="{{ site_settings.hero_floating_element_2_icon|default:'fas fa-book' }}" style="color: {{ site_settings.hero_floating_element_2_color|default:'#0dcaf0' }};"></i>
+                <span class="small">{{ site_settings.hero_floating_element_2_title|default:"مقالات تخصصی" }}</span>
               </div>
               <div class="floating-card floating-card-3">
-                <i class="fas fa-trophy text-warning"></i>
-                <span class="small">{% trans "آزمون‌های استاندارد" %}</span>
+                <i class="{{ site_settings.hero_floating_element_3_icon|default:'fas fa-trophy' }}" style="color: {{ site_settings.hero_floating_element_3_color|default:'#ffc107' }};"></i>
+                <span class="small">{{ site_settings.hero_floating_element_3_title|default:"آزمون‌های استاندارد" }}</span>
               </div>
             </div>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -53,48 +59,50 @@
 </section>
 
 <!-- Stats Section -->
+{% if site_settings.show_hero_stats %}
 <section class="stats-section mb-5 py-4">
   <div class="container-fluid">
     <div class="row g-4 text-center">
-      <div class="col-md-3">
+      <div class="col-md-3 col-6">
         <div class="stat-card">
           <div class="stat-icon mb-3">
-            <i class="fas fa-video fa-3x text-primary"></i>
+            <i class="{{ site_settings.hero_stats_videos_icon|default:'fas fa-video' }} fa-3x" style="color: {{ site_settings.hero_stats_videos_color|default:'#0d6efd' }};"></i>
           </div>
-          <h3 class="stat-number fw-bold text-primary mb-2">{{ latest_videos.count|default:"0" }}+</h3>
-          <p class="stat-label text-muted mb-0">{% trans "ویدیوی آموزشی" %}</p>
+          <h3 class="stat-number fw-bold mb-2" style="color: {{ site_settings.hero_stats_videos_color|default:'#0d6efd' }};">{{ site_settings.hero_stats_videos_count|default:"100" }}+</h3>
+          <p class="stat-label text-muted mb-0">{{ site_settings.hero_stats_videos_title|default:"ویدیوی آموزشی" }}</p>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-3 col-6">
         <div class="stat-card">
           <div class="stat-icon mb-3">
-            <i class="fas fa-newspaper fa-3x text-success"></i>
+            <i class="{{ site_settings.hero_stats_posts_icon|default:'fas fa-newspaper' }} fa-3x" style="color: {{ site_settings.hero_stats_posts_color|default:'#198754' }};"></i>
           </div>
-          <h3 class="stat-number fw-bold text-success mb-2">{{ latest_posts.count|default:"0" }}+</h3>
-          <p class="stat-label text-muted mb-0">{% trans "مقاله تخصصی" %}</p>
+          <h3 class="stat-number fw-bold mb-2" style="color: {{ site_settings.hero_stats_posts_color|default:'#198754' }};">{{ site_settings.hero_stats_posts_count|default:"50" }}+</h3>
+          <p class="stat-label text-muted mb-0">{{ site_settings.hero_stats_posts_title|default:"مقاله تخصصی" }}</p>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-3 col-6">
         <div class="stat-card">
           <div class="stat-icon mb-3">
-            <i class="fas fa-shopping-bag fa-3x text-warning"></i>
+            <i class="{{ site_settings.hero_stats_products_icon|default:'fas fa-shopping-bag' }} fa-3x" style="color: {{ site_settings.hero_stats_products_color|default:'#ffc107' }};"></i>
           </div>
-          <h3 class="stat-number fw-bold text-warning mb-2">{{ latest_products.count|default:"0" }}+</h3>
-          <p class="stat-label text-muted mb-0">{% trans "پکیج آموزشی" %}</p>
+          <h3 class="stat-number fw-bold mb-2" style="color: {{ site_settings.hero_stats_products_color|default:'#ffc107' }};">{{ site_settings.hero_stats_products_count|default:"25" }}+</h3>
+          <p class="stat-label text-muted mb-0">{{ site_settings.hero_stats_products_title|default:"پکیج آموزشی" }}</p>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-3 col-6">
         <div class="stat-card">
           <div class="stat-icon mb-3">
-            <i class="fas fa-users fa-3x text-info"></i>
+            <i class="{{ site_settings.hero_stats_students_icon|default:'fas fa-users' }} fa-3x" style="color: {{ site_settings.hero_stats_students_color|default:'#0dcaf0' }};"></i>
           </div>
-          <h3 class="stat-number fw-bold text-info mb-2">1000+</h3>
-          <p class="stat-label text-muted mb-0">{% trans "دانشجو" %}</p>
+          <h3 class="stat-number fw-bold mb-2" style="color: {{ site_settings.hero_stats_students_color|default:'#0dcaf0' }};">{{ site_settings.hero_stats_students_count|default:"1000" }}+</h3>
+          <p class="stat-label text-muted mb-0">{{ site_settings.hero_stats_students_title|default:"دانشجو" }}</p>
         </div>
       </div>
     </div>
   </div>
 </section>
+{% endif %}
 
 <!-- Featured Videos Section -->
 <section class="featured-section mb-5">
@@ -102,11 +110,11 @@
     <div class="section-header mb-4">
       <div class="d-flex justify-content-between align-items-center">
         <div>
-          <h2 class="section-title h3 fw-bold mb-2">{% trans "ویدیوهای جدید" %}</h2>
-          <p class="section-subtitle text-muted mb-0">{% trans "آخرین درس‌های اضافه شده به مجموعه" %}</p>
+          <h2 class="section-title h3 fw-bold mb-2">ویدیوهای جدید</h2>
+          <p class="section-subtitle text-muted mb-0">آخرین درس‌های اضافه شده به مجموعه</p>
         </div>
         <a href="/videos/" class="btn btn-outline-primary">
-          <i class="fas fa-arrow-left me-2"></i>{% trans "همه ویدیوها" %}
+          <i class="fas fa-arrow-left me-2"></i>همه ویدیوها
         </a>
       </div>
     </div>
@@ -114,7 +122,7 @@
     {% if latest_videos %}
       <div class="row g-4">
         {% for video in latest_videos %}
-          <div class="col-lg-4 col-md-6">
+          <div class="col-lg-4 col-md-6 col-12">
             <div class="video-card card border-0 shadow-sm hover-lift h-100">
               <div class="video-cover position-relative">
                 {% if video.cover %}
@@ -127,15 +135,15 @@
                 <div class="video-overlay">
                   <div class="video-badges">
                     {% if video.is_featured %}
-                      <span class="badge bg-warning">{% trans "ویژه" %}</span>
+                      <span class="badge bg-warning">ویژه</span>
                     {% endif %}
                     {% if video.is_premium %}
-                      <span class="badge bg-primary">{% trans "پریمیوم" %}</span>
+                      <span class="badge bg-primary">پریمیوم</span>
                     {% endif %}
                     <span class="badge bg-info">{{ video.level }}</span>
                   </div>
                   <a href="{{ video.get_absolute_url }}" class="btn btn-light btn-sm">
-                    <i class="fas fa-play me-1"></i>{% trans "مشاهده" %}
+                    <i class="fas fa-play me-1"></i>مشاهده
                   </a>
                 </div>
               </div>
@@ -144,25 +152,25 @@
                 <div class="video-meta d-flex align-items-center gap-3 text-muted small mb-3">
                   <span>
                     <i class="fas fa-clock me-1"></i>
-                    {% if v.topic == "grammar" %}{% trans "گرامر" %}
-                    {% elif v.topic == "speaking" %}{% trans "مکالمه" %}
-                    {% elif v.topic == "vocab" %}{% trans "واژگان" %}
-                    {% elif v.topic == "listening" %}{% trans "شنیداری" %}
-                    {% elif v.topic == "reading" %}{% trans "خواندن" %}
-                    {% elif v.topic == "writing" %}{% trans "نوشتن" %}
-                    {% elif v.topic == "culture" %}{% trans "فرهنگ" %}
-                    {% elif v.topic == "pronunciation" %}{% trans "تلفظ" %}
-                    {% else %}{{ v.topic }}{% endif %}
+                    {% if video.topic == "grammar" %}گرامر
+                    {% elif video.topic == "speaking" %}مکالمه
+                    {% elif video.topic == "vocab" %}واژگان
+                    {% elif video.topic == "listening" %}شنیداری
+                    {% elif video.topic == "reading" %}خواندن
+                    {% elif video.topic == "writing" %}نوشتن
+                    {% elif video.topic == "culture" %}فرهنگ
+                    {% elif video.topic == "pronunciation" %}تلفظ
+                    {% else %}{{ video.topic }}{% endif %}
                   </span>
                   {% if video.duration_minutes %}
                     <span>
-                      <i class="fas fa-clock me-1"></i>{{ video.duration_minutes }} {% trans "دقیقه" %}
+                      <i class="fas fa-clock me-1"></i>{{ video.duration_minutes }} دقیقه
                     </span>
                   {% endif %}
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
                   <a href="{{ video.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
-                    {% trans "مشاهده" %}
+                    مشاهده
                   </a>
                   <small class="text-muted">{{ video.created_at|date:"Y/m/d" }}</small>
                 </div>
@@ -174,8 +182,8 @@
     {% else %}
       <div class="empty-state text-center py-5">
         <i class="fas fa-video fa-4x text-muted mb-3"></i>
-        <h4 class="text-muted mb-2">{% trans "ویدیویی موجود نیست" %}</h4>
-        <p class="text-muted">{% trans "هنوز ویدیویی به مجموعه اضافه نشده است" %}</p>
+        <h4 class="text-muted mb-2">ویدیویی موجود نیست</h4>
+        <p class="text-muted">هنوز ویدیویی به مجموعه اضافه نشده است</p>
       </div>
     {% endif %}
   </div>
@@ -187,11 +195,11 @@
     <div class="section-header mb-4">
       <div class="d-flex justify-content-between align-items-center">
         <div>
-          <h2 class="section-title h3 fw-bold mb-2">{% trans "پکیج‌های آموزشی" %}</h2>
-          <p class="section-subtitle text-muted mb-0">{% trans "مجموعه‌های کامل برای یادگیری بهتر" %}</p>
+          <h2 class="section-title h3 fw-bold mb-2">پکیج‌های آموزشی</h2>
+          <p class="section-subtitle text-muted mb-0">مجموعه‌های کامل برای یادگیری بهتر</p>
         </div>
         <a href="/shop/" class="btn btn-outline-primary">
-          <i class="fas fa-arrow-left me-2"></i>{% trans "همه پکیج‌ها" %}
+          <i class="fas fa-arrow-left me-2"></i>همه پکیج‌ها
         </a>
       </div>
     </div>
@@ -199,7 +207,7 @@
     {% if latest_products %}
       <div class="row g-4">
         {% for product in latest_products %}
-          <div class="col-lg-4 col-md-6">
+          <div class="col-lg-4 col-md-6 col-12">
             <div class="product-card card border-0 shadow-sm hover-lift h-100">
               <div class="product-cover position-relative">
                 {% if product.cover %}
@@ -212,14 +220,14 @@
                 <div class="product-overlay">
                   <div class="product-badges">
                     {% if product.is_featured %}
-                      <span class="badge bg-warning">{% trans "ویژه" %}</span>
+                      <span class="badge bg-warning">ویژه</span>
                     {% endif %}
                     {% if product.discount_percent %}
                       <span class="badge bg-danger">-{{ product.discount_percent }}%</span>
                     {% endif %}
                   </div>
                   <a href="{{ product.get_absolute_url }}" class="btn btn-light btn-sm">
-                    <i class="fas fa-eye me-1"></i>{% trans "مشاهده" %}
+                    <i class="fas fa-eye me-1"></i>مشاهده
                   </a>
                 </div>
               </div>
@@ -233,7 +241,7 @@
                   {% endif %}
                   {% if product.views_count %}
                     <span>
-                      <i class="fas fa-eye me-1"></i>{{ product.views_count }} {% trans "بازدید" %}
+                      <i class="fas fa-eye me-1"></i>{{ product.views_count }} بازدید
                     </span>
                   {% endif %}
                 </div>
@@ -245,10 +253,10 @@
                     {% else %}
                       <span class="text-primary fw-bold">{{ product.price|floatformat:0 }}</span>
                     {% endif %}
-                    <span class="text-muted small">{% trans "تومان" %}</span>
+                    <span class="text-muted small">تومان</span>
                   </div>
                   <a href="{{ product.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
-                    {% trans "مشاهده" %}
+                    مشاهده
                   </a>
                 </div>
               </div>
@@ -259,8 +267,8 @@
     {% else %}
       <div class="empty-state text-center py-5">
         <i class="fas fa-box fa-4x text-muted mb-3"></i>
-        <h4 class="text-muted mb-2">{% trans "پکیجی موجود نیست" %}</h4>
-        <p class="text-muted">{% trans "هنوز پکیج آموزشی به مجموعه اضافه نشده است" %}</p>
+        <h4 class="text-muted mb-2">پکیجی موجود نیست</h4>
+        <p class="text-muted">هنوز پکیج آموزشی به مجموعه اضافه نشده است</p>
       </div>
     {% endif %}
   </div>
@@ -272,11 +280,11 @@
     <div class="section-header mb-4">
       <div class="d-flex justify-content-between align-items-center">
         <div>
-          <h2 class="section-title h3 fw-bold mb-2">{% trans "آخرین مقالات" %}</h2>
-          <p class="section-subtitle text-muted mb-0">{% trans "مطالب مفید و کاربردی برای یادگیری بهتر" %}</p>
+          <h2 class="section-title h3 fw-bold mb-2">آخرین مقالات</h2>
+          <p class="section-subtitle text-muted mb-0">مطالب مفید و کاربردی برای یادگیری بهتر</p>
         </div>
         <a href="/blog/" class="btn btn-outline-primary">
-          <i class="fas fa-arrow-left me-2"></i>{% trans "همه مقالات" %}
+          <i class="fas fa-arrow-left me-2"></i>همه مقالات
         </a>
       </div>
     </div>
@@ -284,7 +292,7 @@
     {% if latest_posts %}
       <div class="row g-4">
         {% for post in latest_posts %}
-          <div class="col-lg-3 col-md-6">
+          <div class="col-lg-3 col-md-6 col-12">
             <div class="post-card card border-0 shadow-sm hover-lift h-100">
               <div class="post-cover position-relative">
                 {% if post.cover %}
@@ -297,14 +305,14 @@
                 <div class="post-overlay">
                   <div class="post-badges">
                     {% if post.is_featured %}
-                      <span class="badge bg-warning">{% trans "ویژه" %}</span>
+                      <span class="badge bg-warning">ویژه</span>
                     {% endif %}
                     {% if post.category %}
                       <span class="badge bg-primary">{{ post.category.name }}</span>
                     {% endif %}
                   </div>
                   <a href="{{ post.get_absolute_url }}" class="btn btn-light btn-sm">
-                    <i class="fas fa-eye me-1"></i>{% trans "مطالعه" %}
+                    <i class="fas fa-eye me-1"></i>مطالعه
                   </a>
                 </div>
               </div>
@@ -318,13 +326,13 @@
                   {% endif %}
                   {% if post.views_count %}
                     <span>
-                      <i class="fas fa-eye me-1"></i>{{ post.views_count }} {% trans "بازدید" %}
+                      <i class="fas fa-eye me-1"></i>{{ post.views_count }} بازدید
                     </span>
                   {% endif %}
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
                   <a href="{{ post.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
-                    {% trans "مطالعه" %}
+                    مطالعه
                   </a>
                   <small class="text-muted">{{ post.published_at|date:"Y/m/d" }}</small>
                 </div>
@@ -336,8 +344,8 @@
     {% else %}
       <div class="empty-state text-center py-5">
         <i class="fas fa-newspaper fa-4x text-muted mb-3"></i>
-        <h4 class="text-muted mb-2">{% trans "مقاله‌ای موجود نیست" %}</h4>
-        <p class="text-muted">{% trans "هنوز مقاله‌ای به بلاگ اضافه نشده است" %}</p>
+        <h4 class="text-muted mb-2">مقاله‌ای موجود نیست</h4>
+        <p class="text-muted">هنوز مقاله‌ای به بلاگ اضافه نشده است</p>
       </div>
     {% endif %}
   </div>
@@ -349,14 +357,14 @@
     <div class="cta-card rounded-4 p-5 text-center position-relative overflow-hidden">
       <div class="cta-bg-gradient"></div>
       <div class="cta-content position-relative">
-        <h2 class="h3 fw-bold mb-3 text-white">{% trans "آماده شروع یادگیری هستید؟" %}</h2>
-        <p class="text-white-50 mb-4">{% trans "از امروز شروع کنید و در مسیر یادگیری زبان آلمانی قدم بردارید" %}</p>
+        <h2 class="h3 fw-bold mb-3 text-white">آماده شروع یادگیری هستید؟</h2>
+        <p class="text-white-50 mb-4">از امروز شروع کنید و در مسیر یادگیری زبان آلمانی قدم بردارید</p>
         <div class="d-flex flex-wrap gap-3 justify-content-center">
           <a href="/videos/" class="btn btn-light btn-lg px-4">
-            <i class="fas fa-play me-2"></i>{% trans "شروع یادگیری" %}
+            <i class="fas fa-play me-2"></i>شروع یادگیری
           </a>
           <a href="/assessments/" class="btn btn-outline-light btn-lg px-4">
-            <i class="fas fa-clipboard-check me-2"></i>{% trans "تعیین سطح" %}
+            <i class="fas fa-clipboard-check me-2"></i>تعیین سطح
           </a>
         </div>
       </div>
@@ -372,22 +380,22 @@
       <div class="row align-items-center g-4">
         <div class="col-lg-6">
           <div class="newsletter-content">
-            <h3 class="h5 fw-bold mb-2">{% trans "عضو خبرنامه شوید" %}</h3>
-            <p class="text-muted mb-0">{% trans "تازه‌ترین درس‌ها، مقالات و تخفیف‌ها را زودتر از همه دریافت کنید" %}</p>
+            <h3 class="h5 fw-bold mb-2">عضو خبرنامه شوید</h3>
+            <p class="text-muted mb-0">تازه‌ترین درس‌ها، مقالات و تخفیف‌ها را زودتر از همه دریافت کنید</p>
           </div>
         </div>
         <div class="col-lg-6">
-          <form class="newsletter-form d-flex gap-2">
-            <div class="input-group">
-              <span class="input-group-text bg-transparent border-end-0">
-                <i class="fas fa-envelope text-muted"></i>
-              </span>
-              <input class="form-control border-start-0" type="email" placeholder="{% trans 'ایمیل شما' %}" required>
-            </div>
-            <button class="btn btn-primary px-4" type="submit">
-              <i class="fas fa-paper-plane me-2"></i>{% trans "عضویت" %}
-            </button>
-          </form>
+                      <form class="newsletter-form d-flex gap-2">
+              <div class="input-group">
+                <span class="input-group-text bg-transparent border-end-0">
+                  <i class="fas fa-envelope text-muted"></i>
+                </span>
+                <input class="form-control border-start-0" type="email" placeholder="ایمیل شما" required>
+              </div>
+              <button class="btn btn-primary px-4" type="submit">
+                <i class="fas fa-paper-plane me-2"></i>عضویت
+              </button>
+            </form>
         </div>
       </div>
     </div>

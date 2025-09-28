@@ -5,58 +5,130 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="csrf-token" content="{{ csrf_token }}">
+  
+  <!-- SEO Meta Tags -->
   <title>{% block title %}Sami Language{% endblock %}</title>
   <meta name="description" content="{{ site_settings.meta_description|default:'آموزش زبان با دوره‌ها، ویدئوها و مقالات کاربردی.' }}">
-  <meta property="og:title" content="Sami Language">
-  <meta property="og:description" content="آموزش زبان با دوره‌ها، ویدئوها و مقالات کاربردی.">
+  <meta name="keywords" content="{{ site_settings.keywords|default:'آموزش زبان آلمانی, دوره آلمانی, ویدیو آموزشی' }}">
+  <meta name="author" content="{{ site_settings.author|default:'Sami Deutsch' }}">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="{{ site_settings.primary_color|default:'#0d6efd' }}">
+  
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="{% block og_title %}{{ site_settings.brand_name|default:'Sami Deutsch' }}{% endblock %}">
+  <meta property="og:description" content="{{ site_settings.meta_description|default:'آموزش زبان با دوره‌ها، ویدئوها و مقالات کاربردی.' }}">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta property="og:image" content="{% if site_settings.og_image %}{{ site_settings.og_image.url }}{% endif %}">
+  <meta property="og:site_name" content="{{ site_settings.brand_name|default:'Sami Deutsch' }}">
+  <meta property="og:locale" content="fa_IR">
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% block twitter_title %}{{ site_settings.brand_name|default:'Sami Deutsch' }}{% endblock %}">
+  <meta name="twitter:description" content="{{ site_settings.meta_description|default:'آموزش زبان با دوره‌ها، ویدئوها و مقالات کاربردی.' }}">
+  {% if site_settings.og_image %}<meta name="twitter:image" content="{{ site_settings.og_image.url }}">{% endif %}
+  
+  <!-- RSS Feed -->
   <link rel="alternate" type="application/rss+xml" title="Blog" href="/sitemap.xml">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" rel="stylesheet">
-      <link href="{% static 'css/app.css' %}" rel="stylesheet">
-    <link href="{% static 'css/dynamic-styles.css' %}" rel="stylesheet">
-    <link href="{% static 'css/advanced-styles.css' %}" rel="stylesheet">
-    <link href="{% static 'css/animations.css' %}" rel="stylesheet">
-
+  
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="{% static 'manifest.json' %}">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="{{ site_settings.brand_name|default:'Sami Deutsch' }}">
+  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+  <!-- Preconnect to external domains for performance -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Critical CSS - Load first -->
+  <link href="{% static 'css/app.css' %}" rel="stylesheet">
+  
+  <!-- External CSS Libraries -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" rel="stylesheet">
+  
+  <!-- Component CSS - Load in order of importance -->
+  <link href="{% static 'css/header-modern.css' %}" rel="stylesheet">
+  <link href="{% static 'css/header-mobile.css' %}" rel="stylesheet">
+  <link href="{% static 'css/forms.css' %}" rel="stylesheet">
+  <link href="{% static 'css/animations.css' %}" rel="stylesheet">
+  <link href="{% static 'css/search-modal.css' %}" rel="stylesheet">
+  
+  <!-- Mobile CSS -->
+  <link href="{% static 'css/home-mobile.css' %}" rel="stylesheet">
+  <link href="{% static 'css/mobile-input-fix.css' %}" rel="stylesheet">
+  <link href="{% static 'css/mobile-enhancements.css' %}" rel="stylesheet">
+  <link href="{% static 'css/mobile-background-fix.css' %}" rel="stylesheet">
+  <link href="{% static 'css/mobile-complete-fix.css' %}" rel="stylesheet">
+  <link href="{% static 'css/mobile-final-fix.css' %}" rel="stylesheet">
+  <link href="{% static 'css/mobile-user-dropdown-fix.css' %}" rel="stylesheet">
+  
+  <!-- Non-critical CSS - Load asynchronously -->
+  <link rel="preload" href="{% static 'css/dynamic-styles.css' %}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="{% static 'css/dynamic-styles.css' %}"></noscript>
+
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;800&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Favicon -->
   <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+  
+  <!-- Alpine.js - Load early for interactivity -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
   
   <!-- Dynamic CSS Variables from Site Settings -->
   <style>
     :root {
+      /* Brand Colors */
       --site-primary-color: {{ site_settings.primary_color|default:'#0d6efd' }};
       --site-navbar-bg-color: {{ site_settings.navbar_bg_color|default:'#0d6efd' }};
       --site-navbar-text-color: {{ site_settings.navbar_text_color|default:'#ffffff' }};
       --site-navbar-hover-color: {{ site_settings.navbar_hover_color|default:'#0b5ed7' }};
+      
+      /* Button Colors */
       --site-button-primary-bg: {{ site_settings.button_primary_bg|default:'#0d6efd' }};
       --site-button-primary-text: {{ site_settings.button_primary_text|default:'#ffffff' }};
       --site-button-secondary-bg: {{ site_settings.button_secondary_bg|default:'#6c757d' }};
       --site-button-secondary-text: {{ site_settings.button_secondary_text|default:'#ffffff' }};
       --site-button-outline-color: {{ site_settings.button_outline_color|default:'#0d6efd' }};
+      
+      /* Card Colors */
       --site-card-bg-color: {{ site_settings.card_bg_color|default:'#ffffff' }};
       --site-card-border-color: {{ site_settings.card_border_color|default:'#dee2e6' }};
       --site-card-shadow-color: {{ site_settings.card_shadow_color|default:'rgba(0,0,0,0.1)' }};
+      
+      /* Text Colors */
       --site-text-primary-color: {{ site_settings.text_primary_color|default:'#0f172a' }};
       --site-text-secondary-color: {{ site_settings.text_secondary_color|default:'#6c757d' }};
       --site-text-muted-color: {{ site_settings.text_muted_color|default:'#adb5bd' }};
+      
+      /* Background Colors */
       --site-body-bg-color: {{ site_settings.body_bg_color|default:'#ffffff' }};
       --site-section-bg-color: {{ site_settings.section_bg_color|default:'#f8f9fa' }};
       --site-footer-bg-color: {{ site_settings.footer_bg_color|default:'#212529' }};
       --site-footer-text-color: {{ site_settings.footer_text_color|default:'#ffffff' }};
+      
+      /* Link Colors */
       --site-link-color: {{ site_settings.link_color|default:'#0d6efd' }};
       --site-link-hover-color: {{ site_settings.link_hover_color|default:'#0a58ca' }};
+      
+      /* Status Colors */
       --site-success-color: {{ site_settings.success_color|default:'#198754' }};
       --site-error-color: {{ site_settings.error_color|default:'#dc3545' }};
       --site-warning-color: {{ site_settings.warning_color|default:'#ffc107' }};
       --site-info-color: {{ site_settings.info_color|default:'#0dcaf0' }};
+      
+      /* Typography */
       --site-heading-font-family: {{ site_settings.heading_font_family|default:'Vazirmatn' }};
       --site-body-font-family: {{ site_settings.body_font_family|default:'Vazirmatn' }};
       --site-base-font-size: {{ site_settings.base_font_size|default:'16px' }};
+      
+      /* Layout */
       --site-container-max-width: {{ site_settings.container_max_width|default:'1200px' }};
       --site-section-padding: {{ site_settings.section_padding|default:'4rem' }};
       --site-card-border-radius: {{ site_settings.card_border_radius|default:'0.375rem' }};
@@ -67,136 +139,22 @@
   </style>
 </head>
 <body>
-  <header class="sticky-top bg-white">
-    <nav class="navbar navbar-expand-lg shadow-sm" aria-label="Main navigation">
-      <div class="container">
-        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/">
-          {% if site_settings.logo %}
-            <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.brand_name }}" width="28" height="28"/>
-          {% else %}
-            <img src="{% static 'logo.svg' %}" alt="{{ site_settings.brand_name }}" width="28" height="28"/>
-          {% endif %}
-          <span>{{ site_settings.brand_name }}</span>
-        </a>
+  <!-- Skip Links for Accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <a href="#navigation" class="skip-link">Skip to navigation</a>
+  
+  <!-- Include Modern Header -->
+  {% include 'header-new.html' %}
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarDesktop">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center">
-            {% if header_menu and header_menu.items.all|length %}
-              {% for item in header_menu.items.all %}
-                {% if item.children.all|length %}
-                  <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="{{ item.url }}" data-bs-toggle="dropdown">{{ item.title }}</a>
-                    <ul class="dropdown-menu shadow border-0 rounded-3">
-                      {% for ch in item.children.all %}
-                        <li><a class="dropdown-item" href="{{ ch.url }}">{{ ch.title }}</a></li>
-                      {% endfor %}
-                    </ul>
-                  </li>
-                {% else %}
-                  <li class="nav-item"><a class="nav-link" href="{{ item.url }}">{{ item.title }}</a></li>
-                {% endif %}
-              {% endfor %}
-            {% else %}
-              {% if site_settings.show_default_nav_links %}
-                <li class="nav-item"><a class="nav-link" href="/">خانه</a></li>
-                <li class="nav-item"><a class="nav-link" href="/videos/">ویدیوها</a></li>
-                <li class="nav-item"><a class="nav-link" href="/shop/">فروشگاه</a></li>
-                <li class="nav-item"><a class="nav-link" href="/blog/">بلاگ</a></li>
-                <li class="nav-item"><a class="nav-link" href="/assess/">تعیین سطح</a></li>
-                <li class="nav-item"><a class="nav-link" href="/contact/">تماس</a></li>
-              {% else %}
-                {% for link in nav_links %}
-                  <li class="nav-item"><a class="nav-link" href="{{ link.url }}">{{ link.title }}</a></li>
-                {% empty %}
-                  <li class="nav-item"><a class="nav-link" href="/">خانه</a></li>
-                {% endfor %}
-              {% endif %}
-            {% endif %}
-          </ul>
-
-          <form class="d-none d-lg-flex position-relative me-3" role="search" action="/search/" x-data="{s:[],q:''}">
-            <input class="form-control" type="search" placeholder="جستجو" name="q" x-model="q" x-on:input.debounce.200ms="fetch('/search/suggest/?q='+encodeURIComponent(q)).then(r=>r.json()).then(d=>s=d.suggestions)">
-            <div class="position-absolute bg-white shadow rounded w-100 mt-5" x-show="s.length && q" style="top:0; z-index: 1000;">
-              <ul class="list-group list-group-flush">
-                <template x-for="it in s" :key="it">
-                  <li class="list-group-item"><a :href="'/search/?q='+encodeURIComponent(it)" x-text="it"></a></li>
-                </template>
-              </ul>
-            </div>
-          </form>
-
-          <div class="d-flex align-items-center gap-2">
-            {% if user.is_authenticated %}
-              <div class="dropdown">
-                <a class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">حساب کاربری</a>
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3">
-                  <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">پروفایل</a></li>
-                  <li>
-                    <form method="post" action="{% url 'accounts:logout' %}">
-                      {% csrf_token %}
-                      <button class="dropdown-item" type="submit">خروج</button>
-                    </form>
-                  </li>
-                </ul>
-              </div>
-            {% else %}
-              <a class="btn btn-outline-primary" href="/accounts/login/">ورود</a>
-              <a class="btn btn-primary" href="/accounts/signup/">ثبت‌نام</a>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Offcanvas Mobile Menu -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="mobileMenuLabel">{{ site_settings.brand_name }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-      </div>
-      <div class="offcanvas-body d-flex flex-column gap-3">
-        <form class="d-flex position-relative" role="search" action="/search/" x-data="{s:[],q:''}">
-          <input class="form-control" type="search" placeholder="جستجو" name="q" x-model="q" x-on:input.debounce.200ms="fetch('/search/suggest/?q='+encodeURIComponent(q)).then(r=>r.json()).then(d=>s=d.suggestions)">
-        </form>
-        <ul class="list-unstyled m-0">
-          <li class="mb-2"><a class="text-decoration-none" href="/">خانه</a></li>
-          <li class="mb-2"><a class="text-decoration-none" href="/videos/">ویدیوها</a></li>
-          <li class="mb-2"><a class="text-decoration-none" href="/shop/">فروشگاه</a></li>
-          <li class="mb-2"><a class="text-decoration-none" href="/blog/">بلاگ</a></li>
-          <li class="mb-2"><a class="text-decoration-none" href="/contact/">تعیین سطح</a></li>
-          <li class="mb-2"><a class="text-decoration-none" href="/contact/">تماس</a></li>
-          {% for link in nav_links %}
-            <li class="mb-2"><a class="text-decoration-none" href="{{ link.url }}">{{ link.title }}</a></li>
-          {% endfor %}
-        </ul>
-        
-        <div class="mt-auto">
-          {% if user.is_authenticated %}
-            <a class="btn w-100 btn-outline-primary mb-2" href="{% url 'accounts:profile' %}">پروفایل</a>
-            <form method="post" action="{% url 'accounts:logout' %}">
-              {% csrf_token %}
-              <button class="btn w-100 btn-primary" type="submit">خروج</button>
-            </form>
-          {% else %}
-            <a class="btn w-100 btn-outline-primary mb-2" href="/accounts/login/">ورود</a>
-            <a class="btn w-100 btn-primary" href="/accounts/signup/">ثبت‌نام</a>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main class="py-4">
+  <!-- Main Content -->
+  <main id="main-content" class="py-4" role="main" aria-label="Main content">
     <div class="container">
       {% block content %}{% endblock %}
     </div>
   </main>
 
-  <footer class="border-top mt-4 py-4">
+  <!-- Footer -->
+  <footer class="border-top mt-4 py-4" role="contentinfo" aria-label="Site footer">
     <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
       <div class="text-muted small">{{ site_settings.footer_text }}</div>
       <ul class="nav">
@@ -207,7 +165,41 @@
     </div>
   </footer>
 
+  <!-- JavaScript Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Custom JavaScript - Load in order of importance -->
+  <script src="{% static 'js/accessibility.js' %}"></script>
+  <script src="{% static 'js/header-modern.js' %}"></script>
+  <script src="{% static 'js/mobile-enhancements.js' %}"></script>
+  <script src="{% static 'js/search.js' %}"></script>
+  
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('{% static "sw.js" %}')
+          .then(function(registration) {
+            console.log('ServiceWorker registration successful');
+          })
+          .catch(function(error) {
+            console.log('ServiceWorker registration failed: ', error);
+          });
+      });
+    }
+  </script>
+  
+  <!-- Performance Monitoring -->
+  <script>
+    if ('performance' in window) {
+      window.addEventListener('load', function() {
+        const perfData = performance.getEntriesByType('navigation')[0];
+        if (perfData) {
+          console.log('Page load time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
+        }
+      });
+    }
+  </script>
 </body>
 </html>
 

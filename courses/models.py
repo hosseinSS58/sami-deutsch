@@ -1,16 +1,12 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from parler.models import TranslatableModel, TranslatedFields
 from urllib.parse import urlparse, parse_qs
-from django.utils.translation import get_language
 
 
-class Video(TranslatableModel):
-    translations = TranslatedFields(
-        title=models.CharField(max_length=200, verbose_name=_("عنوان")),
-        description=models.TextField(blank=True, verbose_name=_("توضیحات")),
-        slug=models.SlugField(max_length=220, unique=True, allow_unicode=True),
-    )
+class Video(models.Model):
+    title = models.CharField(max_length=200, verbose_name=_("عنوان"), default="")
+    description = models.TextField(blank=True, verbose_name=_("توضیحات"), default="")
+    slug = models.SlugField(max_length=220, unique=True, allow_unicode=True, default="")
     level = models.CharField(
         max_length=2,
         choices=[
@@ -59,22 +55,15 @@ class Video(TranslatableModel):
         ordering = ["-is_featured", "-created_at"]
 
     def __str__(self) -> str:
-        return self.safe_translation_getter("title", any_language=True) or f"Video {self.pk}"
+        return self.title
 
     def get_absolute_url(self):
         from django.urls import reverse
-        lang = get_language()
-        slug_val = self.safe_translation_getter("slug", language_code=lang)
-        if not slug_val:
-            slug_val = self.safe_translation_getter("slug", any_language=True)
-        return reverse("videos:detail", kwargs={"slug": slug_val})
+        return reverse("videos:detail", kwargs={"slug": self.slug})
 
     @property
     def slug_current(self) -> str:
-        slug = self.safe_translation_getter("slug", language_code=getattr(self, "_current_language", None))
-        if not slug:
-            slug = self.safe_translation_getter("slug", any_language=True) or ""
-        return slug
+        return self.slug
 
     @property
     def total_duration_formatted(self):

@@ -1,0 +1,266 @@
+/* ===== MOBILE USER DROPDOWN FIX ===== */
+/* رفع مشکل نمایش user dropdown در موبایل */
+
+@media (max-width: 1024px) {
+  
+  /* User Profile Mobile */
+  .user-profile {
+    position: relative;
+    display: block !important;
+  }
+  
+  .user-btn {
+    display: flex !important;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: #f8f9fa !important;
+    border: 1px solid #e9ecef !important;
+    border-radius: var(--border-radius);
+    color: #212529 !important;
+    cursor: pointer;
+    transition: var(--header-transition-fast);
+    text-decoration: none;
+    width: auto;
+  }
+  
+  .user-btn:hover {
+    background: #0d6efd !important;
+    color: #ffffff !important;
+    border-color: #0d6efd !important;
+    transform: translateY(-1px);
+  }
+  
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #0d6efd !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff !important;
+    font-size: 0.875rem;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  
+  .user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  
+  .user-name {
+    display: none; /* Hide on mobile */
+  }
+  
+  /* User Dropdown Mobile */
+  .user-dropdown {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    min-width: 200px !important;
+    max-width: 90vw !important;
+    background: #ffffff !important;
+    border: 1px solid #e9ecef !important;
+    border-radius: var(--border-radius-lg) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    z-index: 1001 !important;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease !important;
+    padding: 0.5rem 0 !important;
+    margin-top: 0.5rem;
+  }
+  
+  .user-dropdown.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+  }
+  
+  .user-dropdown .dropdown-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    padding: 0.75rem 1rem !important;
+    color: #212529 !important;
+    text-decoration: none !important;
+    font-size: 0.9rem !important;
+    transition: var(--header-transition-fast) !important;
+    border: none !important;
+    background: none !important;
+    width: 100% !important;
+    text-align: right !important;
+    cursor: pointer !important;
+    font-family: inherit !important;
+  }
+  
+  .user-dropdown .dropdown-item:hover {
+    background: rgba(13, 110, 253, 0.1) !important;
+    color: #0d6efd !important;
+  }
+  
+  .user-dropdown .dropdown-item:active {
+    background: rgba(13, 110, 253, 0.2) !important;
+  }
+  
+  .user-dropdown .dropdown-item i {
+    width: 16px !important;
+    text-align: center !important;
+    color: #0d6efd !important;
+    font-size: 0.875rem !important;
+  }
+  
+  .dropdown-divider {
+    height: 1px !important;
+    background: #e9ecef !important;
+    margin: 0.5rem 0 !important;
+    border: none !important;
+  }
+  
+  .logout-btn {
+    color: #dc3545 !important;
+  }
+  
+  .logout-btn:hover {
+    background: rgba(220, 53, 69, 0.1) !important;
+    color: #dc3545 !important;
+  }
+  
+  .logout-btn:active {
+    background: rgba(220, 53, 69, 0.2) !important;
+  }
+  
+  /* Touch Device Optimizations */
+  @media (hover: none) and (pointer: coarse) {
+    
+    .user-btn {
+      min-width: 44px;
+      min-height: 44px;
+    }
+    
+    .user-dropdown .dropdown-item {
+      min-height: 44px;
+      padding: 0.75rem 1rem;
+    }
+    
+    /* Remove hover effects on touch devices */
+    .user-btn:hover,
+    .user-dropdown .dropdown-item:hover {
+      transform: none;
+    }
+    
+    /* Add active states for touch */
+    .user-btn:active,
+    .user-dropdown .dropdown-item:active {
+      transform: scale(0.95);
+      background: rgba(13, 110, 253, 0.1);
+    }
+  }
+  
+  /* Small Mobile Devices */
+  @media (max-width: 480px) {
+    
+    .user-dropdown {
+      min-width: 180px !important;
+      max-width: 85vw !important;
+    }
+    
+    .user-dropdown .dropdown-item {
+      padding: 0.625rem 0.75rem !important;
+      font-size: 0.875rem !important;
+    }
+    
+    .user-dropdown .dropdown-item i {
+      width: 14px !important;
+      font-size: 0.8rem !important;
+    }
+  }
+  
+  /* Landscape Mobile */
+  @media (max-width: 768px) and (orientation: landscape) {
+    
+    .user-dropdown {
+      max-width: 80vw !important;
+    }
+  }
+}
+
+/* Force override for all mobile elements */
+@media (max-width: 1024px) {
+  
+  .user-profile {
+    position: relative !important;
+  }
+  
+  .user-dropdown {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    background: #ffffff !important;
+    border: 1px solid #e9ecef !important;
+    z-index: 1001 !important;
+  }
+  
+  .user-dropdown .dropdown-item {
+    background: transparent !important;
+    color: #212529 !important;
+  }
+  
+  .user-dropdown .dropdown-item:hover {
+    background: rgba(13, 110, 253, 0.1) !important;
+    color: #0d6efd !important;
+  }
+}
+
+/* Dark Mode Override */
+@media (prefers-color-scheme: dark) and (max-width: 1024px) {
+  
+  .user-dropdown {
+    background: #ffffff !important;
+    border-color: #e9ecef !important;
+  }
+  
+  .user-dropdown .dropdown-item {
+    color: #212529 !important;
+  }
+  
+  .user-dropdown .dropdown-item:hover {
+    background: rgba(13, 110, 253, 0.1) !important;
+    color: #0d6efd !important;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) and (max-width: 1024px) {
+  
+  .user-dropdown {
+    border: 2px solid #000000 !important;
+  }
+  
+  .user-dropdown .dropdown-item {
+    border: 1px solid #000000 !important;
+    margin-bottom: 1px !important;
+  }
+  
+  .user-dropdown .dropdown-item:hover {
+    background: #000000 !important;
+    color: #ffffff !important;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) and (max-width: 1024px) {
+  
+  .user-dropdown {
+    transition: none !important;
+  }
+  
+  .user-dropdown .dropdown-item {
+    transition: none !important;
+  }
+}

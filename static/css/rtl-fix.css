@@ -1,0 +1,64 @@
+/* RTL Fix for Header - Force Right to Left Layout */
+
+/* Force RTL on all header elements */
+.header {
+  direction: rtl !important;
+}
+
+.header-nav {
+  direction: rtl !important;
+  flex-direction: row-reverse !important;
+}
+
+/* Brand positioning - Right side */
+.header-brand {
+  order: 1 !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
+
+/* Navigation menu - Left side */
+.header-nav-menu {
+  order: 2 !important;
+  margin-right: auto !important;
+  margin-left: 0 !important;
+  flex-direction: row-reverse !important;
+}
+
+/* Actions - Left side */
+.header-actions {
+  order: 3 !important;
+  flex-direction: row-reverse !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Mobile menu RTL */
+.header-mobile-nav {
+  direction: rtl !important;
+  right: 0 !important;
+  left: auto !important;
+}
+
+/* Dropdown positioning for RTL */
+.header-dropdown {
+  right: 0 !important;
+  left: auto !important;
+}
+
+/* User dropdown RTL */
+.header-user-dropdown {
+  right: 0 !important;
+  left: auto !important;
+}
+
+/* Search modal RTL */
+.search-modal {
+  direction: rtl !important;
+}
+
+/* Force all text to be RTL */
+.header * {
+  direction: rtl !important;
+  text-align: right !important;
+}

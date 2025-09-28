@@ -12,6 +12,15 @@ class AssessmentIntroView(FormView):
     form_class = AssessmentStartForm
     success_url = reverse_lazy("assessments:take")
 
+    def get(self, request, *args, **kwargs):
+        # If there's only one active assessment, automatically select it
+        active_assessments = Assessment.objects.filter(is_active=True)
+        if active_assessments.count() == 1:
+            assessment = active_assessments.first()
+            request.session["assessment_id"] = assessment.id
+            return redirect("assessments:take")
+        return super().get(request, *args, **kwargs)
+
     def form_valid(self, form):
         assessment = form.cleaned_data["assessment"]
         self.request.session["assessment_id"] = assessment.id
@@ -24,7 +33,16 @@ class AssessmentTakeView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         assessment_id = request.session.get("assessment_id") or kwargs.get("assessment_id")
-        self.assessment = get_object_or_404(Assessment, id=assessment_id, is_active=True)
+        if not assessment_id:
+            # If no assessment_id is provided, get the first active assessment
+            try:
+                self.assessment = Assessment.objects.filter(is_active=True).first()
+                if not self.assessment:
+                    return redirect("assessments:intro")
+            except Assessment.DoesNotExist:
+                return redirect("assessments:intro")
+        else:
+            self.assessment = get_object_or_404(Assessment, id=assessment_id, is_active=True)
         # Pick 20 mixed-type questions deterministically by id
         questions = list(
             self.assessment.questions
@@ -194,6 +212,39 @@ class AssessmentResultView(TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["recommended_level"] = self.request.session.get("recommended_level")
+        
+        # Get the latest submission for this user
+        user_identifier = str(self.request.user.id or self.request.session.session_key)
+        try:
+            latest_submission = Submission.objects.filter(
+                user_identifier=user_identifier
+            ).order_by('-created_at').first()
+            
+            if latest_submission:
+                ctx.update({
+                    'submission': latest_submission,
+                    'score': latest_submission.score,
+                    'total_weight': latest_submission.total_weight,
+                    'ratio': latest_submission.ratio,
+                    'percentage': round(latest_submission.ratio * 100, 1),
+                    'duration_minutes': round(latest_submission.duration_seconds / 60, 1),
+                    'recommended_level': latest_submission.recommended_level,
+                    'created_at': latest_submission.created_at,
+                })
+                
+                # Get recommended videos based on the user's level
+                try:
+                    from courses.models import Video
+                    recommended_videos = Video.objects.filter(
+                        level=latest_submission.recommended_level
+                    ).order_by('-is_featured', '-created_at')[:6]
+                    ctx['recommended_videos'] = recommended_videos
+                except ImportError:
+                    ctx['recommended_videos'] = []
+                    
+        except Submission.DoesNotExist:
+            pass
+            
         return ctx
 
 

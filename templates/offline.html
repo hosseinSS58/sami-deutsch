@@ -1,0 +1,146 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>آفلاین - Sami Deutsch</title>
+  <meta name="description" content="شما در حال حاضر آفلاین هستید. لطفاً اتصال اینترنت خود را بررسی کنید.">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" rel="stylesheet">
+  <link href="{% static 'css/app.css' %}" rel="stylesheet">
+  <style>
+    .offline-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    .offline-card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      padding: 3rem;
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+      margin: 1rem;
+    }
+    
+    .offline-icon {
+      font-size: 4rem;
+      color: #6c757d;
+      margin-bottom: 1.5rem;
+    }
+    
+    .offline-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #495057;
+      margin-bottom: 1rem;
+    }
+    
+    .offline-description {
+      font-size: 1.1rem;
+      color: #6c757d;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    
+    .retry-button {
+      background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+      border: none;
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .retry-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3);
+    }
+    
+    .offline-features {
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid #e9ecef;
+    }
+    
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      color: #6c757d;
+    }
+    
+    .feature-item i {
+      color: #0d6efd;
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="offline-card">
+      <div class="offline-icon">
+        <i class="fas fa-wifi-slash"></i>
+      </div>
+      
+      <h1 class="offline-title">شما آفلاین هستید</h1>
+      
+      <p class="offline-description">
+        متأسفانه در حال حاضر اتصال اینترنت شما قطع است. 
+        لطفاً اتصال خود را بررسی کرده و دوباره تلاش کنید.
+      </p>
+      
+      <button class="retry-button" onclick="window.location.reload()">
+        <i class="fas fa-redo me-2"></i>
+        تلاش مجدد
+      </button>
+      
+      <div class="offline-features">
+        <h5 class="mb-3">ویژگی‌های آفلاین:</h5>
+        <div class="feature-item">
+          <i class="fas fa-check-circle"></i>
+          <span>دسترسی به محتوای ذخیره شده</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-check-circle"></i>
+          <span>مطالعه مقالات آفلاین</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-check-circle"></i>
+          <span>دسترسی به ویدیوهای دانلود شده</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Check connection status
+    function checkConnection() {
+      if (navigator.onLine) {
+        window.location.href = '/';
+      }
+    }
+    
+    // Listen for online event
+    window.addEventListener('online', function() {
+      window.location.href = '/';
+    });
+    
+    // Check connection every 5 seconds
+    setInterval(checkConnection, 5000);
+    
+    // Service Worker registration
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('{% static "sw.js" %}');
+    }
+  </script>
+</body>
+</html>
