@@ -15,16 +15,24 @@ class ModernHeader {
     this.userBtn = document.querySelector('.user-btn');
     this.userDropdown = document.querySelector('.user-dropdown');
     this.dropdowns = document.querySelectorAll('.dropdown');
-    
+    this.sidebar = document.querySelector('#siteSidebar');
+    this.sidebarOverlay = document.querySelector('[data-sidebar-overlay]');
+    this.sidebarToggles = document.querySelectorAll('[data-sidebar-toggle]');
+    this.sidebarCloseButtons = document.querySelectorAll('[data-sidebar-close]');
+    this.lastFocusedBeforeSidebar = null;
+    this.handleSidebarKeydown = this.handleSidebarKeydown.bind(this);
     this.isScrolled = false;
     this.isMobileMenuOpen = false;
     this.isSearchOpen = false;
     this.isUserDropdownOpen = false;
+    this.isSidebarOpen = false;
+    this.userInteracted = false;
     
     this.init();
   }
 
   init() {
+    this.registerFirstInteraction();
     this.bindEvents();
     this.setupScrollEffect();
     this.setupResizeObserver();
@@ -52,21 +60,46 @@ class ModernHeader {
       this.searchClose.addEventListener('click', () => this.closeSearch());
     }
 
-  // User dropdown
-  if (this.userBtn) {
-    this.userBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.toggleUserDropdown();
-    });
-    
-    // Touch events for mobile
-    if ('ontouchstart' in window) {
-      this.userBtn.addEventListener('touchstart', (e) => {
-        e.preventDefault();
+    // Sidebar toggles
+    if (this.sidebarToggles.length) {
+      this.sidebarToggles.forEach(toggle => {
+        toggle.addEventListener('click', (event) => {
+          event.preventDefault();
+          this.toggleSidebar();
+        });
+      });
+    }
+
+    if (this.sidebarOverlay) {
+      this.sidebarOverlay.addEventListener('click', () => this.closeSidebar());
+    }
+
+    if (this.sidebarCloseButtons.length) {
+      this.sidebarCloseButtons.forEach(button => {
+        button.addEventListener('click', () => this.closeSidebar());
+      });
+    }
+
+    if (this.sidebar) {
+      this.sidebar.addEventListener('keydown', this.handleSidebarKeydown);
+      const sidebarLinks = this.sidebar.querySelectorAll('a[href]');
+      sidebarLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth <= 1200) {
+            this.closeSidebar();
+          }
+        });
+      });
+    }
+
+    // User dropdown (desktop)
+    if (this.userBtn) {
+      this.userBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         this.toggleUserDropdown();
       });
     }
-  }
+
 
     // Close dropdowns on outside click
     document.addEventListener('click', (e) => {
@@ -103,6 +136,9 @@ class ModernHeader {
     
     window.addEventListener('scroll', () => {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      if (!this.header) {
+        return;
+      }
       
       // Add scrolled class
       if (scrollTop > 50) {
@@ -115,6 +151,12 @@ class ModernHeader {
           this.isScrolled = false;
           this.header.classList.remove('scrolled');
         }
+      }
+
+      if (window.innerWidth <= 1024) {
+        this.header.style.transform = 'translateY(0)';
+        lastScrollTop = scrollTop;
+        return;
       }
 
       // Hide header on scroll down, show on scroll up
@@ -134,6 +176,7 @@ class ModernHeader {
         if (window.innerWidth > 1024) {
           this.closeMobileMenu();
         }
+        // keep sidebar state on mobile/tablet unless manually toggled
       });
       
       resizeObserver.observe(document.body);
@@ -174,11 +217,6 @@ class ModernHeader {
         const endX = e.changedTouches[0].clientX;
         const diffY = startY - endY;
         const diffX = startX - endX;
-        
-        // Swipe up to close
-        if (diffY < -50 && Math.abs(diffX) < 50) {
-          this.closeMobileMenu();
-        }
         
         // Swipe right to close (RTL)
         if (diffX < -50 && Math.abs(diffY) < 50) {
@@ -236,9 +274,7 @@ class ModernHeader {
     });
     
     // Haptic feedback
-    if (navigator.vibrate) {
-      navigator.vibrate(50);
-    }
+    this.maybeVibrate(50);
   }
 
   closeMobileMenu() {
@@ -263,9 +299,7 @@ class ModernHeader {
     });
     
     // Haptic feedback
-    if (navigator.vibrate) {
-      navigator.vibrate(30);
-    }
+    this.maybeVibrate(30);
   }
 
   // Search methods
@@ -327,9 +361,7 @@ class ModernHeader {
       this.isUserDropdownOpen = true;
       
       // Haptic feedback for mobile
-      if (navigator.vibrate) {
-        navigator.vibrate(30);
-      }
+      this.maybeVibrate(30);
     }
   }
 
@@ -340,6 +372,31 @@ class ModernHeader {
       this.userDropdown.style.transform = 'translateY(-10px)';
       this.userDropdown.classList.remove('active');
       this.isUserDropdownOpen = false;
+    }
+  }
+
+  registerFirstInteraction() {
+    const markInteraction = () => {
+      this.userInteracted = true;
+      window.removeEventListener('pointerdown', markInteraction, true);
+      window.removeEventListener('keydown', markInteraction, true);
+      window.removeEventListener('touchstart', markInteraction, true);
+    };
+    window.addEventListener('pointerdown', markInteraction, true);
+    window.addEventListener('keydown', markInteraction, true);
+    window.addEventListener('touchstart', markInteraction, true);
+  }
+
+  maybeVibrate(duration = 30) {
+    if (!this.userInteracted) {
+      return;
+    }
+    if (navigator && typeof navigator.vibrate === 'function') {
+      try {
+        navigator.vibrate(duration);
+      } catch (error) {
+        // ignore vibration errors
+      }
     }
   }
 
@@ -374,6 +431,108 @@ class ModernHeader {
     }
   }
 
+  toggleSidebar() {
+    if (this.isSidebarOpen) {
+      this.closeSidebar();
+    } else {
+      this.openSidebar();
+    }
+  }
+
+  openSidebar() {
+    if (!this.sidebar) {
+      return;
+    }
+    if (this.isSidebarOpen) {
+      return;
+    }
+    this.lastFocusedBeforeSidebar = document.activeElement;
+    document.body.classList.add('sidebar-open');
+    this.sidebar.setAttribute('aria-hidden', 'false');
+    this.sidebar.setAttribute('tabindex', '-1');
+    this.updateSidebarToggleState(true);
+    this.focusFirstSidebarElement();
+    this.isSidebarOpen = true;
+    this.maybeVibrate(30);
+  }
+
+  closeSidebar() {
+    if (!this.sidebar || !this.isSidebarOpen) {
+      return;
+    }
+    document.body.classList.remove('sidebar-open');
+    this.sidebar.classList.remove('user-mode');
+    this.sidebar.setAttribute('aria-hidden', 'true');
+    this.sidebar.removeAttribute('tabindex');
+    this.updateSidebarToggleState(false);
+    this.isSidebarOpen = false;
+    if (this.lastFocusedBeforeSidebar && typeof this.lastFocusedBeforeSidebar.focus === 'function') {
+      this.lastFocusedBeforeSidebar.focus();
+    }
+    this.lastFocusedBeforeSidebar = null;
+  }
+
+  updateSidebarToggleState(expanded) {
+    if (this.sidebarToggles.length) {
+      this.sidebarToggles.forEach(toggle => toggle.setAttribute('aria-expanded', String(expanded)));
+    }
+  }
+
+  focusFirstSidebarElement() {
+    if (!this.sidebar) {
+      return;
+    }
+    const focusable = this.getSidebarFocusableElements();
+    if (focusable.length) {
+      focusable[0].focus();
+    } else {
+      this.sidebar.focus();
+    }
+  }
+
+  getSidebarFocusableElements() {
+    if (!this.sidebar) {
+      return [];
+    }
+    const selectors = [
+      'a[href]',
+      'button:not([disabled])',
+      'input:not([disabled])',
+      'select:not([disabled])',
+      'textarea:not([disabled])',
+      '[tabindex]:not([tabindex="-1"])'
+    ];
+    return Array.from(this.sidebar.querySelectorAll(selectors.join(','))).filter((el) => {
+      return el.offsetParent !== null;
+    });
+  }
+
+  handleSidebarKeydown(event) {
+    if (!this.isSidebarOpen) {
+      return;
+    }
+    if (event.key === 'Tab') {
+      const focusable = this.getSidebarFocusableElements();
+      if (!focusable.length) {
+        event.preventDefault();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.closeSidebar();
+    }
+  }
+
   closeAllDropdowns() {
     this.dropdowns.forEach(dropdown => {
       this.closeDropdown(dropdown);
@@ -385,6 +544,7 @@ class ModernHeader {
     this.closeSearch();
     this.closeUserDropdown();
     this.closeAllDropdowns();
+    this.closeSidebar();
   }
 
   // Public methods
@@ -412,11 +572,50 @@ class ModernHeader {
   setActiveNavItem(url) {
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
-      link.classList.remove('active');
-      if (link.getAttribute('href') === url) {
-        link.classList.add('active');
+      link.classList.toggle('active', this.linkMatches(link, url));
+    });
+
+    const sidebarItems = document.querySelectorAll('.sidebar-item, .sidebar-subitem');
+    sidebarItems.forEach(item => item.classList.remove('active'));
+
+    const sidebarLinks = document.querySelectorAll('.sidebar-link, .sidebar-sublink');
+    sidebarLinks.forEach(link => {
+      if (this.linkMatches(link, url)) {
+        const parent = link.closest('.sidebar-subitem, .sidebar-item');
+        if (parent) {
+          parent.classList.add('active');
+        }
+        const ancestor = link.closest('.sidebar-subitem')?.closest('.sidebar-item');
+        if (ancestor) {
+          ancestor.classList.add('active');
+        }
       }
     });
+  }
+
+  linkMatches(link, url) {
+    if (!link) {
+      return false;
+    }
+    const href = link.getAttribute('href');
+    if (!href) {
+      return false;
+    }
+    const normalize = (value) => {
+      if (!value) {
+        return '/';
+      }
+      if (value.length > 1 && value.endsWith('/')) {
+        return value.slice(0, -1);
+      }
+      return value;
+    };
+    const normalizedHref = normalize(href);
+    const normalizedUrl = normalize(url);
+    if (normalizedHref === '/') {
+      return normalizedUrl === '/';
+    }
+    return normalizedUrl.startsWith(normalizedHref);
   }
 }
 

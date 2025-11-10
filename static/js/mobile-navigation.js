@@ -228,3 +228,6 @@ if ('performance' in window) {
     console.log('Page load time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
   });
 }
+
+
+

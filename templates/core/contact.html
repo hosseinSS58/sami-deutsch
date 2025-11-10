@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 {% load form_extras %}
 {% block title %}تماس با ما{% endblock %}
+
+{% block content_container_class %}container py-5{% endblock %}
+
 {% block content %}
-<div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-lg-8">
       <div class="form-card">
@@ -63,7 +65,6 @@
       </div>
     </div>
   </div>
-</div>
 {% endblock %}
 
 

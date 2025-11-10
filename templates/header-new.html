@@ -1,94 +1,7 @@
 {% load static %}
 
-<!-- Modern Header Design -->
-<style>
-/* Force white background for ALL mobile elements */
-@media (max-width: 1024px) {
-  .modern-header,
-  .header-container,
-  .header-logo,
-  .header-actions,
-  .user-section,
-  .auth-buttons,
-  .mobile-nav,
-  .mobile-nav-content,
-  .mobile-nav-header,
-  .mobile-nav-body,
-  .mobile-auth,
-  .search-modal-content,
-  .search-header,
-  .search-body {
-    background: #ffffff !important;
-    background-color: #ffffff !important;
-    background-image: none !important;
-  }
-  
-  .mobile-nav-header {
-    background: #f8f9fa !important;
-  }
-  
-  .search-header {
-    background: #f8f9fa !important;
-  }
-  
-  /* Force dark text */
-  .modern-header,
-  .header-container,
-  .mobile-nav,
-  .mobile-nav-content,
-  .mobile-nav-body,
-  .mobile-auth,
-  .search-modal-content,
-  .search-header,
-  .search-body,
-  .mobile-link,
-  .mobile-nav-header h3,
-  .search-header h3 {
-    color: #212529 !important;
-  }
-  
-  /* Force light borders */
-  .modern-header,
-  .mobile-nav,
-  .mobile-nav-header,
-  .mobile-auth,
-  .search-modal-content,
-  .search-header {
-    border-color: #e9ecef !important;
-  }
-  
-  /* User Dropdown Mobile Fix */
-  .user-dropdown {
-    position: absolute !important;
-    top: 100% !important;
-    right: 0 !important;
-    background: #ffffff !important;
-    border: 1px solid #e9ecef !important;
-    z-index: 1001 !important;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.3s ease !important;
-  }
-  
-  .user-dropdown.active {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateY(0) !important;
-  }
-  
-  .user-dropdown .dropdown-item {
-    background: transparent !important;
-    color: #212529 !important;
-  }
-  
-  .user-dropdown .dropdown-item:hover {
-    background: rgba(13, 110, 253, 0.1) !important;
-    color: #0d6efd !important;
-  }
-}
-</style>
 <header class="modern-header" role="banner">
+
   <div class="header-container">
     
     <!-- Logo Section -->
@@ -106,82 +19,98 @@
 
     <!-- Navigation Menu -->
     <nav class="header-navigation" role="navigation" aria-label="منوی اصلی">
+      {% with current_path=request.path %}
       <ul class="nav-menu">
-        <li class="nav-item">
-          <a href="/" class="nav-link active">
-            <i class="fas fa-home"></i>
-            <span>خانه</span>
-          </a>
-        </li>
-        <li class="nav-item dropdown">
-          <a href="/videos/" class="nav-link dropdown-toggle">
-            <i class="fas fa-video"></i>
-            <span>ویدیوها</span>
-            <i class="fas fa-chevron-down dropdown-icon"></i>
-          </a>
-          <div class="dropdown-menu">
-            <a href="/videos/beginner/" class="dropdown-item">
-              <i class="fas fa-play-circle"></i>
-              <span>سطح A1-A2</span>
+        {% if header_menu and header_menu.items.all|length %}
+          {% for item in header_menu.items.all %}
+            {% with children=item.children.all %}
+              {% if children|length %}
+                <li class="nav-item dropdown">
+                  <a href="{{ item.url }}" class="nav-link dropdown-toggle{% if current_path == item.url %} active{% endif %}">
+                    {% if item.icon_class %}<i class="{{ item.icon_class }}"></i>{% endif %}
+                    <span>{{ item.title }}</span>
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                  </a>
+                  <div class="dropdown-menu">
+                    {% for child in children %}
+                      <a href="{{ child.url }}" class="dropdown-item{% if request.path == child.url %} active{% endif %}">
+                        {% if child.icon_class %}<i class="{{ child.icon_class }}"></i>{% endif %}
+                        <span>{{ child.title }}</span>
+                      </a>
+                    {% endfor %}
+                  </div>
+                </li>
+              {% else %}
+                <li class="nav-item">
+                  <a href="{{ item.url }}" class="nav-link{% if current_path == item.url %} active{% endif %}">
+                    {% if item.icon_class %}<i class="{{ item.icon_class }}"></i>{% endif %}
+                    <span>{{ item.title }}</span>
+                  </a>
+                </li>
+              {% endif %}
+            {% endwith %}
+          {% endfor %}
+        {% elif site_settings.show_default_nav_links %}
+          <li class="nav-item">
+            <a href="/" class="nav-link{% if current_path == '/' %} active{% endif %}">
+              <i class="fas fa-home"></i>
+              <span>خانه</span>
             </a>
-            <a href="/videos/intermediate/" class="dropdown-item">
-              <i class="fas fa-play-circle"></i>
-              <span>سطح B1-B2</span>
+          </li>
+          <li class="nav-item">
+            <a href="/videos/" class="nav-link{% if current_path|slice:":8" == '/videos/' %} active{% endif %}">
+              <i class="fas fa-video"></i>
+              <span>ویدیوها</span>
             </a>
-            <a href="/videos/advanced/" class="dropdown-item">
-              <i class="fas fa-play-circle"></i>
-              <span>سطح C1-C2</span>
+          </li>
+          <li class="nav-item">
+            <a href="/blog/" class="nav-link{% if current_path|slice:":6" == '/blog/' %} active{% endif %}">
+              <i class="fas fa-newspaper"></i>
+              <span>وبلاگ</span>
             </a>
-          </div>
-        </li>
-        <li class="nav-item dropdown">
-          <a href="/videos/" class="nav-link dropdown-toggle">
-            <i class="fas fa-video"></i>
-            <span>ویدیوها</span>
-            <i class="fas fa-chevron-down dropdown-icon"></i>
-          </a>
-          <div class="dropdown-menu">
-            <a href="/videos/?level=beginner" class="dropdown-item">
-              <i class="fas fa-play-circle"></i>
-              <span>مبتدی</span>
+          </li>
+          <li class="nav-item">
+            <a href="/assessments/" class="nav-link{% if current_path|slice:":12" == '/assessments/' %} active{% endif %}">
+              <i class="fas fa-clipboard-check"></i>
+              <span>آزمون‌ها</span>
             </a>
-            <a href="/videos/?level=intermediate" class="dropdown-item">
-              <i class="fas fa-graduation-cap"></i>
-              <span>متوسط</span>
-            </a>
-            <a href="/videos/?level=advanced" class="dropdown-item">
-              <i class="fas fa-trophy"></i>
-              <span>پیشرفته</span>
-            </a>
-          </div>
-        </li>
-        <li class="nav-item">
-          <a href="/blog/" class="nav-link">
-            <i class="fas fa-newspaper"></i>
-            <span>وبلاگ</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="/assessments/" class="nav-link">
-            <i class="fas fa-clipboard-check"></i>
-            <span>آزمون‌ها</span>
-          </a>
-        </li>
+          </li>
+        {% elif nav_links %}
+          {% for link in nav_links %}
+            <li class="nav-item">
+              <a href="{{ link.url }}" class="nav-link{% if current_path == link.url %} active{% endif %}">
+                <span>{{ link.title }}</span>
+              </a>
+            </li>
+          {% endfor %}
+        {% endif %}
       </ul>
+      {% endwith %}
     </nav>
 
     <!-- Header Actions -->
     <div class="header-actions">
+      <!-- Sidebar Toggle -->
+      <button class="action-btn sidebar-toggle d-none d-lg-flex" type="button" aria-label="نمایش نوار کناری"
+              data-sidebar-toggle aria-controls="siteSidebar" aria-expanded="false">
+        <i class="fas fa-bars"></i>
+      </button>
       
       <!-- Search Button -->
-      <button class="action-btn search-btn" type="button" aria-label="جستجو">
+      <button class="action-btn search-btn d-none d-lg-flex" type="button" aria-label="جستجو">
         <i class="fas fa-search"></i>
       </button>
 
+
+      <!-- Primary CTA -->
+      <a href="/videos/" class="btn btn-primary header-cta d-none d-xl-inline-flex">
+        <i class="fas fa-play-circle"></i>
+        <span>شروع یادگیری</span>
+      </a>
+
       <!-- User Section -->
-      <div class="user-section">
+      <div class="user-section d-none d-lg-flex">
         {% if user.is_authenticated %}
-          <!-- Authenticated User -->
           <div class="user-profile">
             <button class="user-btn" type="button" aria-label="پروفایل کاربر">
               <div class="user-avatar">
@@ -220,7 +149,6 @@
             </div>
           </div>
         {% else %}
-          <!-- Guest User -->
           <div class="auth-buttons">
             <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary">
               <i class="fas fa-sign-in-alt"></i>
@@ -255,18 +183,106 @@
         </button>
       </div>
       <div class="mobile-nav-body">
-        <ul class="mobile-menu">
-          <li><a href="/" class="mobile-link"><i class="fas fa-home"></i>خانه</a></li>
-          <li><a href="/videos/" class="mobile-link"><i class="fas fa-video"></i>ویدیوها</a></li>
-          <li><a href="/blog/" class="mobile-link"><i class="fas fa-newspaper"></i>وبلاگ</a></li>
-          <li><a href="/assessments/" class="mobile-link"><i class="fas fa-clipboard-check"></i>آزمون‌ها</a></li>
-        </ul>
-        <div class="mobile-auth">
-          {% if not user.is_authenticated %}
-            <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary w-100 mb-2">ورود</a>
-            <a href="{% url 'accounts:signup' %}" class="btn btn-primary w-100">ثبت‌نام</a>
-          {% endif %}
+        <div class="mobile-search d-lg-none">
+          <form action="/search/" method="get" class="mobile-search-form">
+            <div class="mobile-search-group">
+              <i class="fas fa-search"></i>
+              <input type="search" name="q" placeholder="جستجو..." required>
+              <button type="submit" aria-label="جستجو">
+                <i class="fas fa-arrow-left"></i>
+              </button>
+            </div>
+          </form>
         </div>
+        {% with current_path=request.path %}
+        <ul class="mobile-menu">
+          {% if header_menu and header_menu.items.all|length %}
+            {% for item in header_menu.items.all %}
+              <li>
+                <a href="{{ item.url }}" class="mobile-link{% if current_path == item.url %} active{% endif %}">
+                  {% if item.icon_class %}<i class="{{ item.icon_class }}"></i>{% endif %}
+                  {{ item.title }}
+                </a>
+              </li>
+              {% for child in item.children.all %}
+                <li>
+                  <a href="{{ child.url }}" class="mobile-link mobile-sublink{% if current_path == child.url %} active{% endif %}">
+                    {% if child.icon_class %}<i class="{{ child.icon_class }}"></i>{% endif %}
+                    {{ child.title }}
+                  </a>
+                </li>
+              {% endfor %}
+            {% endfor %}
+          {% elif site_settings.show_default_nav_links %}
+            <li><a href="/" class="mobile-link{% if current_path == '/' %} active{% endif %}"><i class="fas fa-home"></i>خانه</a></li>
+            <li><a href="/videos/" class="mobile-link{% if current_path|slice:":8" == '/videos/' %} active{% endif %}"><i class="fas fa-video"></i>ویدیوها</a></li>
+            <li><a href="/blog/" class="mobile-link{% if current_path|slice:":6" == '/blog/' %} active{% endif %}"><i class="fas fa-newspaper"></i>وبلاگ</a></li>
+            <li><a href="/assessments/" class="mobile-link{% if current_path|slice:":12" == '/assessments/' %} active{% endif %}"><i class="fas fa-clipboard-check"></i>آزمون‌ها</a></li>
+          {% elif nav_links %}
+            {% for link in nav_links %}
+              <li>
+                <a href="{{ link.url }}" class="mobile-link{% if current_path == link.url %} active{% endif %}">
+                  {{ link.title }}
+                </a>
+              </li>
+            {% endfor %}
+          {% endif %}
+        </ul>
+        {% endwith %}
+
+        <div class="mobile-quick-actions d-lg-none">
+          <a href="/videos/" class="mobile-quick-action">
+            <i class="fas fa-play-circle"></i>
+            <span>شروع یادگیری</span>
+          </a>
+          <a href="/assessments/" class="mobile-quick-action">
+            <i class="fas fa-clipboard-check"></i>
+            <span>تعیین سطح</span>
+          </a>
+          <a href="/blog/" class="mobile-quick-action">
+            <i class="fas fa-lightbulb"></i>
+            <span>نکات یادگیری</span>
+          </a>
+        </div>
+
+        <div class="mobile-contact-card d-lg-none">
+          <div class="mobile-contact-row">
+            <i class="fas fa-phone-alt"></i>
+            <a href="tel:02112345678">۰۲۱-۱۲۳۴۵۶۷۸</a>
+          </div>
+          <div class="mobile-contact-row">
+            <i class="fas fa-envelope"></i>
+            <a href="mailto:support@samideutsch.com">support@samideutsch.com</a>
+          </div>
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="mobile-user-card d-lg-none">
+          <div class="mobile-user-avatar">
+            {% if user.profile.avatar %}
+              <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}">
+            {% else %}
+              <i class="fas fa-user"></i>
+            {% endif %}
+          </div>
+          <div class="mobile-user-info">
+            <strong>{{ user.username|default:"کاربر" }}</strong>
+            <span>{{ user.email }}</span>
+          </div>
+        </div>
+        <div class="mobile-auth">
+          <a href="{% url 'accounts:profile' %}" class="btn btn-primary w-100 mb-2">پروفایل من</a>
+          <form method="post" action="{% url 'accounts:logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-secondary w-100">خروج</button>
+          </form>
+        </div>
+        {% else %}
+        <div class="mobile-auth">
+          <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary w-100 mb-2">ورود</a>
+          <a href="{% url 'accounts:signup' %}" class="btn btn-primary w-100">ثبت‌نام</a>
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>

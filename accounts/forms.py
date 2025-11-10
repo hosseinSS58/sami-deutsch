@@ -13,14 +13,6 @@ class SignUpForm(UserCreationForm):
     first_name = forms.CharField(label=_("نام"), required=False)
     last_name = forms.CharField(label=_("نام خانوادگی"), required=False)
 
-    # Profile extras
-    avatar = forms.ImageField(label=_("آواتار"), required=False)
-    phone = forms.CharField(label=_("تلفن"), required=False)
-    level = forms.ChoiceField(
-        label=_("سطح تقریبی"),
-        required=False,
-        choices=Profile.LanguageLevel.choices,
-    )
     newsletter_opt_in = forms.BooleanField(label=_("عضویت در خبرنامه"), required=False)
 
     class Meta(UserCreationForm.Meta):
@@ -32,9 +24,6 @@ class SignUpForm(UserCreationForm):
             "email",
             "password1",
             "password2",
-            "avatar",
-            "phone",
-            "level",
             "newsletter_opt_in",
         )
 
@@ -48,12 +37,7 @@ class SignUpForm(UserCreationForm):
         user = super().save(commit)
         # Persist profile data
         profile, _ = Profile.objects.get_or_create(user=user)
-        profile.phone = self.cleaned_data.get("phone", "")
-        profile.level = self.cleaned_data.get("level") or ""
         profile.newsletter_opt_in = bool(self.cleaned_data.get("newsletter_opt_in"))
-        avatar = self.cleaned_data.get("avatar")
-        if avatar:
-            profile.avatar = avatar
         if commit:
             profile.save()
         return user

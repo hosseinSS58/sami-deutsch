@@ -179,3 +179,55 @@ section {
 .custom-css {
     /* This will be populated by the custom_css field */
 }
+
+/* Mobile overrides to mirror desktop look-and-feel */
+@media (max-width: 576px) {
+    html, body {
+        font-size: var(--base-font-size) !important;
+        line-height: 1.6 !important;
+        -webkit-text-size-adjust: 100% !important;
+    }
+
+    /* Keep buttons inline-sized like desktop */
+    .btn { 
+        width: auto !important; 
+        display: inline-block !important; 
+    }
+    .btn-lg {
+        padding: 0.5rem 1rem !important;
+        font-size: 1rem !important;
+        line-height: 1.5 !important;
+    }
+
+    /* Inputs same visual weight as desktop */
+    .form-control, .form-select {
+        font-size: 1rem !important;
+        padding: 0.5rem 0.75rem !important;
+        line-height: 1.5 !important;
+    }
+
+    /* Headings closer to desktop scale */
+    h1 { font-size: 1.75rem !important; }
+    h2 { font-size: 1.5rem !important; }
+    h3 { font-size: 1.25rem !important; }
+    h4 { font-size: 1.125rem !important; }
+    h5 { font-size: 1rem !important; }
+    h6 { font-size: 0.875rem !important; }
+
+    /* Navigation paddings similar to desktop */
+    .nav-link { 
+        padding: 0.5rem 0.75rem !important; 
+    }
+
+    /* Cards keep desktop shadow and radius */
+    .card {
+        border-radius: var(--card-radius) !important;
+        box-shadow: 0 0.125rem 0.25rem var(--card-shadow) !important;
+    }
+
+    /* Avoid full-bleed containers unintentionally */
+    .container, .container-fluid {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+}

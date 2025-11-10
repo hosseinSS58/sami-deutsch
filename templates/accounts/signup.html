@@ -25,17 +25,29 @@
               <label class="form-label" for="id_{{ field.name }}">{{ field.label }}</label>
               {% if field.field.widget.input_type == 'checkbox' %}
                 <div class="form-check">
-                  {{ field }}
+                  {% if field.errors %}
+                    {{ field|add_class:'form-check-input is-invalid' }}
+                  {% else %}
+                    {{ field|add_class:'form-check-input' }}
+                  {% endif %}
                   <label class="form-check-label" for="id_{{ field.name }}">{{ field.help_text|default:field.label }}</label>
                 </div>
               {% elif field.field.widget.input_type == 'file' %}
-                {{ field|add_class:'form-control' }}
+                {% if field.errors %}
+                  {{ field|add_class:'form-control is-invalid' }}
+                {% else %}
+                  {{ field|add_class:'form-control' }}
+                {% endif %}
                 {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
               {% else %}
-                {{ field|add_class:'form-control' }}
+                {% if field.errors %}
+                  {{ field|add_class:'form-control is-invalid' }}
+                {% else %}
+                  {{ field|add_class:'form-control' }}
+                {% endif %}
                 {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
               {% endif %}
-              {% for err in field.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+              {% for err in field.errors %}<div class="invalid-feedback d-block">{{ err }}</div>{% endfor %}
             </div>
           {% endfor %}
         </div>

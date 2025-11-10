@@ -34,10 +34,11 @@
   
   <!-- PWA Meta Tags -->
   <link rel="manifest" href="{% static 'manifest.json' %}">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="{{ site_settings.brand_name|default:'Sami Deutsch' }}">
-  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'img/icon-192x192.png' %}">
   <!-- Preconnect to external domains for performance -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,19 +57,17 @@
   <link href="{% static 'css/forms.css' %}" rel="stylesheet">
   <link href="{% static 'css/animations.css' %}" rel="stylesheet">
   <link href="{% static 'css/search-modal.css' %}" rel="stylesheet">
+  <link href="{% static 'css/sidebar.css' %}" rel="stylesheet">
   
   <!-- Mobile CSS -->
   <link href="{% static 'css/home-mobile.css' %}" rel="stylesheet">
-  <link href="{% static 'css/mobile-input-fix.css' %}" rel="stylesheet">
   <link href="{% static 'css/mobile-enhancements.css' %}" rel="stylesheet">
-  <link href="{% static 'css/mobile-background-fix.css' %}" rel="stylesheet">
-  <link href="{% static 'css/mobile-complete-fix.css' %}" rel="stylesheet">
-  <link href="{% static 'css/mobile-final-fix.css' %}" rel="stylesheet">
-  <link href="{% static 'css/mobile-user-dropdown-fix.css' %}" rel="stylesheet">
   
   <!-- Non-critical CSS - Load asynchronously -->
   <link rel="preload" href="{% static 'css/dynamic-styles.css' %}" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="{% static 'css/dynamic-styles.css' %}"></noscript>
+
+  {% block extra_css %}{% endblock %}
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;800&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -146,11 +145,26 @@
   <!-- Include Modern Header -->
   {% include 'header-new.html' %}
 
+  {% include 'components/sidebar.html' %}
+  <div class="sidebar-overlay" data-sidebar-overlay aria-hidden="true"></div>
+
   <!-- Main Content -->
   <main id="main-content" class="py-4" role="main" aria-label="Main content">
-    <div class="container">
+    {% block main_layout %}
+    <div class="{% block content_container_class %}container{% endblock %}">
+      {% if messages %}
+      <div class="page-messages mb-4">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
+      {% endif %}
       {% block content %}{% endblock %}
     </div>
+    {% endblock main_layout %}
   </main>
 
   <!-- Footer -->
@@ -194,12 +208,22 @@
     if ('performance' in window) {
       window.addEventListener('load', function() {
         const perfData = performance.getEntriesByType('navigation')[0];
-        if (perfData) {
-          console.log('Page load time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
+        if (!perfData) {
+          return;
+        }
+        let loadTime = null;
+        if (perfData.loadEventEnd && perfData.loadEventEnd >= perfData.loadEventStart) {
+          loadTime = perfData.loadEventEnd - perfData.loadEventStart;
+        } else if (typeof perfData.duration === 'number' && perfData.duration > 0) {
+          loadTime = perfData.duration;
+        }
+        if (loadTime !== null) {
+          console.log('Page load time:', Math.round(loadTime), 'ms');
         }
       });
     }
   </script>
+  {% block extra_js %}{% endblock %}
 </body>
 </html>
 

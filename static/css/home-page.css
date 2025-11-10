@@ -1,0 +1,77 @@
+/* ===== Home Page Enhancements ===== */
+
+.home-cta-card {
+  background: linear-gradient(
+    135deg,
+    var(--site-primary-color, #0d6efd),
+    var(--site-link-hover-color, #0a58ca)
+  );
+  border: none;
+  box-shadow: 0 1.5rem 3rem rgba(13, 110, 253, 0.25);
+  color: #ffffff;
+}
+
+.home-cta-card .cta-bg-gradient {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.35), transparent 55%);
+  opacity: 0.8;
+}
+
+.home-cta-card .cta-content {
+  position: relative;
+  z-index: 1;
+}
+
+.home-cta-card .btn-light {
+  color: var(--site-primary-color, #0d6efd);
+  background: #ffffff;
+  border: none;
+  box-shadow: 0 0.5rem 1.5rem rgba(255, 255, 255, 0.25);
+}
+
+.home-cta-card .btn-outline-light {
+  border-color: rgba(255, 255, 255, 0.75);
+  color: #ffffff;
+}
+
+.home-cta-card .btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.home-newsletter-card {
+  background: linear-gradient(
+    135deg,
+    rgba(13, 110, 253, 0.08),
+    rgba(13, 110, 253, 0.02)
+  );
+  border: 1px solid rgba(13, 110, 253, 0.12);
+}
+
+.home-newsletter-card .form-control {
+  background: #ffffff;
+  border-color: rgba(13, 110, 253, 0.2);
+}
+
+.home-newsletter-card .form-control:focus {
+  border-color: var(--site-primary-color, #0d6efd);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.2);
+}
+
+.newsletter-feedback .alert {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .home-cta-card {
+    padding: 3rem 2rem !important;
+    text-align: center;
+  }
+
+  .home-cta-card .cta-content .btn {
+    width: 100%;
+    max-width: 240px;
+  }
+}
+

@@ -3,8 +3,13 @@
 
 {% block title %}{{ video.title }} - {% trans "ویدیوهای آموزشی آلمانی" %}{% endblock %}
 
+{% block extra_css %}
+<link href="{% static 'css/video-pages.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content_container_class %}container py-5 video-detail-page{% endblock %}
+
 {% block content %}
-<div class="container py-5">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
@@ -496,7 +501,6 @@
         </div>
     </div>
     {% endif %}
-</div>
 
 <!-- Image Modal -->
 <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
@@ -512,49 +516,6 @@
         </div>
     </div>
 </div>
-
-<!-- Custom CSS -->
-<style>
-.nav-tabs .nav-link {
-    border-radius: 0.5rem 0.5rem 0 0;
-    border: none;
-    color: var(--text-secondary);
-    transition: all 0.2s ease;
-}
-
-.nav-tabs .nav-link:hover {
-    border-color: var(--link-color);
-    color: var(--link-color);
-}
-
-.nav-tabs .nav-link.active {
-    background: linear-gradient(135deg, var(--german-black), #1a1a1a);
-    border-color: var(--german-gold);
-    color: var(--german-gold);
-}
-
-.card {
-    border-radius: 1rem;
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.1) !important;
-}
-
-.badge {
-    font-size: 0.75rem;
-}
-
-@media (max-width: 768px) {
-    .card:hover {
-        transform: none;
-    }
-}
-</style>
-
 <!-- JavaScript -->
 <script>
 function openImageModal(imageUrl, caption) {

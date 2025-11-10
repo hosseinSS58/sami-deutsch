@@ -1,0 +1,144 @@
+{% load static %}
+<aside class="site-sidebar" id="siteSidebar" role="complementary" aria-hidden="true" aria-label="نوار کناری سایت">
+  <div class="sidebar-header">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <div class="sidebar-brand-text">
+        <span class="sidebar-brand-title">{{ site_settings.brand_name|default:"Sami Deutsch" }}</span>
+        <span class="sidebar-brand-subtitle">آموزش زبان آلمانی</span>
+      </div>
+    </div>
+    <button class="sidebar-close-btn" type="button" aria-label="بستن نوار کناری" data-sidebar-close>
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <div class="sidebar-content">
+    <nav class="sidebar-nav" aria-label="منوی کناری">
+      {% with current_path=request.path %}
+      <ul class="sidebar-menu">
+        {% if header_menu and header_menu.items.all|length %}
+          {% for item in header_menu.items.all %}
+            {% with children=item.children.all %}
+              <li class="sidebar-item{% if current_path == item.url %} active{% endif %}">
+                <a href="{{ item.url }}" class="sidebar-link">
+                  {% if item.icon_class %}<i class="{{ item.icon_class }}"></i>{% else %}<i class="fas fa-circle"></i>{% endif %}
+                  <span>{{ item.title }}</span>
+                </a>
+                {% if children|length %}
+                  <ul class="sidebar-submenu">
+                    {% for child in children %}
+                      <li class="sidebar-subitem{% if current_path == child.url %} active{% endif %}">
+                        <a href="{{ child.url }}" class="sidebar-sublink">
+                          {% if child.icon_class %}<i class="{{ child.icon_class }}"></i>{% else %}<i class="far fa-circle"></i>{% endif %}
+                          <span>{{ child.title }}</span>
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </li>
+            {% endwith %}
+          {% endfor %}
+        {% elif site_settings.show_default_nav_links %}
+          <li class="sidebar-item{% if current_path == '/' %} active{% endif %}">
+            <a href="/" class="sidebar-link"><i class="fas fa-home"></i><span>خانه</span></a>
+          </li>
+          <li class="sidebar-item{% if current_path|slice:':8' == '/videos/' %} active{% endif %}">
+            <a href="/videos/" class="sidebar-link"><i class="fas fa-video"></i><span>ویدیوها</span></a>
+          </li>
+          <li class="sidebar-item{% if current_path|slice:':6' == '/blog/' %} active{% endif %}">
+            <a href="/blog/" class="sidebar-link"><i class="fas fa-newspaper"></i><span>بلاگ</span></a>
+          </li>
+          <li class="sidebar-item{% if current_path|slice:':12' == '/assessments/' %} active{% endif %}">
+            <a href="/assessments/" class="sidebar-link"><i class="fas fa-clipboard-check"></i><span>آزمون‌ها</span></a>
+          </li>
+          <li class="sidebar-item{% if current_path|slice:':6' == '/shop/' %} active{% endif %}">
+            <a href="/shop/" class="sidebar-link"><i class="fas fa-shopping-bag"></i><span>فروشگاه</span></a>
+          </li>
+        {% elif nav_links %}
+          {% for link in nav_links %}
+            <li class="sidebar-item{% if current_path == link.url %} active{% endif %}">
+              <a href="{{ link.url }}" class="sidebar-link">
+                <i class="fas fa-angle-left"></i>
+                <span>{{ link.title }}</span>
+              </a>
+            </li>
+          {% endfor %}
+        {% endif %}
+      </ul>
+      {% endwith %}
+    </nav>
+
+    <div class="sidebar-section">
+      <h3 class="sidebar-section-title">
+        <i class="fas fa-bolt"></i>
+        دسترسی سریع
+      </h3>
+      <div class="sidebar-actions">
+        <a class="sidebar-action" href="/videos/">
+          <i class="fas fa-play-circle"></i>
+          <span>شروع یادگیری</span>
+        </a>
+        <a class="sidebar-action" href="/assessments/">
+          <i class="fas fa-chart-line"></i>
+          <span>تعیین سطح</span>
+        </a>
+        <a class="sidebar-action" href="/contact/">
+          <i class="fas fa-headset"></i>
+          <span>پشتیبانی</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3 class="sidebar-section-title">
+        <i class="fas fa-tags"></i>
+        دسته‌بندی‌ها
+      </h3>
+      <div class="sidebar-taglist">
+        <a href="/videos/?topic=grammar" class="sidebar-tag">گرامر</a>
+        <a href="/videos/?topic=speaking" class="sidebar-tag">مکالمه</a>
+        <a href="/videos/?topic=listening" class="sidebar-tag">شنیداری</a>
+        <a href="/videos/?topic=vocab" class="sidebar-tag">واژگان</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    {% if user.is_authenticated %}
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar">
+        {% if user.profile.avatar %}
+          <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}">
+        {% else %}
+          <i class="fas fa-user"></i>
+        {% endif %}
+      </div>
+      <div class="sidebar-user-info">
+        <strong>{{ user.username|default:"کاربر" }}</strong>
+        <a href="{% url 'accounts:profile' %}">پروفایل من</a>
+      </div>
+    </div>
+    <form method="post" action="{% url 'accounts:logout' %}" class="sidebar-logout">
+      {% csrf_token %}
+      <button type="submit" class="sidebar-action-logout">
+        <i class="fas fa-sign-out-alt"></i>
+        خروج
+      </button>
+    </form>
+    {% endif %}
+    <div class="sidebar-contact">
+      <i class="fas fa-envelope"></i>
+      <a href="mailto:support@samideutsch.com">support@samideutsch.com</a>
+    </div>
+    <div class="sidebar-social">
+      <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+      <a href="#" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
+    </div>
+  </div>
+</aside>
+

@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView, FormView
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
+from django.contrib import messages
 from .forms import ContactForm
 from courses.models import Video
 from blog.models import Post
@@ -29,6 +30,7 @@ class ContactView(FormView):
 
     def form_valid(self, form):
         form.save()
+        messages.success(self.request, _("پیام شما با موفقیت ارسال شد!"))
         return super().form_valid(form)
 
 

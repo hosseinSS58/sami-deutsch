@@ -1,0 +1,87 @@
+/* ===== Video Pages Shared Styles ===== */
+
+/* Video listing cards */
+.video-list-page .video-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.video-list-page .video-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.video-list-page .video-card .card-img-top {
+  transition: transform 0.3s ease;
+}
+
+.video-list-page .video-card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.video-list-page .video-card .badge {
+  font-size: 0.75rem;
+}
+
+.video-list-page .video-card .card-title {
+  line-height: 1.3;
+  min-height: 2.6rem;
+}
+
+.video-list-page .video-card .card-text {
+  line-height: 1.5;
+  min-height: 3rem;
+}
+
+@media (max-width: 768px) {
+  .video-list-page .video-card:hover {
+    transform: none;
+    box-shadow: none !important;
+  }
+
+  .video-list-page .video-card:hover .card-img-top {
+    transform: none;
+  }
+}
+
+/* Video detail tabs and cards */
+.video-detail-page .nav-tabs .nav-link {
+  border-radius: 0.5rem 0.5rem 0 0;
+  border: none;
+  color: var(--site-text-secondary-color, #6c757d);
+  transition: all 0.2s ease;
+}
+
+.video-detail-page .nav-tabs .nav-link:hover {
+  border-color: var(--site-link-color, #0d6efd);
+  color: var(--site-link-color, #0d6efd);
+}
+
+.video-detail-page .nav-tabs .nav-link.active {
+  background: linear-gradient(135deg, var(--german-black, #000000), #1a1a1a);
+  border-color: var(--german-gold, #ffd700);
+  color: var(--german-gold, #ffd700);
+}
+
+.video-detail-page .card {
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.video-detail-page .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.video-detail-page .badge {
+  font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .video-detail-page .card:hover {
+    transform: none;
+  }
+}
+
