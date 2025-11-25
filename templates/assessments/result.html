@@ -17,39 +17,39 @@
 
       {% if submission %}
         <!-- Results Summary -->
-        <div class="row g-4 mb-5">
-          <div class="col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-              <div class="card-body text-center">
-                <i class="fas fa-trophy fa-3x text-warning mb-3"></i>
-                <h5 class="card-title">{% trans "سطح پیشنهادی" %}</h5>
-                <h2 class="text-primary">{{ recommended_level }}</h2>
-                <p class="text-muted small">{% trans "بر اساس عملکرد شما" %}</p>
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <div class="row g-3 align-items-stretch">
+              <div class="col-12 col-md-6">
+                <div class="rounded-3 h-100 p-3 text-center border bg-light">
+                  <i class="fas fa-trophy fa-2x text-warning mb-2"></i>
+                  <h6 class="text-muted mb-1">{% trans "سطح پیشنهادی" %}</h6>
+                  <div class="h2 text-primary mb-0">{{ recommended_level }}</div>
+                  <p class="text-muted small mb-0">{% trans "بر اساس عملکرد شما" %}</p>
+                </div>
               </div>
-            </div>
-          </div>
-          
-          <div class="col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-              <div class="card-body text-center">
-                <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
-                <h5 class="card-title">{% trans "نمره شما" %}</h5>
-                <h2 class="text-success">{{ percentage }}%</h2>
-                <p class="text-muted small">{{ score|floatformat:1 }} از {{ total_weight|floatformat:1 }}</p>
+              <div class="col-12 col-md-6">
+                <div class="rounded-3 h-100 p-3 text-center border bg-light">
+                  <i class="fas fa-chart-line fa-2x text-success mb-2"></i>
+                  <h6 class="text-muted mb-1">{% trans "نمره شما" %}</h6>
+                  <div class="h2 text-success mb-0">{{ percentage }}%</div>
+                  <p class="text-muted small mb-0">{{ score|floatformat:1 }} از {{ total_weight|floatformat:1 }}</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Detailed Results -->
+        <!-- Combined details card -->
         <div class="card border-0 shadow-sm mb-4">
           <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">
-              <i class="fas fa-info-circle me-2"></i>{% trans "جزئیات آزمون" %}
+            <h5 class="mb-0 d-flex align-items-center gap-2 flex-wrap">
+              <i class="fas fa-info-circle"></i>
+              <span>گزارش کامل آزمون</span>
             </h5>
           </div>
           <div class="card-body">
-            <div class="row g-3">
+            <div class="row g-3 mb-4">
               <div class="col-md-6">
                 <div class="d-flex justify-content-between">
                   <span>{% trans "زمان صرف‌شده:" %}</span>
@@ -75,31 +75,74 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Level Description -->
-        <div class="card border-0 shadow-sm mb-4">
-          <div class="card-header">
-            <h5 class="mb-0">
-              <i class="fas fa-graduation-cap me-2"></i>{% trans "توضیح سطح" %}
-            </h5>
-          </div>
-          <div class="card-body">
-            {% if recommended_level == "A1" %}
-              <p class="mb-0">{% trans "سطح A1: مبتدی - شما می‌توانید عبارات ساده و روزمره را درک کرده و استفاده کنید." %}</p>
-            {% elif recommended_level == "A2" %}
-              <p class="mb-0">{% trans "سطح A2: مبتدی پیشرفته - شما می‌توانید در موقعیت‌های ساده و روزمره ارتباط برقرار کنید." %}</p>
-            {% elif recommended_level == "B1" %}
-              <p class="mb-0">{% trans "سطح B1: متوسط - شما می‌توانید در اکثر موقعیت‌ها به طور مستقل ارتباط برقرار کنید." %}</p>
-            {% elif recommended_level == "B2" %}
-              <p class="mb-0">{% trans "سطح B2: متوسط پیشرفته - شما می‌توانید در موقعیت‌های پیچیده به طور مستقل ارتباط برقرار کنید." %}</p>
-            {% elif recommended_level == "C1" %}
-              <p class="mb-0">{% trans "سطح C1: پیشرفته - شما می‌توانید در موقعیت‌های پیچیده و تخصصی به طور روان ارتباط برقرار کنید." %}</p>
+            <div class="mb-4">
+              <h6 class="mb-2">
+                <i class="fas fa-graduation-cap me-1 text-primary"></i>{% trans "توضیح سطح" %}
+              </h6>
+              <div class="p-3 rounded-3 bg-light border">
+                {% if recommended_level == "A1" %}
+                  <p class="mb-0">{% trans "سطح A1: مبتدی - شما می‌توانید عبارات ساده و روزمره را درک کرده و استفاده کنید." %}</p>
+                {% elif recommended_level == "A2" %}
+                  <p class="mb-0">{% trans "سطح A2: مبتدی پیشرفته - شما می‌توانید در موقعیت‌های ساده و روزمره ارتباط برقرار کنید." %}</p>
+                {% elif recommended_level == "B1" %}
+                  <p class="mb-0">{% trans "سطح B1: متوسط - شما می‌توانید در اکثر موقعیت‌ها به طور مستقل ارتباط برقرار کنید." %}</p>
+                {% elif recommended_level == "B2" %}
+                  <p class="mb-0">{% trans "سطح B2: متوسط پیشرفته - شما می‌توانید در موقعیت‌های پیچیده به طور مستقل ارتباط برقرار کنید." %}</p>
+                {% elif recommended_level == "C1" %}
+                  <p class="mb-0">{% trans "سطح C1: پیشرفته - شما می‌توانید в موقعیت‌های پیچیده و تخصصی به طور روان ارتباط برقرار کنید." %}</p>
+                {% endif %}
+              </div>
+            </div>
+            {% if batch_history %}
+            <div>
+              <div class="d-flex justify-content-between alignments-center mb-2">
+                <h6 class="mb-0">
+                  <i class="fas fa-list-ol me-1 text-primary"></i>گزارش مراحل آزمون
+                </h6>
+                <small class="text-muted">برای مشاهده جزئیات هر مرحله کلیک کنید</small>
+              </div>
+              <div class="accordion" id="batchAccordion">
+                {% for batch in batch_history %}
+                <div class="accordion-item mb-2 border-0">
+                  <h2 class="accordion-header" id="batchHeading{{ forloop.counter }}">
+                    <button class="accordion-button collapsed shadow-sm rounded-3" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#batchCollapse{{ forloop.counter }}"
+                            aria-expanded="false"
+                            aria-controls="batchCollapse{{ forloop.counter }}">
+                      <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
+                        <div>
+                          <span class="badge bg-secondary-subtle text-secondary border">سطح {{ batch.level }}</span>
+                        </div>
+                        <div class="text-muted small">
+                          صحیح: {{ batch.correct }}/{{ batch.total }} ({{ batch.ratio_percent }}%)
+                        </div>
+                      </div>
+                    </button>
+                  </h2>
+                  <div id="batchCollapse{{ forloop.counter }}" class="accordion-collapse collapse"
+                       aria-labelledby="batchHeading{{ forloop.counter }}" data-bs-parent="#batchAccordion">
+                    <div class="accordion-body">
+                      <div class="row g-2">
+                        {% for question in batch.questions %}
+                        <div class="col-md-6">
+                          <div class="border rounded-3 p-2 h-100 d-flex gap-2 align-items-start {% if question.correct %}bg-success-subtle{% else %}bg-danger-subtle{% endif %}">
+                            <i class="fas {% if question.correct %}fa-check-circle text-success{% else %}fa-times-circle text-danger{% endif %} mt-1"></i>
+                            <div>
+                              <div class="fw-semibold small">{{ question.text }}</div>
+                              <div class="text-muted small">{{ question.type_label }}</div>
+                            </div>
+                          </div>
+                        </div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
             {% endif %}
-          </div>
-        </div>
-
         <!-- Recommended Videos -->
         {% if recommended_videos %}
         <div class="card border-0 shadow-sm mb-4">

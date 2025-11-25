@@ -31,47 +31,21 @@
                 <span x-text="progress"></span>%
               </small>
             </div>
-            {% if last_batch_detail %}
-            <div class="d-flex justify-content-between align-items-center mb-1">
-              <div class="small text-muted">
-                <span class="badge bg-secondary-subtle text-secondary border small">
-                  نتیجه سطح قبلی{% if last_batch_stats and last_batch_stats.level %}: {{ last_batch_stats.level }}{% endif %}
-                </span>
-              </div>
-              {% if last_batch_stats %}
-              <div class="small text-muted">
-                صحیح: {{ last_batch_stats.correct }}/{{ last_batch_stats.total }} ({{ last_batch_stats.ratio_percent }}%)
-              </div>
-              {% endif %}
-            </div>
-            <!-- Segmented bar for last batch results -->
-            <div class="d-flex gap-1 mb-1">
-              {% for item in last_batch_detail %}
-                <div style="height:8px;flex:1;"
-                     class="{% if item.correct %}bg-success{% else %}bg-danger{% endif %} rounded-1">
-                </div>
-              {% endfor %}
-            </div>
-            {% else %}
             <div class="progress" style="height: 8px;">
               <div class="progress-bar" role="progressbar" :style="`width:${progress}%`" :aria-valuenow="progress" aria-valuemin="0" :aria-valuemax="100"></div>
             </div>
-            {% endif %}
           </div>
 
           <form method="post" class="mt-3">
             {% csrf_token %}
-            
-            <!-- Batch feedback -->
-            {% if last_batch_stats %}
-            <div class="alert alert-info d-flex align-items-center gap-2">
-              <i class="fas fa-info-circle"></i>
-              <div>
-                سطح {{ last_batch_stats.level }} — صحیح: {{ last_batch_stats.correct }}/{{ last_batch_stats.total }} ({{ last_batch_stats.ratio_percent }}%)
-              </div>
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for error in form.non_field_errors %}
+              <div>{{ error }}</div>
+              {% endfor %}
             </div>
             {% endif %}
-
+            
             <!-- Pre-start Panel: collect name/email (only when needed) -->
             <div x-show="!started && showIdentity" aria-live="polite">
               <div class="card border-0 shadow-sm mb-3">

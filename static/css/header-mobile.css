@@ -31,16 +31,35 @@
   
   .logo-link {
     gap: 0.5rem;
+    min-width: auto;
   }
   
   .logo-icon {
     width: 40px;
     height: 40px;
     font-size: 1.125rem;
+    flex-shrink: 0;
   }
   
   .logo-text {
-    display: none; /* Hide text on mobile */
+    display: flex !important; /* Show text on mobile */
+    flex-direction: column;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+  
+  .logo-title {
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .logo-subtitle {
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   /* Hide desktop navigation */
@@ -587,6 +606,31 @@
     font-size: 1rem;
   }
   
+  .logo-text {
+    display: flex !important;
+    flex-direction: column;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+  
+  .logo-title {
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .logo-subtitle {
+    font-size: 0.65rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .logo-link {
+    gap: 0.4rem;
+  }
+  
   .mobile-toggle {
     width: 35px;
     height: 35px;
@@ -721,6 +765,31 @@
   
   .modern-header {
     height: 50px;
+  }
+  
+  .logo-text {
+    display: flex !important;
+    flex-direction: column;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+  
+  .logo-title {
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .logo-subtitle {
+    font-size: 0.65rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .logo-link {
+    gap: 0.4rem;
   }
   
   .mobile-nav {

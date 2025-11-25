@@ -1,30 +1,21 @@
+from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView, FormView
-from django.urls import reverse_lazy
 import re
 import time
 from .models import Assessment, Question, Choice, Submission, SubmissionItem
-from .forms import AssessmentStartForm, build_assessment_form
+from .forms import build_assessment_form
 
 
-class AssessmentIntroView(FormView):
+class AssessmentIntroView(TemplateView):
     template_name = "assessments/intro.html"
-    form_class = AssessmentStartForm
-    success_url = reverse_lazy("assessments:take")
 
-    def get(self, request, *args, **kwargs):
-        # If there's only one active assessment, automatically select it
-        active_assessments = Assessment.objects.filter(is_active=True)
-        if active_assessments.count() == 1:
-            assessment = active_assessments.first()
-            request.session["assessment_id"] = assessment.id
-            return redirect("assessments:take")
-        return super().get(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        assessment = form.cleaned_data["assessment"]
-        self.request.session["assessment_id"] = assessment.id
-        return super().form_valid(form)
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        active_assessments = Assessment.objects.filter(is_active=True).order_by("level", "title")
+        ctx["levels_available"] = sorted(set(active_assessments.values_list("level", flat=True)))
+        return ctx
 
 
 class AssessmentTakeView(FormView):
@@ -32,33 +23,47 @@ class AssessmentTakeView(FormView):
     form_class = None
     started_initial = False
 
-    def dispatch(self, request, *args, **kwargs):
-        assessment_id = request.session.get("assessment_id") or kwargs.get("assessment_id")
+    def _get_user_identifier(self) -> str:
+        return str(self.request.user.id or self.request.session.session_key)
 
-        # Adaptive engine configuration
+    def _attempts_exceeded(self) -> bool:
+        limit = getattr(self.assessment, "attempt_limit", 0) or 0
+        if limit <= 0:
+            return False
+        user_identifier = self._get_user_identifier()
+        attempt_count = Submission.objects.filter(
+            assessment=self.assessment,
+            user_identifier=user_identifier,
+        ).count()
+        return attempt_count >= limit
+
+    def _cache_elapsed(self) -> int:
+        start_ts = int(self.request.session.get("assessment_start", int(time.time())))
+        elapsed = max(0, int(time.time()) - start_ts)
+        self._elapsed_seconds_cache = elapsed
+        return elapsed
+
+    def _time_limit_exceeded(self) -> bool:
+        limit = getattr(self.assessment, "time_limit_seconds", 0) or 0
+        if limit <= 0:
+            return False
+        elapsed = self._cache_elapsed()
+        return elapsed > limit
+
+    def _reset_assessment_progress(self):
+        keys = ["assessment_start", "adaptive_state", "adaptive_history", "identity"]
+        for key in keys:
+            self.request.session.pop(key, None)
+        self.request.session["adaptive"] = False
+
+    def dispatch(self, request, *args, **kwargs):
+        # Always use adaptive engine
         level_order = ["A1", "A2", "B1", "B2"]
         # Batch size increases with level
         level_batch_sizes = {"A1": 5, "A2": 7, "B1": 9, "B2": 12}
 
-        # If user explicitly chose an assessment, run classic single-assessment mode
-        if assessment_id:
-            self.assessment = get_object_or_404(Assessment, id=assessment_id, is_active=True)
-            questions = list(
-                self.assessment.questions
-                .order_by("id")
-                .prefetch_related("choices", "answer_patterns", "ordering_items", "match_pairs")[:20]
-            )
-            self.questions = questions
-            self.form_class = build_assessment_form(self.assessment, questions=questions)
-            # attempt limit control
-            attempts = request.session.get("attempts", {}).get(str(self.assessment.id), 0)
-            if attempts >= self.assessment.attempt_limit:
-                return redirect("assessments:result")
-            request.session.setdefault("assessment_start", int(time.time()))
-            request.session["adaptive"] = False
-            return super().dispatch(request, *args, **kwargs)
-
-        # Otherwise, start or continue adaptive mode
+        # Start or continue adaptive mode only
+        request.session.pop("assessment_id", None)
         request.session["adaptive"] = True
         # Initialize adaptive state
         if "adaptive_state" not in request.session:
@@ -68,6 +73,7 @@ class AssessmentTakeView(FormView):
                 "asked_by_level": {lvl: [] for lvl in level_order},
                 "start_ts": int(time.time()),
             }
+            request.session["adaptive_history"] = []
         state = request.session["adaptive_state"]
         current_level = state.get("current_level", "A1")
 
@@ -94,6 +100,13 @@ class AssessmentTakeView(FormView):
 
         self.questions = batch
         self.form_class = build_assessment_form(self.assessment, questions=batch)
+        if self._attempts_exceeded():
+            messages.warning(self.request, _("به حداکثر دفعات مجاز برای این آزمون رسیده‌اید."))
+            return redirect("assessments:result")
+        if self._time_limit_exceeded():
+            self._reset_assessment_progress()
+            messages.info(self.request, _("مهلت آزمون قبلی شما تمام شد. می‌توانید دوباره شروع کنید."))
+            return redirect("assessments:take")
         # If identity already provided in adaptive mode, skip pre-start panel
         ident = request.session.get("identity", {})
         self.started_initial = bool(ident.get("full_name") and ident.get("email"))
@@ -118,27 +131,29 @@ class AssessmentTakeView(FormView):
             context["question_groups"] = groups
             context["question_fields"] = [f for f in form if str(getattr(f, "name", "")).startswith("q_")]
         context["time_limit"] = self.assessment.time_limit_seconds
-        # Adaptive identity form toggle and batch feedback
+        # Adaptive identity form toggle
         context["show_identity_form"] = not bool(self.request.session.get("identity", {}).get("full_name") and self.request.session.get("identity", {}).get("email"))
         context["started_initial"] = self.started_initial
-        last_stats = self.request.session.pop("last_batch_stats", None)
-        if last_stats:
-            context["last_batch_stats"] = last_stats
-        # Expose segmented correctness detail (do not pop to allow showing after redirect)
-        last_detail = self.request.session.get("last_batch_detail")
-        if last_detail:
-            context["last_batch_detail"] = last_detail
         return context
 
     def form_valid(self, form):
+        if self._time_limit_exceeded():
+            self._reset_assessment_progress()
+            messages.warning(self.request, _("مهلت آزمون به پایان رسیده است. لطفاً دوباره شروع کنید."))
+            return redirect("assessments:take")
+        if self._attempts_exceeded():
+            form.add_error(None, _("به حداکثر دفعات مجاز برای این آزمون رسیده‌اید."))
+            return self.form_invalid(form)
         # Classic single-assessment mode
         if not self.request.session.get("adaptive"):
             total_weight = 0
             gained_total = 0.0
-            start_ts = int(self.request.session.get("assessment_start", int(time.time())))
+            elapsed = getattr(self, "_elapsed_seconds_cache", None)
+            if elapsed is None:
+                elapsed = self._cache_elapsed()
             submission = Submission.objects.create(
                 assessment=self.assessment,
-                user_identifier=str(self.request.user.id or self.request.session.session_key),
+                user_identifier=self._get_user_identifier(),
                 full_name=form.cleaned_data.get("full_name", ""),
                 email=form.cleaned_data.get("email", ""),
             )
@@ -246,7 +261,7 @@ class AssessmentTakeView(FormView):
                 total_weight += question.weight
                 gained_total += gained
 
-            duration = max(0, int(time.time()) - start_ts)
+            duration = elapsed
             ratio = gained_total / max(total_weight, 1)
             thresholds = [
                 (0.85, "C1"),
@@ -369,7 +384,7 @@ class AssessmentTakeView(FormView):
 
         # Decide next level based on ratio thresholds
         ratio = batch_gained / max(batch_total, 1.0)
-        # Save batch feedback for UI, including per-question correctness
+        # Build per-question detail for later reporting
         detail = []
         for question in self.questions:
             # Re-evaluate quickly to capture boolean per question
@@ -424,15 +439,26 @@ class AssessmentTakeView(FormView):
                 correct_pairs = {p.left_text: p.right_text for p in question.match_pairs.all()}
                 correct_count = sum(1 for k, v in correct_pairs.items() if pairs.get(k) == v)
                 q_correct = (correct_count == len(correct_pairs) and len(correct_pairs) > 0)
-            detail.append({"id": question.id, "correct": bool(q_correct)})
+            detail.append(
+                {
+                    "id": question.id,
+                    "text": question.text,
+                    "type_label": question.get_type_display(),
+                    "correct": bool(q_correct),
+                }
+            )
 
-        self.request.session["last_batch_stats"] = {
-            "level": current_level,
-            "correct": int(correct_full),
-            "total": len(self.questions),
-            "ratio_percent": int(round(ratio * 100)),
-        }
-        self.request.session["last_batch_detail"] = detail
+        history = self.request.session.get("adaptive_history", [])
+        history.append(
+            {
+                "level": current_level,
+                "correct": int(correct_full),
+                "total": len(self.questions),
+                "ratio_percent": int(round(ratio * 100)),
+                "questions": detail,
+            }
+        )
+        self.request.session["adaptive_history"] = history
         # thresholds: <30% down, 30-60 stay, >60 up
         def level_index(lvl: str) -> int:
             try:
@@ -466,15 +492,18 @@ class AssessmentTakeView(FormView):
 
         if finalize:
             # Create a single submission representing the recommended level
+            elapsed = getattr(self, "_elapsed_seconds_cache", None)
+            if elapsed is None:
+                elapsed = self._cache_elapsed()
             submission = Submission.objects.create(
                 assessment=self.assessment,  # store last used assessment
-                user_identifier=str(self.request.user.id or self.request.session.session_key),
+                user_identifier=self._get_user_identifier(),
                 full_name=form.cleaned_data.get("full_name", ""),
                 email=form.cleaned_data.get("email", ""),
                 score=float(batch_gained),
                 total_weight=float(batch_total),
                 ratio=float(ratio),
-                duration_seconds=max(0, int(time.time()) - int(self.request.session.get("assessment_start", int(time.time())))),
+                duration_seconds=elapsed,
                 recommended_level=next_level,
             )
             # Minimal per-question items are not persisted in adaptive mode to keep DB lean
@@ -496,6 +525,7 @@ class AssessmentResultView(TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["recommended_level"] = self.request.session.get("recommended_level")
+        ctx["batch_history"] = list(self.request.session.get("adaptive_history", []))
         
         # Get the latest submission for this user
         user_identifier = str(self.request.user.id or self.request.session.session_key)

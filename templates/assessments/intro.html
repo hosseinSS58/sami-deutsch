@@ -3,213 +3,145 @@
 {% block title %}آزمون تعیین سطح{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
-  <!-- Header Section -->
-  <div class="row mb-5">
-    <div class="col-12 text-center">
-      <div class="py-5">
-        <i class="fas fa-clipboard-check fa-4x text-primary mb-4"></i>
-        <h1 class="h2 mb-3">آزمون تعیین سطح زبان آلمانی</h1>
-        <p class="lead text-muted mb-4">با شرکت در این آزمون، سطح دقیق مهارت‌های زبان آلمانی خود را شناسایی کنید</p>
-        <div class="row justify-content-center">
-          <div class="col-md-8">
-            <div class="card border-0 shadow-sm">
-              <div class="card-body p-4">
-                <h5 class="card-title mb-3">ویژگی‌های آزمون:</h5>
-                <div class="row g-3">
-                  <div class="col-md-6">
-                    <div class="d-flex align-items-center">
-                      <i class="fas fa-clock text-primary me-3"></i>
-                      <span>زمان: 30 دقیقه</span>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="d-flex align-items-center">
-                      <i class="fas fa-question-circle text-primary me-3"></i>
-                      <span>تعداد سوال: 50</span>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="d-flex align-items-center">
-                      <i class="fas fa-chart-line text-primary me-3"></i>
-                      <span>سطح‌بندی: A1 تا C1</span>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="d-flex align-items-center">
-                      <i class="fas fa-certificate text-primary me-3"></i>
-                      <span>گواهی پایان</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Assessment Types -->
-  <div class="row g-4 mb-5">
+<div class="container py-5">
+  <!-- Hero -->
+  <div class="row gy-4 mb-5">
     <div class="col-12">
-      <h3 class="h4 mb-4 text-center">انواع آزمون‌های موجود</h3>
-    </div>
-    
-    <div class="col-lg-4 col-md-6">
-      <div class="card h-100 border-0 shadow-sm hover-lift">
-        <div class="card-body text-center p-4">
-          <div class="mb-3">
-            <i class="fas fa-language fa-3x text-primary"></i>
-          </div>
-          <h5 class="card-title">آزمون عمومی</h5>
-          <p class="card-text text-muted">
-            آزمون جامع برای تعیین سطح کلی مهارت‌های زبان آلمانی شامل گرامر، واژگان و درک مطلب
-          </p>
-          <div class="mt-3">
-            <span class="badge bg-success me-2">30 دقیقه</span>
-            <span class="badge bg-info">50 سوال</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-lg-4 col-md-6">
-      <div class="card h-100 border-0 shadow-sm hover-lift">
-        <div class="card-body text-center p-4">
-          <div class="mb-3">
-            <i class="fas fa-microphone fa-3x text-warning"></i>
-          </div>
-          <h5 class="card-title">آزمون مکالمه</h5>
-          <p class="card-text text-muted">
-            تمرکز بر مهارت‌های گفتاری و تلفظ با سوالات تعاملی و ضبط صدا
-          </p>
-          <div class="mt-3">
-            <span class="badge bg-success me-2">20 دقیقه</span>
-            <span class="badge bg-info">25 سوال</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-lg-4 col-md-6">
-      <div class="card h-100 border-0 shadow-sm hover-lift">
-        <div class="card-body text-center p-4">
-          <div class="mb-3">
-            <i class="fas fa-headphones fa-3x text-danger"></i>
-          </div>
-          <h5 class="card-title">آزمون شنیداری</h5>
-          <p class="card-text text-muted">
-            ارزیابی مهارت‌های شنیداری با فایل‌های صوتی متنوع و سوالات مربوطه
-          </p>
-          <div class="mt-3">
-            <span class="badge bg-success me-2">25 دقیقه</span>
-            <span class="badge bg-info">30 سوال</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Instructions -->
-  <div class="row mb-5">
-    <div class="col-12">
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0">
-            <i class="fas fa-info-circle me-2"></i>نکات مهم قبل از شروع آزمون
-          </h5>
-        </div>
-        <div class="card-body">
-          <div class="row g-3">
-            <div class="col-md-6">
-              <ul class="list-unstyled">
-                <li class="mb-2">
-                  <i class="fas fa-check text-success me-2"></i>
-                  محیط آرام و بدون سر و صدا انتخاب کنید
-                </li>
-                <li class="mb-2">
-                  <i class="fas fa-check text-success me-2"></i>
-                  اینترنت پایدار داشته باشید
-                </li>
-                <li class="mb-2">
-                  <i class="fas fa-check text-success me-2"></i>
-                  زمان کافی برای تکمیل آزمون اختصاص دهید
-                </li>
-              </ul>
-            </div>
-            <div class="col-md-6">
-              <ul class="list-unstyled">
-                <li class="mb-2">
-                  <i class="fas fa-check text-success me-2"></i>
-                  سوالات را با دقت بخوانید
-                </li>
-                <li class="mb-2">
-                  <i class="fas fa-check text-success me-2"></i>
-                  پاسخ‌ها را قبل از ارسال بررسی کنید
-                </li>
-                <li class="mb-2">
-                  <i class="fas fa-check text-success me-2"></i>
-                  در صورت مشکل با پشتیبانی تماس بگیرید
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Start Assessment -->
-  <div class="row">
-    <div class="col-12 text-center">
-      <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3">آزمون تعیین سطح سمی دویچ</span>
+      <h1 class="display-6 mb-3">یک آزمون، یک نتیجه دقیق برای یادگیری آلمانی</h1>
+      <p class="text-muted mb-4">
+        آزمون آنلاین ما فقط بر مهارت‌های عمومی (گرامر، واژگان و درک مطلب) متمرکز است و با موتور تطبیقی،
+        سطح پیشنهادی شما را بین A1 تا B2 مشخص می‌کند. هیچ بخش شنیداری یا مکالمه‌ی جداگانه‌ای وجود ندارد.
+      </p>
+      <div class="d-flex justify-content-center flex-wrap gap-3 text-center">
         <a href="{% url 'assessments:take' %}" class="btn btn-primary btn-lg">
           <i class="fas fa-play me-2"></i>شروع آزمون
         </a>
-                  <a href="{% url 'assessments:result' %}" class="btn btn-outline-secondary btn-lg">
-            <i class="fas fa-chart-bar me-2"></i>نتایج آزمون
-          </a>
+        <a href="{% url 'assessments:result' %}" class="btn btn-outline-secondary btn-lg">
+          <i class="fas fa-chart-line me-2"></i>مشاهده آخرین نتیجه
+        </a>
         <a href="{% url 'core:contact' %}" class="btn btn-outline-info btn-lg">
-          <i class="fas fa-question-circle me-2"></i>راهنمایی
+          <i class="fas fa-life-ring me-2"></i>نیاز به راهنمایی؟
         </a>
       </div>
     </div>
   </div>
 
-  <!-- Recent Results -->
-  {% if recent_results %}
-    <div class="row mt-5">
-      <div class="col-12">
-        <h4 class="mb-4">آخرین نتایج آزمون‌ها</h4>
-        <div class="row g-3">
-          {% for result in recent_results %}
-            <div class="col-md-6 col-lg-4">
-              <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h6 class="card-title mb-0">{{ result.assessment.title }}</h6>
-                    <span class="badge bg-{% if result.score >= 80 %}success{% elif result.score >= 60 %}warning{% else %}danger{% endif %}">
-                      {{ result.score }}%
-                    </span>
-                  </div>
-                  <p class="text-muted small mb-2">
-                    <i class="fas fa-calendar me-1"></i>
-                    {{ result.completed_at|date:"Y/m/d" }}
-                  </p>
-                                      <p class="text-muted small mb-0">
-                      <i class="fas fa-clock me-1"></i>
-                      زمان: {{ result.duration_minutes }} دقیقه
-                    </p>
-                </div>
+  <!-- Why this test -->
+  <div class="mb-4">
+    <h2 class="h5 mb-3 text-center">چرا آزمون تعیین سطح سمی دویچ؟</h2>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body py-3">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <div class="icon text-info rounded-2 p-3">
+                <i class="fas fa-brain fa-2x"></i>
               </div>
+              <h6 class="mb-0">موتور تطبیقی</h6>
             </div>
-          {% endfor %}
+            <p class="text-muted mb-0 small">
+              سوال‌ها مرحله‌به‌مرحله متناسب با عملکرد شما تنظیم می‌شوند تا سطح دقیق پیشنهاد شود.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body py-3">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <div class="icon text-success rounded-2 p-3">
+                  <i class="fas fa-tachometer-alt fa-2x"></i>
+                </div>
+              <h6 class="mb-0">کم‌حجم و مفید</h6>
+            </div>
+            <p class="text-muted mb-0 small">
+              سوالات کوتاه و عمومی؛ بدون شنیداری یا مکالمه، مناسب برای زمان محدود.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0.shadow-sm h-100">
+          <div class="card-body py-3">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <div class="icon text-warning rounded-3 p-3">
+                <i class="fas fa-chart-pie fa-2x"></i>
+              </div>
+              <h6.class="mb-0">نتیجه فوری</h6>
+            </div>
+            <p class="text-muted mb-0 small">
+              بلافاصله بعد از آزمون، سطح پیشنهادی، درصد پاسخ صحیح و پیشنهاد محتوا نمایش داده می‌شود.
+            </p>
+          </div>
         </div>
       </div>
     </div>
-  {% endif %}
+  </div>
+
+  <!-- How it works -->
+  <div class="mb-5">
+    <h2 class="h4 mb-4 text-center">فرآیند آزمون چگونه است؟</h2>
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <span class="badge bg-primary-subtle text-primary mb-3">مرحله ۱</span>
+            <h5 class="mb-2">تکمیل اطلاعات سریع</h5>
+            <p class="text-muted mb-0">نام و ایمیل خود را وارد کنید تا نتیجه به‌صورت شخصی برای شما ذخیره شود.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <span class="badge bg-primary-subtle text-primary mb-3">مرحله ۲</span>
+            <h5 class="mb-2">پاسخ به سوالات تطبیقی</h5>
+            <p class="text-muted mb-0">هر بخش شامل چند سوال چندگزینه‌ای یا تشریحی کوتاه است که بر اساس عملکرد شما تنظیم می‌شود.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <span class="badge bg-primary-subtle text-primary mb-3">مرحله ۳</span>
+            <h5 class="mb-2">دریافت سطح پیشنهادی</h5>
+            <p class="text-muted mb-0">نتیجه شامل درصد پیشرفت، سطح پیشنهادی و پیشنهاد دوره‌ها یا ویدیوهای مناسب است.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tips -->
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="mb-3"><i class="fas fa-lightbulb me-2 text-warning"></i>نکات مهم قبل از شروع</h5>
+          <ul class="list-unstyled text-muted mb-0">
+            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>این آزمون فقط بخش عمومی دارد؛ صدا یا مکالمه ضبط نمی‌شود.</li>
+            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>به محض شروع تایمر فعال می‌شود؛ زمان را مدیریت کنید.</li>
+            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>برای هر سوال، پاسخ را قبل از رفتن به بعدی بررسی کنید.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="mb-3"><i class="fas fa-question-circle me-2 text-info"></i>سوالات رایج</h5>
+          <div class="mb-3">
+            <strong>آیا می‌توانم آزمون را تکرار کنم؟</strong>
+            <p class="text-muted mb-0">بله، تا سقف تعیین‌شده در هر آزمون می‌توانید مجدد شرکت کنید. این محدودیت اکنون سمت سرور کنترل می‌شود.</p>
+          </div>
+          <div>
+            <strong>آیا مهارت مکالمه یا شنیداری سنجیده می‌شود؟</strong>
+            <p class="text-muted mb-0">خیر. تمرکز صرفاً بر سوالات نوشتاری است؛ برای مهارت‌های دیگر از دوره‌های تخصصی ما استفاده کنید.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
-
-

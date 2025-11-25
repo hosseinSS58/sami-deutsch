@@ -76,6 +76,10 @@ class Video(models.Model):
             return f"{hours} ساعت و {minutes} دقیقه"
         return f"{minutes} دقیقه"
 
+    @property
+    def primary_youtube_link(self):
+        return self.youtube_links.filter(is_active=True).order_by("order", "id").first()
+
 
 class VideoImage(models.Model):
     """تصاویر اضافی برای ویدیو"""

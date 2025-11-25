@@ -1,0 +1,308 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:courses_video_changelist' %}">{% trans 'Videos' %}</a>
+    &rsaquo; {% trans 'Import from YouTube' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>{% trans "وارد کردن ویدیو از یوتیوب" %}</h1>
+
+<div class="module">
+    <form method="post" id="youtube-import-form" class="form-horizontal">
+        {% csrf_token %}
+        
+        <fieldset class="module aligned">
+            <h2>{% trans "لینک یوتیوب" %}</h2>
+            
+            <div class="form-row">
+                <div>
+                    <label for="id_youtube_url">{% trans "لینک ویدیو یوتیوب:" %}</label>
+                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                        <input type="url" 
+                               name="youtube_url" 
+                               id="id_youtube_url" 
+                               required 
+                               class="vTextField" 
+                               placeholder="https://www.youtube.com/watch?v=..." 
+                               style="flex: 1;"
+                               value="">
+                        <button type="button" 
+                                id="extract-btn" 
+                                class="button"
+                                style="white-space: nowrap;">
+                            <i class="fas fa-search"></i> {% trans "استخراج اطلاعات" %}
+                        </button>
+                    </div>
+                    <p class="help">{% trans "لینک ویدیو یوتیوب را وارد کنید (مثال: https://www.youtube.com/watch?v=dQw4w9WgXcQ)" %}</p>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- Preview Section (hidden by default) -->
+        <div id="preview-section" style="display: none; margin-top: 20px;">
+            <fieldset class="module aligned">
+                <h2>{% trans "پیش‌نمایش اطلاعات استخراج شده" %}</h2>
+                
+                <div id="preview-content">
+                    <div class="form-row" style="display: flex; gap: 20px; align-items: start;">
+                        <div style="flex: 0 0 300px;">
+                            <img id="preview-thumbnail" 
+                                 src="" 
+                                 alt="Thumbnail" 
+                                 style="width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        </div>
+                        <div style="flex: 1;">
+                            <div class="form-row">
+                                <strong>{% trans "عنوان:" %}</strong>
+                                <p id="preview-title" style="margin: 5px 0;"></p>
+                            </div>
+                            <div class="form-row">
+                                <strong>{% trans "کانال:" %}</strong>
+                                <p id="preview-channel" style="margin: 5px 0;"></p>
+                            </div>
+                            <div class="form-row">
+                                <strong>{% trans "مدت زمان:" %}</strong>
+                                <p id="preview-duration" style="margin: 5px 0;"></p>
+                            </div>
+                            <div class="form-row">
+                                <strong>{% trans "توضیحات:" %}</strong>
+                                <p id="preview-description" style="margin: 5px 0; max-height: 150px; overflow-y: auto;"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+
+        <!-- Form Fields -->
+        <fieldset class="module aligned">
+            <h2>{% trans "تنظیمات ویدیو" %}</h2>
+            
+            <div class="form-row">
+                <div>
+                    <label for="id_level">{% trans "سطح:" %}</label>
+                    <select name="level" id="id_level" class="vSelectField" required>
+                        {% for value, label in levels %}
+                            <option value="{{ value }}" {% if value == "A1" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label for="id_topic">{% trans "موضوع:" %}</label>
+                    <select name="topic" id="id_topic" class="vSelectField" required>
+                        {% for value, label in topics %}
+                            <option value="{{ value }}" {% if value == "grammar" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label for="id_difficulty">{% trans "سطح دشواری:" %}</label>
+                    <select name="difficulty" id="id_difficulty" class="vSelectField" required>
+                        {% for value, label in difficulties %}
+                            <option value="{{ value }}" {% if value == "beginner" %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label for="id_is_free">
+                        <input type="checkbox" name="is_free" id="id_is_free" checked>
+                        {% trans "رایگان" %}
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label for="id_is_featured">
+                        <input type="checkbox" name="is_featured" id="id_is_featured">
+                        {% trans "ویژه" %}
+                    </label>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="submit-row">
+            <input type="submit" value="{% trans 'ایجاد ویدیو' %}" class="default" id="submit-btn" disabled>
+            <a href="{% url 'admin:courses_video_changelist' %}" class="button">{% trans "لغو" %}</a>
+        </div>
+    </form>
+</div>
+
+<div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 30px; border-radius: 8px; text-align: center;">
+        <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px;"></div>
+        <p>{% trans "در حال استخراج اطلاعات..." %}</p>
+    </div>
+</div>
+
+<style>
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .form-row {
+        margin-bottom: 15px;
+    }
+    
+    #preview-section {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+    }
+    
+    #preview-content p {
+        color: #495057;
+        line-height: 1.6;
+    }
+    
+    .error-message {
+        color: #dc3545;
+        background: #f8d7da;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+    }
+    
+    .success-message {
+        color: #155724;
+        background: #d4edda;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+    }
+</style>
+
+<script>
+(function() {
+    const extractBtn = document.getElementById('extract-btn');
+    const youtubeUrlInput = document.getElementById('id_youtube_url');
+    const previewSection = document.getElementById('preview-section');
+    const submitBtn = document.getElementById('submit-btn');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const form = document.getElementById('youtube-import-form');
+    
+    function showLoading() {
+        loadingOverlay.style.display = 'flex';
+    }
+    
+    function hideLoading() {
+        loadingOverlay.style.display = 'none';
+    }
+    
+    function formatDuration(minutes) {
+        if (!minutes) return 'نامشخص';
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        if (hours > 0) {
+            return hours + ' ساعت و ' + mins + ' دقیقه';
+        }
+        return mins + ' دقیقه';
+    }
+    
+    function showError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.textContent = message;
+        previewSection.insertBefore(errorDiv, previewSection.firstChild);
+        setTimeout(() => errorDiv.remove(), 5000);
+    }
+    
+    function updatePreview(data) {
+        if (!data.success) {
+            showError(data.error || 'خطا در استخراج اطلاعات');
+            previewSection.style.display = 'none';
+            submitBtn.disabled = true;
+            return;
+        }
+        
+        // Update preview fields
+        document.getElementById('preview-title').textContent = data.title || 'بدون عنوان';
+        document.getElementById('preview-channel').textContent = data.channel || 'نامشخص';
+        document.getElementById('preview-duration').textContent = formatDuration(data.duration_minutes);
+        document.getElementById('preview-description').textContent = data.description ? 
+            (data.description.substring(0, 500) + (data.description.length > 500 ? '...' : '')) : 
+            'بدون توضیحات';
+        document.getElementById('preview-thumbnail').src = data.thumbnail_url || '';
+        
+        // Show preview and enable submit
+        previewSection.style.display = 'block';
+        submitBtn.disabled = false;
+        
+        // Scroll to preview
+        previewSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    
+    extractBtn.addEventListener('click', function() {
+        const url = youtubeUrlInput.value.trim();
+        if (!url) {
+            alert('لطفاً لینک یوتیوب را وارد کنید');
+            return;
+        }
+        
+        // Remove previous error messages
+        const errors = previewSection.querySelectorAll('.error-message');
+        errors.forEach(e => e.remove());
+        
+        showLoading();
+        
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch('{% url "admin:courses_video_extract_metadata" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrfToken,
+            },
+            body: 'youtube_url=' + encodeURIComponent(url)
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            updatePreview(data);
+        })
+        .catch(error => {
+            hideLoading();
+            showError('خطا در ارتباط با سرور: ' + error.message);
+            console.error('Error:', error);
+        });
+    });
+    
+    // Allow Enter key in URL input to trigger extraction
+    youtubeUrlInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            extractBtn.click();
+        }
+    });
+    
+    // Auto-extract if URL is pasted
+    youtubeUrlInput.addEventListener('paste', function() {
+        setTimeout(() => {
+            if (youtubeUrlInput.value.trim()) {
+                extractBtn.click();
+            }
+        }, 100);
+    });
+})();
+</script>
+{% endblock %}
+
