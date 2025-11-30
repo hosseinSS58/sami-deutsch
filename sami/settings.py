@@ -73,6 +73,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "accounts.middleware.SecurityLoggingMiddleware",  # Security logging
+    "sami.security_middleware.SecurityHeadersMiddleware",  # Additional security headers
+    "sami.security_middleware.SessionSecurityMiddleware",  # Session security
+    # "sami.security_middleware.IPWhitelistMiddleware",  # Uncomment to enable IP whitelist for admin
 ]
 
 ROOT_URLCONF = "sami.urls"
@@ -205,3 +209,162 @@ EMAIL_BACKEND = env(
 # Auth redirects
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
+
+############################
+# Security Settings
+############################
+
+# SECURITY WARNING: These settings should be configured via environment variables in production!
+
+# HTTPS Settings (only enable in production with SSL)
+SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=False)
+SECURE_PROXY_SSL_HEADER = env.tuple("SECURE_PROXY_SSL_HEADER", default=None)
+
+# HSTS (HTTP Strict Transport Security)
+SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", default=0)  # Set to 31536000 (1 year) in production
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool("SECURE_HSTS_INCLUDE_SUBDOMAINS", default=False)
+SECURE_HSTS_PRELOAD = env.bool("SECURE_HSTS_PRELOAD", default=False)
+
+# Content Security
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = "DENY"  # Changed from default to DENY for better security
+
+# Session Security
+SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=False)  # Set to True in production with HTTPS
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_AGE = 86400  # 24 hours
+SESSION_SAVE_EVERY_REQUEST = True  # Prevent session fixation
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Session expires when browser closes
+
+# CSRF Security
+CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", default=False)  # Set to True in production with HTTPS
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+
+# Password Security (already configured above, but adding additional settings)
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.Argon2PasswordHasher",  # Best option if available
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+    "django.contrib.auth.hashers.ScryptPasswordHasher",
+]
+
+# File Upload Security
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5 MB
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
+
+# Additional Security Headers (via middleware)
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
+# Error Pages (custom templates for production)
+# These templates will be used when DEBUG=False
+# Make sure to create: templates/404.html, templates/500.html, templates/403.html
+
+############################
+# Logging Configuration
+############################
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
+        },
+        "sensitive_data_filter": {
+            "()": "sami.logging_filters.SensitiveDataFilter",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": BASE_DIR / "logs" / "django.log",
+            "maxBytes": 1024 * 1024 * 10,  # 10 MB
+            "backupCount": 5,
+            "formatter": "verbose",
+            "filters": ["sensitive_data_filter"],  # Filter sensitive data
+        },
+        "security_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": BASE_DIR / "logs" / "security.log",
+            "maxBytes": 1024 * 1024 * 10,  # 10 MB
+            "backupCount": 10,
+            "formatter": "verbose",
+            "filters": ["sensitive_data_filter"],  # Filter sensitive data
+        },
+        "mail_admins": {
+            "level": "ERROR",
+            "filters": ["require_debug_false"],
+            "class": "django.utils.log.AdminEmailHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console", "file"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["security_file", "mail_admins"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["file", "mail_admins"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "accounts": {
+            "handlers": ["console", "file", "security_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
+
+# Create logs directory if it doesn't exist
+LOGS_DIR = BASE_DIR / "logs"
+LOGS_DIR.mkdir(exist_ok=True)
+
+############################
+# Admin Security
+############################
+
+# Admin URL customization (change in production for better security)
+ADMIN_URL = env("ADMIN_URL", default="admin/")
+
+# Admin site header and title
+ADMIN_SITE_HEADER = "Sami Deutsch Administration"
+ADMIN_SITE_TITLE = "Sami Deutsch Admin"
+ADMIN_INDEX_TITLE = "پنل مدیریت سامی دویچ"
+
+# Optional: IP whitelist for admin access (comma-separated list)
+# Only enable in production if needed
+# ADMIN_IP_WHITELIST = env.list("ADMIN_IP_WHITELIST", default=[])
+
+# Password reset settings
+PASSWORD_RESET_TIMEOUT = 86400  # 24 hours (default)
+PASSWORD_RESET_EMAIL_SUBJECT = "بازیابی رمز عبور - Sami Deutsch"

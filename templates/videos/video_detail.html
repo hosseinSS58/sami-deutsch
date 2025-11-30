@@ -416,7 +416,9 @@
                             <!-- Description -->
                             <div class="mb-3">
                                 <h6 class="mb-2">{% trans "توضیحات:" %}</h6>
-                                <p class="text-muted">{{ video.description }}</p>
+                                <div class="text-muted" style="line-height: 1.8; white-space: pre-wrap; word-wrap: break-word;">
+                                    {{ video.description|linebreaks }}
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-4">

@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Profile
-from .forms import SignUpForm, CustomAuthForm
+from .forms import SignUpForm, CustomAuthForm, ProfileEditForm
 
 
 class SignUpView(CreateView):
@@ -12,13 +12,13 @@ class SignUpView(CreateView):
     success_url = reverse_lazy("accounts:login")
 
 
-class ProfileView(TemplateView):
+class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = "accounts/profile.html"
 
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
     model = Profile
-    fields = ["avatar", "phone", "level", "bio", "website", "newsletter_opt_in"]
+    form_class = ProfileEditForm
     template_name = "accounts/profile_edit.html"
 
     def get_object(self, queryset=None):

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "صفحه یافت نشد" %} - 404{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="error-page">
+                <h1 class="display-1 text-primary mb-4">404</h1>
+                <h2 class="h3 mb-3">{% trans "صفحه مورد نظر یافت نشد" %}</h2>
+                <p class="text-muted mb-4">
+                    {% trans "متأسفانه صفحه‌ای که به دنبال آن هستید وجود ندارد یا حذف شده است." %}
+                </p>
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <a href="{% url 'core:home' %}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>{% trans "بازگشت به صفحه اصلی" %}
+                    </a>
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-right me-2"></i>{% trans "بازگشت به صفحه قبل" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

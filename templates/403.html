@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "دسترسی مجاز نیست" %} - 403{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="error-page">
+                <h1 class="display-1 text-warning mb-4">403</h1>
+                <h2 class="h3 mb-3">{% trans "دسترسی مجاز نیست" %}</h2>
+                <p class="text-muted mb-4">
+                    {% trans "شما اجازه دسترسی به این صفحه را ندارید." %}
+                </p>
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <a href="{% url 'core:home' %}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>{% trans "بازگشت به صفحه اصلی" %}
+                    </a>
+                    {% if not user.is_authenticated %}
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-sign-in-alt me-2"></i>{% trans "ورود به حساب کاربری" %}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
