@@ -127,3 +127,8 @@ psql -U sami_user -d sami_deutsch -h localhost
 
 **برای جزئیات کامل، `DEPLOYMENT_GUIDE.md` را مطالعه کنید.**
 
+
+
+
+
+

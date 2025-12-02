@@ -142,3 +142,8 @@ echo "  - Check logs: tail -f $PROJECT_DIR/logs/django.log"
 echo "  - Check security logs: tail -f $PROJECT_DIR/logs/security.log"
 echo "  - Test the website: https://yourdomain.com"
 
+
+
+
+
+

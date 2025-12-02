@@ -244,3 +244,8 @@ Select-String -Path logs/security.log -Pattern "ip=" | ForEach-Object { $_.Match
 
 **نکته:** این راهنما باید به صورت منظم به‌روزرسانی شود.
 
+
+
+
+
+

@@ -1,0 +1,19 @@
+# Apache configuration for Django on cPanel
+# This file is optional and may not be needed if using Passenger directly
+
+# Enable Passenger
+PassengerEnabled On
+
+# Uncomment and adjust these lines if needed:
+# PassengerAppRoot /home/username/public_html
+# PassengerBaseURI /
+# PassengerPython /home/username/virtualenv/public_html/3.8/bin/python
+
+# Redirect all requests to passenger_wsgi.py
+# This is usually handled automatically by cPanel's Python App setup
+
+
+
+
+
+

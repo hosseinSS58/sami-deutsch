@@ -13,7 +13,9 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["latest_videos"] = Video.objects.all().order_by("-created_at")[:6]
+        ctx["latest_videos"] = Video.objects.prefetch_related(
+            "youtube_links"
+        ).order_by("-created_at")[:6]
         ctx["latest_products"] = Product.objects.filter(is_active=True).order_by("-created_at")[:6]
         ctx["latest_posts"] = Post.objects.all().order_by("-published_at")[:4]
         return ctx

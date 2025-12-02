@@ -45,3 +45,8 @@ class SecureAdminSite(AdminSite):
 # admin_site = SecureAdminSite(name="secure_admin")
 # Then use admin_site.register() instead of admin.site.register()
 
+
+
+
+
+

@@ -159,3 +159,8 @@ curl -I https://yourdomain.com
 
 **نکته:** این چک‌لیست باید قبل از هر deployment بررسی شود.
 
+
+
+
+
+
