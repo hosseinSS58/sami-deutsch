@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import SiteSettings, NavLink, FooterLink, HomeFeature, HomeSlider, Slide, Menu, MenuItem
+from .models import SiteSettings, NavLink, FooterLink, HomeFeature, HomeSlider, Slide, Menu, MenuItem, HomePageSection
 
 
 @admin.register(SiteSettings)
@@ -109,7 +109,17 @@ class HomeFeatureAdmin(admin.ModelAdmin):
 
 @admin.register(HomeSlider)
 class HomeSliderAdmin(admin.ModelAdmin):
-    fieldsets = (("Behavior", {"fields": ("autoplay", "interval_ms", "show_arrows", "show_indicators", "pause_on_hover", "aspect_ratio")}),)
+    fieldsets = (
+        ("موقعیت", {
+            "fields": ("position", "custom_order"),
+        }),
+        ("تنظیمات نمایش", {
+            "fields": ("use_custom_size", "height_desktop", "height_mobile", "max_width", "aspect_ratio", "show_arrows", "show_indicators"),
+        }),
+        ("تنظیمات Autoplay", {
+            "fields": ("autoplay", "interval_ms", "pause_on_hover"),
+        }),
+    )
 
 
 @admin.register(Slide)
@@ -135,6 +145,99 @@ class MenuAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     inlines = [MenuItemInline]
 
-from django.contrib import admin
 
-# Register your models here.
+@admin.register(HomePageSection)
+class HomePageSectionAdmin(admin.ModelAdmin):
+    list_display = ("title", "section_type", "order", "item_count", "is_active")
+    list_editable = ("order", "is_active")
+    list_filter = ("section_type", "is_active", "video_filter_featured", "video_filter_is_free", "product_filter_featured", "post_filter_featured")
+    search_fields = ("title", "subtitle")
+    
+    fieldsets = (
+        ("اطلاعات اصلی", {
+            "fields": (
+                "section_type",
+                "title",
+                "subtitle",
+                "section_icon",
+                "order",
+                "is_active",
+            )
+        }),
+        ("تنظیمات نمایش", {
+            "fields": (
+                "item_count",
+                "use_manual_items",
+                "manual_videos",
+            )
+        }),
+        ("فیلترهای ویدیو - ویژگی‌ها", {
+            "fields": (
+                "video_filter_featured",
+                "video_filter_is_free",
+                "video_filter_has_youtube",
+            ),
+            "classes": ("collapse",),
+        }),
+        ("فیلترهای ویدیو - سطح و موضوع", {
+            "fields": (
+                "video_filter_level",
+                "video_filter_topic",
+                "video_filter_difficulty",
+            ),
+            "classes": ("collapse",),
+        }),
+        ("فیلترهای ویدیو - مدت زمان", {
+            "fields": (
+                "video_filter_duration_min",
+                "video_filter_duration_max",
+            ),
+            "classes": ("collapse",),
+        }),
+        ("فیلترهای ویدیو - مرتب‌سازی", {
+            "fields": (
+                "video_order_by",
+            ),
+            "classes": ("collapse",),
+        }),
+        ("فیلترهای محصول", {
+            "fields": (
+                "product_filter_featured",
+                "product_filter_active",
+            ),
+            "classes": ("collapse",),
+        }),
+        ("فیلترهای مقاله", {
+            "fields": (
+                "post_filter_featured",
+            ),
+            "classes": ("collapse",),
+        }),
+        ("دکمه 'همه'", {
+            "fields": (
+                "show_view_all_button",
+                "view_all_button_text",
+                "view_all_button_url",
+                "view_all_button_icon",
+            )
+        }),
+    )
+    
+    def get_fieldsets(self, request, obj=None):
+        """نمایش فیلترها بر اساس نوع بخش"""
+        fieldsets = list(super().get_fieldsets(request, obj))
+        
+        # اگر در حال ایجاد بخش جدید هستیم، همه فیلترها را نشان بده
+        # اگر در حال ویرایش هستیم، فقط فیلترهای مربوط به نوع بخش را نشان بده
+        if obj and obj.section_type:
+            if obj.section_type == "videos":
+                # حذف فیلترهای محصول و پست
+                fieldsets = [fs for fs in fieldsets if "فیلترهای محصول" not in fs[0] and "فیلترهای مقاله" not in fs[0]]
+            elif obj.section_type == "products":
+                # حذف فیلترهای ویدیو و پست
+                fieldsets = [fs for fs in fieldsets if "فیلترهای ویدیو" not in fs[0] and "فیلترهای مقاله" not in fs[0]]
+            elif obj.section_type == "posts":
+                # حذف فیلترهای ویدیو و محصول
+                fieldsets = [fs for fs in fieldsets if "فیلترهای ویدیو" not in fs[0] and "فیلترهای محصول" not in fs[0]]
+        
+        return fieldsets

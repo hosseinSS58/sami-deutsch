@@ -16,6 +16,11 @@
 
 {% block content %}
 
+{# اسلایدر در بالای صفحه (قبل از Hero) #}
+{% if home_slides and home_slider_settings.position == "top" %}
+  {% include "core/partials/home_hero_slider.html" %}
+{% endif %}
+
 <!-- Hero Section -->
 <section class="hero-section mb-5" style="background-color: {{ site_settings.hero_bg_color|default:'#f8f9fa' }};">
   <div class="container-fluid">
@@ -117,283 +122,164 @@
 </section>
 {% endif %}
 
-<!-- Featured Videos Section -->
-<section class="featured-section mb-5">
-  <div class="container-fluid">
-    <div class="section-header mb-4">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <h2 class="section-title h3 fw-bold mb-2">ویدیوهای جدید</h2>
-          <p class="section-subtitle text-muted mb-0">آخرین درس‌های اضافه شده به مجموعه</p>
+{# اسلایدر بعد از Hero Section #}
+{% if home_slides and home_slider_settings.position == "after_hero" %}
+  {% include "core/partials/home_hero_slider.html" %}
+{% endif %}
+
+{# اسلایدر بعد از Stats Section #}
+{% if home_slides and home_slider_settings.position == "after_stats" %}
+  {% include "core/partials/home_hero_slider.html" %}
+{% endif %}
+
+<!-- Dynamic Home Sections -->
+{% if home_sections %}
+  {% for section_data in home_sections %}
+    {% with section=section_data.section items=section_data.items slider=section_data.slider %}
+      {% if section.section_type == "videos" %}
+        {% include "core/sections/video_section.html" %}
+      {% elif section.section_type == "products" %}
+        {% include "core/sections/product_section.html" %}
+      {% elif section.section_type == "posts" %}
+        {% include "core/sections/post_section.html" %}
+      {% elif section.section_type == "slider" %}
+        {% include "core/partials/home_hero_slider.html" %}
+      {% endif %}
+    {% endwith %}
+  {% endfor %}
+{% else %}
+  <!-- Fallback: اگر هیچ بخشی تنظیم نشده باشد، بخش‌های پیش‌فرض را نمایش بده -->
+  {% if latest_videos %}
+    <section class="featured-section mb-5">
+      <div class="container-fluid">
+        <div class="section-header mb-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2 class="section-title h3 fw-bold mb-2">ویدیوهای جدید</h2>
+              <p class="section-subtitle text-muted mb-0">آخرین درس‌های اضافه شده به مجموعه</p>
+            </div>
+            <a href="/videos/" class="btn btn-outline-primary">
+              <i class="fas fa-arrow-left me-2"></i>همه ویدیوها
+            </a>
+          </div>
         </div>
-        <a href="/videos/" class="btn btn-outline-primary">
-          <i class="fas fa-arrow-left me-2"></i>همه ویدیوها
-        </a>
-      </div>
-    </div>
-    
-    {% if latest_videos %}
-      <div class="row g-4">
-        {% for video in latest_videos %}
-          <div class="col-lg-4 col-md-6 col-12">
-            <div class="video-card card border-0 shadow-sm hover-lift h-100">
-              <div class="video-cover position-relative">
-                {% if video.cover %}
-                  <img src="{{ video.cover.url }}" class="card-img-top" alt="{{ video.title }}" loading="lazy">
-                {% else %}
-                  <div class="default-cover d-flex align-items-center justify-content-center">
-                    <i class="fas fa-video fa-3x text-muted"></i>
-                  </div>
-                {% endif %}
-                <div class="video-overlay">
-                  <div class="video-badges">
-                    {% if video.is_featured %}
-                      <span class="badge bg-warning">ویژه</span>
-                    {% endif %}
-                    {% if video.is_premium %}
-                      <span class="badge bg-primary">پریمیوم</span>
-                    {% endif %}
-                    <span class="badge bg-info">{{ video.level }}</span>
-                    {% if video.primary_youtube_link %}
-                      <span class="badge bg-danger">
-                        <i class="fab fa-youtube me-1"></i>یوتیوب
-                      </span>
-                    {% endif %}
-                  </div>
-                  <div class="d-flex gap-2">
+        <div class="row g-4">
+          {% for video in latest_videos %}
+            <div class="col-lg-4 col-md-6 col-12">
+              <div class="video-card card border-0 shadow-sm hover-lift h-100">
+                <div class="video-cover position-relative">
+                  {% if video.cover %}
+                    <img src="{{ video.cover.url }}" class="card-img-top" alt="{{ video.title }}" loading="lazy">
+                  {% else %}
+                    <div class="default-cover d-flex align-items-center justify-content-center">
+                      <i class="fas fa-video fa-3x text-muted"></i>
+                    </div>
+                  {% endif %}
+                  <div class="video-overlay">
+                    <div class="video-badges">
+                      {% if video.is_featured %}
+                        <span class="badge bg-warning">ویژه</span>
+                      {% endif %}
+                      <span class="badge bg-info">{{ video.level }}</span>
+                    </div>
                     <a href="{{ video.get_absolute_url }}" class="btn btn-light btn-sm">
                       <i class="fas fa-play me-1"></i>مشاهده
                     </a>
-                    {% if video.primary_youtube_link %}
-                      <a href="{{ video.primary_youtube_link.youtube_url }}" class="btn btn-danger btn-sm" target="_blank" rel="noopener">
-                        <i class="fab fa-youtube me-1"></i>یوتیوب
-                      </a>
-                    {% endif %}
                   </div>
                 </div>
-              </div>
-              <div class="card-body">
-                <h5 class="card-title h6 mb-2 text-truncate" title="{{ video.title }}">{{ video.title }}</h5>
-                <div class="video-meta d-flex align-items-center gap-3 text-muted small mb-3">
-                  <span>
-                    <i class="fas fa-clock me-1"></i>
-                    {% if video.topic == "grammar" %}گرامر
-                    {% elif video.topic == "speaking" %}مکالمه
-                    {% elif video.topic == "vocab" %}واژگان
-                    {% elif video.topic == "listening" %}شنیداری
-                    {% elif video.topic == "reading" %}خواندن
-                    {% elif video.topic == "writing" %}نوشتن
-                    {% elif video.topic == "culture" %}فرهنگ
-                    {% elif video.topic == "pronunciation" %}تلفظ
-                    {% else %}{{ video.topic }}{% endif %}
-                  </span>
-                  {% if video.duration_minutes %}
-                    <span>
-                      <i class="fas fa-clock me-1"></i>{{ video.duration_minutes }} دقیقه
-                    </span>
-                  {% endif %}
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="d-flex gap-2">
-                    <a href="{{ video.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
-                      مشاهده
-                    </a>
-                    {% if video.primary_youtube_link %}
-                      <a href="{{ video.primary_youtube_link.youtube_url }}" class="btn btn-danger btn-sm" target="_blank" rel="noopener">
-                        <i class="fab fa-youtube me-1"></i>یوتیوب
-                      </a>
-                    {% endif %}
-                  </div>
-                  <small class="text-muted">{{ video.created_at|date:"Y/m/d" }}</small>
+                <div class="card-body">
+                  <h5 class="card-title h6 mb-2 text-truncate" title="{{ video.title }}">{{ video.title }}</h5>
+                  <a href="{{ video.get_absolute_url }}" class="btn btn-outline-primary btn-sm">مشاهده</a>
                 </div>
               </div>
             </div>
-          </div>
-        {% endfor %}
-      </div>
-    {% else %}
-      <div class="empty-state text-center py-5">
-        <i class="fas fa-video fa-4x text-muted mb-3"></i>
-        <h4 class="text-muted mb-2">ویدیویی موجود نیست</h4>
-        <p class="text-muted">هنوز ویدیویی به مجموعه اضافه نشده است</p>
-      </div>
-    {% endif %}
-  </div>
-</section>
-
-<!-- Featured Products Section -->
-<section class="featured-section mb-5">
-  <div class="container-fluid">
-    <div class="section-header mb-4">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <h2 class="section-title h3 fw-bold mb-2">پکیج‌های آموزشی</h2>
-          <p class="section-subtitle text-muted mb-0">مجموعه‌های کامل برای یادگیری بهتر</p>
+          {% endfor %}
         </div>
-        <a href="/shop/" class="btn btn-outline-primary">
-          <i class="fas fa-arrow-left me-2"></i>همه پکیج‌ها
-        </a>
       </div>
-    </div>
-    
-    {% if latest_products %}
-      <div class="row g-4">
-        {% for product in latest_products %}
-          <div class="col-lg-4 col-md-6 col-12">
-            <div class="product-card card border-0 shadow-sm hover-lift h-100">
-              <div class="product-cover position-relative">
-                {% if product.cover %}
-                  <img src="{{ product.cover.url }}" class="card-img-top" alt="{{ product.name }}" loading="lazy">
-                {% else %}
-                  <div class="default-cover d-flex align-items-center justify-content-center">
-                    <i class="fas fa-box fa-3x text-muted"></i>
-                  </div>
-                {% endif %}
-                <div class="product-overlay">
-                  <div class="product-badges">
-                    {% if product.is_featured %}
-                      <span class="badge bg-warning">ویژه</span>
-                    {% endif %}
-                    {% if product.discount_percent %}
-                      <span class="badge bg-danger">-{{ product.discount_percent }}%</span>
-                    {% endif %}
-                  </div>
-                  <a href="{{ product.get_absolute_url }}" class="btn btn-light btn-sm">
-                    <i class="fas fa-eye me-1"></i>مشاهده
-                  </a>
-                </div>
-              </div>
-              <div class="card-body">
-                <h5 class="card-title h6 mb-2 text-truncate" title="{{ product.name }}">{{ product.name }}</h5>
-                <div class="product-meta d-flex align-items-center gap-3 text-muted small mb-3">
-                  {% if product.category %}
-                    <span>
-                      <i class="fas fa-tag me-1"></i>{{ product.category.name }}
-                    </span>
-                  {% endif %}
-                  {% if product.views_count %}
-                    <span>
-                      <i class="fas fa-eye me-1"></i>{{ product.views_count }} بازدید
-                    </span>
+    </section>
+  {% endif %}
+  
+  {% if latest_products %}
+    <section class="featured-section mb-5">
+      <div class="container-fluid">
+        <div class="section-header mb-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2 class="section-title h3 fw-bold mb-2">پکیج‌های آموزشی</h2>
+              <p class="section-subtitle text-muted mb-0">مجموعه‌های کامل برای یادگیری بهتر</p>
+            </div>
+            <a href="/shop/" class="btn btn-outline-primary">
+              <i class="fas fa-arrow-left me-2"></i>همه پکیج‌ها
+            </a>
+          </div>
+        </div>
+        <div class="row g-4">
+          {% for product in latest_products %}
+            <div class="col-lg-4 col-md-6 col-12">
+              <div class="product-card card border-0 shadow-sm hover-lift h-100">
+                <div class="product-cover position-relative">
+                  {% if product.cover %}
+                    <img src="{{ product.cover.url }}" class="card-img-top" alt="{{ product.name }}" loading="lazy">
+                  {% else %}
+                    <div class="default-cover d-flex align-items-center justify-content-center">
+                      <i class="fas fa-box fa-3x text-muted"></i>
+                    </div>
                   {% endif %}
                 </div>
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="card-body">
+                  <h5 class="card-title h6 mb-2 text-truncate" title="{{ product.name }}">{{ product.name }}</h5>
                   <div class="price-section">
-                    {% if product.discount_price %}
-                      <span class="text-decoration-line-through text-muted me-2">{{ product.price|floatformat:0 }}</span>
-                      <span class="text-danger fw-bold">{{ product.discount_price|floatformat:0 }}</span>
-                    {% else %}
-                      <span class="text-primary fw-bold">{{ product.price|floatformat:0 }}</span>
-                    {% endif %}
+                    <span class="text-primary fw-bold">{{ product.price|floatformat:0 }}</span>
                     <span class="text-muted small">تومان</span>
                   </div>
-                  <a href="{{ product.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
-                    مشاهده
-                  </a>
                 </div>
               </div>
             </div>
-          </div>
-        {% endfor %}
-      </div>
-    {% else %}
-      <div class="empty-state text-center py-5">
-        <i class="fas fa-box fa-4x text-muted mb-3"></i>
-        <h4 class="text-muted mb-2">پکیجی موجود نیست</h4>
-        <p class="text-muted">هنوز پکیج آموزشی به مجموعه اضافه نشده است</p>
-      </div>
-    {% endif %}
-  </div>
-</section>
-
-<!-- Blog Section -->
-<section class="featured-section mb-5">
-  <div class="container-fluid">
-    <div class="section-header mb-4">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <h2 class="section-title h3 fw-bold mb-2">آخرین مقالات</h2>
-          <p class="section-subtitle text-muted mb-0">مطالب مفید و کاربردی برای یادگیری بهتر</p>
+          {% endfor %}
         </div>
-        <a href="/blog/" class="btn btn-outline-primary">
-          <i class="fas fa-arrow-left me-2"></i>همه مقالات
-        </a>
       </div>
-    </div>
-    
-    {% if latest_posts %}
-      <div class="row g-4">
-        {% for post in latest_posts %}
-          <div class="col-lg-3 col-md-6 col-12">
-            <div class="post-card card border-0 shadow-sm hover-lift h-100">
-              <div class="post-cover position-relative">
-                {% if post.cover %}
-                  <img src="{{ post.cover.url }}" class="card-img-top" alt="{{ post.title }}" loading="lazy">
-                {% else %}
-                  <div class="default-cover d-flex align-items-center justify-content-center">
-                    <i class="fas fa-newspaper fa-3x text-muted"></i>
-                  </div>
-                {% endif %}
-                <div class="post-overlay">
-                  <div class="post-badges">
-                    {% if post.is_featured %}
-                      <span class="badge bg-warning">ویژه</span>
-                    {% endif %}
-                    {% if post.category %}
-                      <span class="badge bg-primary">{{ post.category.name }}</span>
-                    {% endif %}
-                  </div>
-                  <a href="{{ post.get_absolute_url }}" class="btn btn-light btn-sm">
-                    <i class="fas fa-eye me-1"></i>مطالعه
-                  </a>
-                </div>
-              </div>
-              <div class="card-body">
-                <h6 class="card-title mb-2 text-truncate" title="{{ post.title }}">{{ post.title }}</h6>
-                <div class="post-meta d-flex align-items-center gap-3 text-muted small mb-3">
-                  {% if post.published_at %}
-                    <span>
-                      <i class="fas fa-calendar me-1"></i>{{ post.published_at|date:"Y/m/d" }}
-                    </span>
-                  {% endif %}
-                  {% if post.views_count %}
-                    <span>
-                      <i class="fas fa-eye me-1"></i>{{ post.views_count }} بازدید
-                    </span>
-                  {% endif %}
-                  {% if post.youtube_video_id %}
-                    <span>
-                      <i class="fab fa-youtube me-1 text-danger"></i>ویدیو یوتیوب
-                    </span>
+    </section>
+  {% endif %}
+  
+  {% if latest_posts %}
+    <section class="featured-section mb-5">
+      <div class="container-fluid">
+        <div class="section-header mb-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2 class="section-title h3 fw-bold mb-2">آخرین مقالات</h2>
+              <p class="section-subtitle text-muted mb-0">مطالب مفید و کاربردی برای یادگیری بهتر</p>
+            </div>
+            <a href="/blog/" class="btn btn-outline-primary">
+              <i class="fas fa-arrow-left me-2"></i>همه مقالات
+            </a>
+          </div>
+        </div>
+        <div class="row g-4">
+          {% for post in latest_posts %}
+            <div class="col-lg-3 col-md-6 col-12">
+              <div class="post-card card border-0 shadow-sm hover-lift h-100">
+                <div class="post-cover position-relative">
+                  {% if post.cover %}
+                    <img src="{{ post.cover.url }}" class="card-img-top" alt="{{ post.title }}" loading="lazy">
+                  {% else %}
+                    <div class="default-cover d-flex align-items-center justify-content-center">
+                      <i class="fas fa-newspaper fa-3x text-muted"></i>
+                    </div>
                   {% endif %}
                 </div>
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="d-flex gap-2">
-                    <a href="{{ post.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
-                      مطالعه
-                    </a>
-                    {% if post.youtube_watch_url %}
-                      <a href="{{ post.youtube_watch_url }}" class="btn btn-danger btn-sm" target="_blank" rel="noopener">
-                        <i class="fab fa-youtube me-1"></i>ویدیو
-                      </a>
-                    {% endif %}
-                  </div>
-                  <small class="text-muted">{{ post.published_at|date:"Y/m/d" }}</small>
+                <div class="card-body">
+                  <h6 class="card-title mb-2 text-truncate" title="{{ post.title }}">{{ post.title }}</h6>
+                  <a href="{{ post.get_absolute_url }}" class="btn btn-outline-primary btn-sm">مطالعه</a>
                 </div>
               </div>
             </div>
-          </div>
-        {% endfor %}
+          {% endfor %}
+        </div>
       </div>
-    {% else %}
-      <div class="empty-state text-center py-5">
-        <i class="fas fa-newspaper fa-4x text-muted mb-3"></i>
-        <h4 class="text-muted mb-2">مقاله‌ای موجود نیست</h4>
-        <p class="text-muted">هنوز مقاله‌ای به بلاگ اضافه نشده است</p>
-      </div>
-    {% endif %}
-  </div>
-</section>
+    </section>
+  {% endif %}
+{% endif %}
 
 <!-- CTA Section -->
 <section class="cta-section mb-5">

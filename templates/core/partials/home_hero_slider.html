@@ -1,0 +1,94 @@
+{% load static %}
+
+{# اسلایدر جدید صفحه هوم - استفاده از HomeSlider و Slide #}
+{% if home_slides %}
+<section class="home-hero-slider-section mb-5">
+  <div class="container-fluid px-0">
+    <div id="homeHeroSlider" class="carousel slide home-hero-slider"
+         data-bs-ride="{% if home_slider_settings and home_slider_settings.autoplay %}carousel{% else %}false{% endif %}"
+         {% if home_slider_settings and home_slider_settings.autoplay %}
+           data-bs-interval="{{ home_slider_settings.interval_ms }}"
+         {% endif %}
+         {% if home_slider_settings and home_slider_settings.pause_on_hover %}
+           data-bs-pause="hover"
+         {% endif %}>
+
+      {% if home_slider_settings and home_slider_settings.show_indicators %}
+      <div class="carousel-indicators">
+        {% for slide in home_slides %}
+          <button type="button"
+                  data-bs-target="#homeHeroSlider"
+                  data-bs-slide-to="{{ forloop.counter0 }}"
+                  class="{% if forloop.first %}active{% endif %}"
+                  aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+                  aria-label="اسلاید {{ forloop.counter }}"></button>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="carousel-inner">
+        {% for slide in home_slides %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <div class="position-relative slider-image-wrapper"
+                 style="
+                   width: 100%;
+                   {% if home_slider_settings and home_slider_settings.use_custom_size %}
+                     height: {{ home_slider_settings.height_desktop }}px;
+                     {% if home_slider_settings.max_width %}
+                       max-width: {{ home_slider_settings.max_width }}px;
+                       margin-inline: auto;
+                     {% endif %}
+                   {% else %}
+                     aspect-ratio: {{ home_slider_settings.aspect_ratio|default:'21/9' }};
+                   {% endif %}
+                 ">
+              <img src="{{ slide.image.url }}"
+                   class="d-block w-100 h-100"
+                   alt="{{ slide.title }}"
+                   loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                   style="object-fit: cover;">
+
+              <div class="carousel-caption d-none d-md-block text-{{ slide.text_align }} slide-caption-overlay"
+                   style="
+                     color: {{ slide.text_color }};
+                     background-color: {{ slide.caption_bg_color }};
+                     padding: 2rem;
+                     border-radius: 0.75rem;
+                     {% if slide.overlay_h_align == 'start' %}right: 5%; left: auto;{% elif slide.overlay_h_align == 'end' %}left: 5%; right: auto;{% else %}left: 50%; right: auto; transform: translateX(-50%);{% endif %}
+                     {% if slide.overlay_v_align == 'top' %}top: 10%; bottom: auto;{% elif slide.overlay_v_align == 'bottom' %}bottom: 10%; top: auto;{% else %}top: 50%; bottom: auto; transform: translateY(-50%){% if slide.overlay_h_align == 'center' %} translateX(-50%){% endif %};{% endif %}
+                     opacity: 0.85;
+                   ">
+                {% if slide.title %}
+                  <h2 class="fw-bold mb-2">{{ slide.title }}</h2>
+                {% endif %}
+                {% if slide.subtitle %}
+                  <p class="mb-3">{{ slide.subtitle }}</p>
+                {% endif %}
+                {% if slide.cta_text and slide.cta_url %}
+                  <a href="{{ slide.cta_url }}"
+                     class="btn btn-light btn-lg mt-2 px-4 py-2">
+                    {{ slide.cta_text }}
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if home_slider_settings and home_slider_settings.show_arrows %}
+      <button class="carousel-control-prev" type="button" data-bs-target="#homeHeroSlider" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">قبلی</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#homeHeroSlider" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">بعدی</span>
+      </button>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+

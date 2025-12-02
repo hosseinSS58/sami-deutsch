@@ -1,0 +1,93 @@
+{% load static %}
+<!-- Product Section -->
+<section class="featured-section mb-5">
+  <div class="container-fluid">
+    <div class="section-header mb-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          {% if section.section_icon %}
+            <i class="{{ section.section_icon }} me-2"></i>
+          {% endif %}
+          <h2 class="section-title h3 fw-bold mb-2">{{ section.title }}</h2>
+          {% if section.subtitle %}
+            <p class="section-subtitle text-muted mb-0">{{ section.subtitle }}</p>
+          {% endif %}
+        </div>
+        {% if section.show_view_all_button %}
+          <a href="{{ section.get_view_all_url }}" class="btn btn-outline-primary">
+            <i class="{{ section.view_all_button_icon|default:'fas fa-arrow-left' }} me-2"></i>{{ section.get_view_all_text }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    
+    {% if items %}
+      <div class="row g-4">
+        {% for product in items %}
+          <div class="col-lg-4 col-md-6 col-12">
+            <div class="product-card card border-0 shadow-sm hover-lift h-100">
+              <div class="product-cover position-relative">
+                {% if product.cover %}
+                  <img src="{{ product.cover.url }}" class="card-img-top" alt="{{ product.name }}" loading="lazy">
+                {% else %}
+                  <div class="default-cover d-flex align-items-center justify-content-center">
+                    <i class="fas fa-box fa-3x text-muted"></i>
+                  </div>
+                {% endif %}
+                <div class="product-overlay">
+                  <div class="product-badges">
+                    {% if product.is_featured %}
+                      <span class="badge bg-warning">ویژه</span>
+                    {% endif %}
+                    {% if product.discount_percent %}
+                      <span class="badge bg-danger">-{{ product.discount_percent }}%</span>
+                    {% endif %}
+                  </div>
+                  <a href="{{ product.get_absolute_url }}" class="btn btn-light btn-sm">
+                    <i class="fas fa-eye me-1"></i>مشاهده
+                  </a>
+                </div>
+              </div>
+              <div class="card-body">
+                <h5 class="card-title h6 mb-2 text-truncate" title="{{ product.name }}">{{ product.name }}</h5>
+                <div class="product-meta d-flex align-items-center gap-3 text-muted small mb-3">
+                  {% if product.category %}
+                    <span>
+                      <i class="fas fa-tag me-1"></i>{{ product.category.name }}
+                    </span>
+                  {% endif %}
+                  {% if product.views_count %}
+                    <span>
+                      <i class="fas fa-eye me-1"></i>{{ product.views_count }} بازدید
+                    </span>
+                  {% endif %}
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="price-section">
+                    {% if product.discount_price %}
+                      <span class="text-decoration-line-through text-muted me-2">{{ product.price|floatformat:0 }}</span>
+                      <span class="text-danger fw-bold">{{ product.discount_price|floatformat:0 }}</span>
+                    {% else %}
+                      <span class="text-primary fw-bold">{{ product.price|floatformat:0 }}</span>
+                    {% endif %}
+                    <span class="text-muted small">تومان</span>
+                  </div>
+                  <a href="{{ product.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                    مشاهده
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state text-center py-5">
+        <i class="fas fa-box fa-4x text-muted mb-3"></i>
+        <h4 class="text-muted mb-2">پکیجی موجود نیست</h4>
+        <p class="text-muted">هنوز پکیج آموزشی به مجموعه اضافه نشده است</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+

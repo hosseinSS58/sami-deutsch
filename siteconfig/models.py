@@ -183,12 +183,58 @@ class HomeFeature(models.Model):
 
 
 class HomeSlider(SingletonModel):
+    class Position(models.TextChoices):
+        TOP = "top", _("بالای صفحه (قبل از Hero)")
+        AFTER_HERO = "after_hero", _("بعد از Hero Section")
+        AFTER_STATS = "after_stats", _("بعد از Stats Section")
+        CUSTOM = "custom", _("موقعیت سفارشی (بر اساس order)")
+    
     autoplay = models.BooleanField(default=True)
     interval_ms = models.PositiveIntegerField(default=5000)
     show_arrows = models.BooleanField(default=True)
     show_indicators = models.BooleanField(default=True)
     pause_on_hover = models.BooleanField(default=True)
-    aspect_ratio = models.CharField(max_length=10, default="21x9", help_text="مثل 16x9 یا 21x9")
+
+    # سایزبندی
+    use_custom_size = models.BooleanField(
+        default=False,
+        verbose_name=_("سایزبندی دستی"),
+        help_text=_("اگر فعال باشد از ارتفاع‌های ثابت به‌جای نسبت تصویر استفاده می‌شود"),
+    )
+    height_desktop = models.PositiveIntegerField(
+        default=480,
+        verbose_name=_("ارتفاع دسکتاپ (px)"),
+        help_text=_("مثلاً 480 یا 600"),
+    )
+    height_mobile = models.PositiveIntegerField(
+        default=260,
+        verbose_name=_("ارتفاع موبایل (px)"),
+        help_text=_("مثلاً 220 یا 280"),
+    )
+    max_width = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("حداکثر عرض (px)"),
+        help_text=_("اختیاری؛ اگر پر شود، اسلایدر در مرکز با این حداکثر عرض نمایش داده می‌شود"),
+    )
+    aspect_ratio = models.CharField(
+        max_length=10,
+        default="21/9",
+        verbose_name=_("نسبت تصویر (در صورت غیرفعال بودن سایزبندی دستی)"),
+        help_text=_("مثل 16/9 یا 21/9"),
+    )
+    position = models.CharField(
+        max_length=20,
+        choices=Position.choices,
+        default=Position.TOP,
+        verbose_name=_("موقعیت اسلایدر"),
+        help_text=_("جای قرار گرفتن اسلایدر در صفحه هوم")
+    )
+    custom_order = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name=_("ترتیب سفارشی"),
+        help_text=_("فقط وقتی موقعیت 'سفارشی' انتخاب شده باشد استفاده می‌شود")
+    )
 
     def __str__(self) -> str:
         return "Home slider"
@@ -252,6 +298,240 @@ class MenuItem(models.Model):
     def __str__(self) -> str:
         return self.title
 
-from django.db import models
 
-# Create your models here.
+class HomePageSection(models.Model):
+    """مدل برای مدیریت بخش‌های صفحه هوم از ادمین"""
+    
+    class SectionType(models.TextChoices):
+        VIDEOS = "videos", _("ویدیوها")
+        PRODUCTS = "products", _("محصولات")
+        POSTS = "posts", _("مقالات")
+        SLIDER = "slider", _("اسلایدر")
+    
+    # اطلاعات اصلی
+    section_type = models.CharField(
+        max_length=20,
+        choices=SectionType.choices,
+        verbose_name=_("نوع بخش"),
+        help_text=_("نوع محتوایی که در این بخش نمایش داده می‌شود")
+    )
+    title = models.CharField(
+        max_length=100,
+        verbose_name=_("عنوان بخش"),
+        help_text=_("مثلاً: ویدیوهای جدید، پکیج‌های آموزشی")
+    )
+    subtitle = models.CharField(
+        max_length=200,
+        blank=True,
+        default="",
+        verbose_name=_("زیرعنوان"),
+        help_text=_("توضیح کوتاه برای بخش")
+    )
+    
+    # تنظیمات نمایش
+    order = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name=_("ترتیب نمایش"),
+        help_text=_("بخش‌ها بر اساس این عدد مرتب می‌شوند")
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name=_("فعال"),
+        help_text=_("اگر غیرفعال باشد، این بخش نمایش داده نمی‌شود")
+    )
+    
+    # تعداد و حالت انتخاب
+    item_count = models.PositiveSmallIntegerField(
+        default=6,
+        verbose_name=_("تعداد آیتم‌ها"),
+        help_text=_("تعداد آیتم‌هایی که در این بخش نمایش داده می‌شود")
+    )
+    use_manual_items = models.BooleanField(
+        default=False,
+        verbose_name=_("انتخاب دستی آیتم‌ها"),
+        help_text=_("اگر فعال باشد، به‌جای فیلتر، آیتم‌ها را به‌صورت دستی انتخاب می‌کنید")
+    )
+    # فقط برای بخش ویدیوها استفاده می‌شود
+    manual_videos = models.ManyToManyField(
+        "courses.Video",
+        blank=True,
+        related_name="home_manual_sections",
+        verbose_name=_("ویدیوهای انتخاب‌شده دستی"),
+        help_text=_("اگر این فیلد خالی نباشد و 'انتخاب دستی' فعال باشد، فقط همین ویدیوها نمایش داده می‌شوند")
+    )
+    
+    # فیلترهای ویدیو - ویژگی‌های اصلی
+    video_filter_featured = models.BooleanField(
+        default=False,
+        verbose_name=_("فقط ویدیوهای ویژه"),
+        help_text=_("اگر فعال باشد، فقط ویدیوهای ویژه نمایش داده می‌شوند")
+    )
+    video_filter_is_free = models.BooleanField(
+        default=False,
+        verbose_name=_("فقط ویدیوهای رایگان"),
+        help_text=_("اگر فعال باشد، فقط ویدیوهای رایگان نمایش داده می‌شوند")
+    )
+    video_filter_has_youtube = models.BooleanField(
+        default=False,
+        verbose_name=_("فقط ویدیوهای دارای لینک یوتیوب"),
+        help_text=_("اگر فعال باشد، فقط ویدیوهایی که لینک یوتیوب دارند نمایش داده می‌شوند")
+    )
+    
+    # فیلترهای ویدیو - سطح و موضوع
+    video_filter_level = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        choices=[("A1", "A1"), ("A2", "A2"), ("B1", "B1"), ("B2", "B2"), ("C1", "C1")],
+        verbose_name=_("فیلتر بر اساس سطح"),
+        help_text=_("اگر انتخاب شود، فقط ویدیوهای این سطح نمایش داده می‌شوند")
+    )
+    video_filter_topic = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        choices=[
+            ("grammar", _("گرامر")),
+            ("speaking", _("مکالمه")),
+            ("vocab", _("واژگان")),
+            ("listening", _("شنیداری")),
+            ("reading", _("خواندن")),
+            ("writing", _("نوشتن")),
+            ("culture", _("فرهنگ")),
+            ("pronunciation", _("تلفظ")),
+        ],
+        verbose_name=_("فیلتر بر اساس موضوع"),
+        help_text=_("اگر انتخاب شود، فقط ویدیوهای این موضوع نمایش داده می‌شوند")
+    )
+    video_filter_difficulty = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        choices=[
+            ("beginner", _("مبتدی")),
+            ("intermediate", _("متوسط")),
+            ("advanced", _("پیشرفته")),
+        ],
+        verbose_name=_("فیلتر بر اساس سطح دشواری"),
+        help_text=_("اگر انتخاب شود، فقط ویدیوهای این سطح دشواری نمایش داده می‌شوند")
+    )
+    
+    # فیلترهای ویدیو - مدت زمان
+    video_filter_duration_min = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_("حداقل مدت زمان (دقیقه)"),
+        help_text=_("فقط ویدیوهایی که حداقل این مدت زمان را دارند نمایش داده می‌شوند")
+    )
+    video_filter_duration_max = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_("حداکثر مدت زمان (دقیقه)"),
+        help_text=_("فقط ویدیوهایی که حداکثر این مدت زمان را دارند نمایش داده می‌شوند")
+    )
+    
+    # فیلترهای ویدیو - مرتب‌سازی
+    video_order_by = models.CharField(
+        max_length=30,
+        blank=True,
+        default="-created_at",
+        choices=[
+            ("-created_at", _("جدیدترین (پیش‌فرض)")),
+            ("created_at", _("قدیمی‌ترین")),
+            ("-duration_minutes", _("طولانی‌ترین")),
+            ("duration_minutes", _("کوتاه‌ترین")),
+            ("title", _("عنوان (الفبایی)")),
+            ("-title", _("عنوان (الفبایی معکوس)")),
+            ("-is_featured", _("ویژه اول")),
+        ],
+        verbose_name=_("مرتب‌سازی بر اساس"),
+        help_text=_("نحوه مرتب‌سازی ویدیوها در این بخش")
+    )
+    
+    # فیلترهای محصول
+    product_filter_featured = models.BooleanField(
+        default=False,
+        verbose_name=_("فقط محصولات ویژه"),
+        help_text=_("اگر فعال باشد، فقط محصولات ویژه نمایش داده می‌شوند")
+    )
+    product_filter_active = models.BooleanField(
+        default=True,
+        verbose_name=_("فقط محصولات فعال"),
+        help_text=_("فقط محصولات فعال نمایش داده می‌شوند")
+    )
+    
+    # فیلترهای پست
+    post_filter_featured = models.BooleanField(
+        default=False,
+        verbose_name=_("فقط مقالات ویژه"),
+        help_text=_("اگر فعال باشد، فقط مقالات ویژه نمایش داده می‌شوند")
+    )
+    
+    # لینک "همه"
+    show_view_all_button = models.BooleanField(
+        default=True,
+        verbose_name=_("نمایش دکمه 'همه'"),
+        help_text=_("اگر فعال باشد، دکمه 'همه' نمایش داده می‌شود")
+    )
+    view_all_button_text = models.CharField(
+        max_length=50,
+        blank=True,
+        default="",
+        verbose_name=_("متن دکمه 'همه'"),
+        help_text=_("مثلاً: همه ویدیوها، همه پکیج‌ها. اگر خالی باشد، به صورت خودکار تنظیم می‌شود")
+    )
+    view_all_button_url = models.CharField(
+        max_length=200,
+        blank=True,
+        default="",
+        verbose_name=_("لینک دکمه 'همه'"),
+        help_text=_("مثلاً: /videos/، /shop/. اگر خالی باشد، به صورت خودکار تنظیم می‌شود")
+    )
+    view_all_button_icon = models.CharField(
+        max_length=50,
+        blank=True,
+        default="fas fa-arrow-left",
+        verbose_name=_("آیکون دکمه 'همه'")
+    )
+    
+    # آیکون بخش (اختیاری)
+    section_icon = models.CharField(
+        max_length=50,
+        blank=True,
+        default="",
+        verbose_name=_("آیکون بخش"),
+        help_text=_("آیکون FontAwesome برای بخش (اختیاری)")
+    )
+    
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = _("بخش صفحه هوم")
+        verbose_name_plural = _("بخش‌های صفحه هوم")
+    
+    def __str__(self) -> str:
+        status = "✓" if self.is_active else "✗"
+        return f"{status} {self.get_section_type_display()}: {self.title}"
+    
+    def get_view_all_url(self):
+        """برگرداندن URL دکمه 'همه' به صورت خودکار اگر تنظیم نشده باشد"""
+        if self.view_all_button_url:
+            return self.view_all_button_url
+        
+        url_map = {
+            "videos": "/videos/",
+            "products": "/shop/",
+            "posts": "/blog/",
+        }
+        return url_map.get(self.section_type, "#")
+    
+    def get_view_all_text(self):
+        """برگرداندن متن دکمه 'همه' به صورت خودکار اگر تنظیم نشده باشد"""
+        if self.view_all_button_text:
+            return self.view_all_button_text
+        
+        text_map = {
+            "videos": "همه ویدیوها",
+            "products": "همه پکیج‌ها",
+            "posts": "همه مقالات",
+        }
+        return text_map.get(self.section_type, "مشاهده همه")

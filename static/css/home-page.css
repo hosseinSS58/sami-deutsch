@@ -63,6 +63,14 @@
   margin-bottom: 0;
 }
 
+/* Slider responsive height overrides for mobile when custom size is enabled */
+@media (max-width: 768px) {
+  .home-hero-slider-section .slider-image-wrapper {
+    height: auto;
+    max-height: 260px;
+  }
+}
+
 @media (max-width: 768px) {
   .home-cta-card {
     padding: 3rem 2rem !important;
