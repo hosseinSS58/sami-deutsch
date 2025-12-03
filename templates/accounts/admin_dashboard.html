@@ -1,0 +1,479 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "داشبورد مدیریت" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Header Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h2 mb-2">{% trans "داشبورد مدیریت" %}</h1>
+          <p class="text-muted mb-0">{% trans "مدیریت و نظارت بر سایت" %}</p>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'accounts:analytics_detail' %}" class="btn btn-info">
+            <i class="fas fa-chart-line me-2"></i>{% trans "آمار تفصیلی بازدیدها" %}
+          </a>
+          <a href="/admin/" class="btn btn-primary" target="_blank">
+            <i class="fas fa-cog me-2"></i>{% trans "پنل ادمین" %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="row g-4 mb-4">
+    <!-- Users Stats -->
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h6 class="text-muted mb-1">{% trans "کل کاربران" %}</h6>
+              <h2 class="mb-0">{{ total_users }}</h2>
+            </div>
+            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+              <i class="fas fa-users fa-2x text-primary"></i>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between">
+            <small class="text-muted">
+              <i class="fas fa-user-shield me-1"></i>{% trans "مدیران:" %} {{ total_admins }}
+            </small>
+            <small class="text-success">
+              <i class="fas fa-arrow-up me-1"></i>+{{ recent_users }} {% trans "این هفته" %}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Videos Stats -->
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h6 class="text-muted mb-1">{% trans "ویدیوها" %}</h6>
+              <h2 class="mb-0">{{ total_videos }}</h2>
+            </div>
+            <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+              <i class="fas fa-video fa-2x text-danger"></i>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between">
+            <small class="text-muted">
+              <i class="fas fa-star me-1"></i>{% trans "ویژه:" %} {{ featured_videos }}
+            </small>
+            <small class="text-success">
+              <i class="fas fa-arrow-up me-1"></i>+{{ recent_videos }} {% trans "این هفته" %}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Posts Stats -->
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h6 class="text-muted mb-1">{% trans "مقالات" %}</h6>
+              <h2 class="mb-0">{{ total_posts }}</h2>
+            </div>
+            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+              <i class="fas fa-newspaper fa-2x text-success"></i>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between">
+            <small class="text-muted">
+              <i class="fas fa-eye me-1"></i>{% trans "بازدید:" %} {{ total_post_views|floatformat:0 }}
+            </small>
+            <small class="text-success">
+              <i class="fas fa-arrow-up me-1"></i>+{{ recent_posts }} {% trans "این هفته" %}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products Stats -->
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h6 class="text-muted mb-1">{% trans "محصولات" %}</h6>
+              <h2 class="mb-0">{{ total_products }}</h2>
+            </div>
+            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+              <i class="fas fa-shopping-bag fa-2x text-warning"></i>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between">
+            <small class="text-muted">
+              <i class="fas fa-check-circle me-1"></i>{% trans "فعال:" %} {{ active_products }}
+            </small>
+            <small class="text-muted">
+              <i class="fas fa-shopping-cart me-1"></i>{% trans "سفارشات:" %} {{ total_orders }}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue Card -->
+  {% if total_revenue > 0 %}
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <h5 class="mb-2">{% trans "درآمد کل" %}</h5>
+              <h2 class="text-success mb-0">{{ total_revenue|floatformat:0 }} {% trans "تومان" %}</h2>
+              <p class="text-muted mb-0 mt-2">
+                {% trans "از" %} {{ paid_orders }} {% trans "سفارش پرداخت شده" %}
+              </p>
+            </div>
+            <div class="col-md-4 text-end">
+              <div class="bg-success bg-opacity-10 rounded-circle p-4 d-inline-block">
+                <i class="fas fa-money-bill-wave fa-3x text-success"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Site Visits Summary -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="fas fa-chart-area me-2"></i>{% trans "خلاصه آمار بازدید (۷ روز گذشته)" %}
+          </h5>
+          <a href="{% url 'accounts:analytics_detail' %}" class="btn btn-light btn-sm">
+            <i class="fas fa-external-link-alt me-1"></i>{% trans "مشاهده جزئیات کامل" %}
+          </a>
+        </div>
+        <div class="card-body">
+          <div class="row g-4">
+            <!-- Total Visits -->
+            <div class="col-lg-3 col-md-6">
+              <div class="text-center p-3 bg-light rounded">
+                <i class="fas fa-eye fa-2x text-primary mb-2"></i>
+                <h3 class="mb-1">{{ visits_total_7_days|default:0 }}</h3>
+                <p class="text-muted mb-0 small">{% trans "کل بازدیدها" %}</p>
+              </div>
+            </div>
+
+            <!-- Device Stats -->
+            <div class="col-lg-3 col-md-6">
+              <div class="text-center p-3 bg-light rounded">
+                <i class="fas fa-desktop fa-2x text-info mb-2"></i>
+                <h3 class="mb-1">{{ desktop_visits|default:0 }}</h3>
+                <p class="text-muted mb-0 small">{% trans "دسکتاپ" %}</p>
+              </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+              <div class="text-center p-3 bg-light rounded">
+                <i class="fas fa-mobile-alt fa-2x text-success mb-2"></i>
+                <h3 class="mb-1">{{ mobile_visits|default:0 }}</h3>
+                <p class="text-muted mb-0 small">{% trans "موبایل" %}</p>
+              </div>
+            </div>
+
+            <!-- Top Page -->
+            <div class="col-lg-3 col-md-6">
+              <div class="text-center p-3 bg-light rounded">
+                <i class="fas fa-file-alt fa-2x text-warning mb-2"></i>
+                {% if top_pages %}
+                  <h3 class="mb-1">{{ top_pages.0.count|default:0 }}</h3>
+                  <p class="text-muted mb-0 small text-truncate" style="max-width: 100%;" title="{{ top_pages.0.path }}">
+                    {% trans "محبوب‌ترین صفحه" %}
+                  </p>
+                {% else %}
+                  <h3 class="mb-1">-</h3>
+                  <p class="text-muted mb-0 small">{% trans "داده‌ای موجود نیست" %}</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-bolt me-2"></i>{% trans "دسترسی سریع" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3 col-sm-6">
+              <a href="/admin/courses/video/" class="btn btn-outline-primary w-100" target="_blank">
+                <i class="fas fa-video me-2"></i>{% trans "مدیریت ویدیوها" %}
+              </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <a href="/admin/blog/post/" class="btn btn-outline-success w-100" target="_blank">
+                <i class="fas fa-newspaper me-2"></i>{% trans "مدیریت مقالات" %}
+              </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <a href="/admin/shop/product/" class="btn btn-outline-warning w-100" target="_blank">
+                <i class="fas fa-shopping-bag me-2"></i>{% trans "مدیریت محصولات" %}
+              </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <a href="/admin/siteconfig/homepagesection/" class="btn btn-outline-info w-100" target="_blank">
+                <i class="fas fa-th-large me-2"></i>{% trans "بخش‌های صفحه هوم" %}
+              </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <a href="/admin/siteconfig/homeslider/" class="btn btn-outline-secondary w-100" target="_blank">
+                <i class="fas fa-images me-2"></i>{% trans "اسلایدر صفحه هوم" %}
+              </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <a href="/admin/accounts/user/" class="btn btn-outline-dark w-100" target="_blank">
+                <i class="fas fa-users me-2"></i>{% trans "مدیریت کاربران" %}
+              </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <a href="/admin/shop/order/" class="btn btn-outline-danger w-100" target="_blank">
+                <i class="fas fa-shopping-cart me-2"></i>{% trans "سفارشات" %}
+              </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <a href="/admin/siteconfig/sitesettings/" class="btn btn-outline-primary w-100" target="_blank">
+                <i class="fas fa-cog me-2"></i>{% trans "تنظیمات سایت" %}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="row g-4">
+    <!-- Latest Videos -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-danger text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-video me-2"></i>{% trans "آخرین ویدیوها" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if latest_videos %}
+            <div class="list-group list-group-flush">
+              {% for video in latest_videos %}
+                <div class="list-group-item border-0 px-0">
+                  <div class="d-flex align-items-center">
+                    <div class="me-3">
+                      <i class="fas fa-video text-danger"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1">{{ video.title|truncatewords:8 }}</h6>
+                      <small class="text-muted">
+                        <i class="fas fa-clock me-1"></i>
+                        {{ video.created_at|date:"Y/m/d" }}
+                      </small>
+                    </div>
+                    <div>
+                      <a href="/admin/courses/video/{{ video.id }}/change/" class="btn btn-outline-danger btn-sm" target="_blank">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            {% if latest_videos.has_other_pages %}
+              <div class="card-footer bg-transparent border-0 pt-3">
+                {% include "components/pagination.html" with page_obj=latest_videos page_param="videos_page" %}
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+              <p class="text-muted mb-0">{% trans "ویدیویی وجود ندارد" %}</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Latest Posts -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-newspaper me-2"></i>{% trans "آخرین مقالات" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if latest_posts %}
+            <div class="list-group list-group-flush">
+              {% for post in latest_posts %}
+                <div class="list-group-item border-0 px-0">
+                  <div class="d-flex align-items-center">
+                    <div class="me-3">
+                      <i class="fas fa-newspaper text-success"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1">{{ post.title|truncatewords:8 }}</h6>
+                      <small class="text-muted">
+                        <i class="fas fa-clock me-1"></i>
+                        {{ post.published_at|date:"Y/m/d" }}
+                        <span class="ms-2">
+                          <i class="fas fa-eye me-1"></i>{{ post.views_count }}
+                        </span>
+                      </small>
+                    </div>
+                    <div>
+                      <a href="/admin/blog/post/{{ post.id }}/change/" class="btn btn-outline-success btn-sm" target="_blank">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            {% if latest_posts.has_other_pages %}
+              <div class="card-footer bg-transparent border-0 pt-3">
+                {% include "components/pagination.html" with page_obj=latest_posts page_param="posts_page" %}
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+              <p class="text-muted mb-0">{% trans "مقاله‌ای وجود ندارد" %}</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Latest Orders -->
+    {% if latest_orders %}
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-warning text-dark">
+          <h5 class="mb-0">
+            <i class="fas fa-shopping-cart me-2"></i>{% trans "آخرین سفارشات" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+            {% for order in latest_orders %}
+              <div class="list-group-item border-0 px-0">
+                <div class="d-flex align-items-center">
+                  <div class="me-3">
+                    <i class="fas fa-shopping-cart text-warning"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <h6 class="mb-1">{{ order.full_name }}</h6>
+                    <small class="text-muted">
+                      <i class="fas fa-money-bill me-1"></i>
+                      {{ order.total_amount|floatformat:0 }} {% trans "تومان" %}
+                      <span class="ms-2">
+                        <span class="badge bg-{% if order.status == 'paid' %}success{% elif order.status == 'canceled' %}danger{% else %}secondary{% endif %}">
+                          {{ order.get_status_display }}
+                        </span>
+                      </span>
+                    </small>
+                  </div>
+                  <div>
+                    <a href="/admin/shop/order/{{ order.id }}/change/" class="btn btn-outline-warning btn-sm" target="_blank">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          {% if latest_orders.has_other_pages %}
+            <div class="card-footer bg-transparent border-0 pt-3">
+              {% include "components/pagination.html" with page_obj=latest_orders page_param="orders_page" %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Latest Users -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-users me-2"></i>{% trans "آخرین کاربران" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if latest_users %}
+            <div class="list-group list-group-flush">
+              {% for user in latest_users %}
+                <div class="list-group-item border-0 px-0">
+                  <div class="d-flex align-items-center">
+                    <div class="me-3">
+                      <i class="fas fa-user text-primary"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1">{{ user.get_full_name|default:user.username }}</h6>
+                      <small class="text-muted">
+                        <i class="fas fa-clock me-1"></i>
+                        {{ user.date_joined|date:"Y/m/d" }}
+                        {% if user.profile.user_category == 'admin' %}
+                          <span class="badge bg-danger ms-2">{% trans "مدیر" %}</span>
+                        {% else %}
+                          <span class="badge bg-secondary ms-2">{% trans "کاربر" %}</span>
+                        {% endif %}
+                      </small>
+                    </div>
+                    <div>
+                      <a href="/admin/accounts/user/{{ user.id }}/change/" class="btn btn-outline-primary btn-sm" target="_blank">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            {% if latest_users.has_other_pages %}
+              <div class="card-footer bg-transparent border-0 pt-3">
+                {% include "components/pagination.html" with page_obj=latest_users page_param="users_page" %}
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+              <p class="text-muted mb-0">{% trans "کاربری وجود ندارد" %}</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

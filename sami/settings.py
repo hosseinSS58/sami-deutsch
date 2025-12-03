@@ -33,7 +33,7 @@ SECRET_KEY = env("SECRET_KEY", default="django-insecure-dev-secret-key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG", default=True)
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1", "192.168.1.101"]) 
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1", "192.168.1.104"]) 
 
 
 # Application definition
@@ -76,6 +76,7 @@ MIDDLEWARE = [
     "accounts.middleware.SecurityLoggingMiddleware",  # Security logging
     "sami.security_middleware.SecurityHeadersMiddleware",  # Additional security headers
     "sami.security_middleware.SessionSecurityMiddleware",  # Session security
+    "core.middleware.SiteAnalyticsMiddleware",  # Site visits analytics
     # "sami.security_middleware.IPWhitelistMiddleware",  # Uncomment to enable IP whitelist for admin
 ]
 

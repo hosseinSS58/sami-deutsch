@@ -10,7 +10,11 @@ User = get_user_model()
 @receiver(post_save, sender=User)
 def create_profile(sender, instance: User, created: bool, **kwargs):
     if created:
-        Profile.objects.get_or_create(user=instance)
+        profile, _ = Profile.objects.get_or_create(user=instance)
+        # تنظیم دسته‌بندی پیش‌فرض به یوزر معمولی
+        if not profile.user_category:
+            profile.user_category = Profile.UserCategory.USER
+            profile.save()
 
 
 

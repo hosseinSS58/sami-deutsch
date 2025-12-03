@@ -83,3 +83,19 @@
   }
 }
 
+/* Video meta overlay on cover image (home page video cards) */
+.video-meta-overlay .video-meta {
+  /* اطمینان از چسبیدن به سمت راست */
+  justify-content: flex-end;
+}
+
+.video-meta-overlay .badge {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+}
+
+.video-meta-overlay .badge i {
+  font-size: 0.7rem;
+}
+

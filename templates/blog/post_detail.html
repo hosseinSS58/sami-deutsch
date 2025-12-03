@@ -78,7 +78,12 @@
                 <small class="text-muted">
                   <i class="fas fa-external-link-alt me-1"></i>{% trans "ویدیو از یوتیوب" %}
                 </small>
-                <a href="{{ post.youtube_watch_url }}" target="_blank" class="btn btn-outline-danger btn-sm">
+                <a href="{{ post.youtube_watch_url }}" 
+                   target="_blank" 
+                   class="btn btn-outline-danger btn-sm"
+                   data-source-type="post"
+                   data-source-id="{{ post.id }}"
+                   data-source-title="{{ post.title }}">
                   <i class="fab fa-youtube me-1"></i>{% trans "مشاهده در یوتیوب" %}
                 </a>
               </div>

@@ -47,11 +47,32 @@ class VideoListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        # Add filter options
-        context['levels'] = Video.objects.values_list('level', flat=True).distinct()
-        context['topics'] = Video.objects.values_list('topic', flat=True).distinct()
-        context['difficulties'] = Video.objects.values_list('difficulty', flat=True).distinct()
+
+        # Base queryset for building distinct filter options (avoid duplicates)
+        base_qs = Video.objects.all()
+
+        # Add filter options (distinct, non-empty, ordered)
+        context['levels'] = (
+            base_qs.exclude(level__isnull=True)
+                   .exclude(level='')
+                   .values_list('level', flat=True)
+                   .order_by('level')
+                   .distinct()
+        )
+        context['topics'] = (
+            base_qs.exclude(topic__isnull=True)
+                   .exclude(topic='')
+                   .values_list('topic', flat=True)
+                   .order_by('topic')
+                   .distinct()
+        )
+        context['difficulties'] = (
+            base_qs.exclude(difficulty__isnull=True)
+                   .exclude(difficulty='')
+                   .values_list('difficulty', flat=True)
+                   .order_by('difficulty')
+                   .distinct()
+        )
         context['tags'] = VideoTag.objects.annotate(video_count=Count('videos')).order_by('-video_count')[:20]
         
         # Add current filters

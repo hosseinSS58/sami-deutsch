@@ -1,0 +1,879 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load core_extras %}
+
+{% block title %}{% trans "آمار تفصیلی بازدیدها" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Header Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h2 mb-2">{% trans "آمار تفصیلی بازدیدها" %}</h1>
+          <p class="text-muted mb-0">{% trans "جزئیات کامل بازدیدها و کلیک‌های یوتیوب" %}</p>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-right me-2"></i>{% trans "بازگشت به داشبورد" %}
+          </a>
+          <a href="/admin/core/sitevisit/" class="btn btn-primary" target="_blank">
+            <i class="fas fa-cog me-2"></i>{% trans "مدیریت بازدیدها" %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <form method="get" class="d-flex align-items-center gap-3">
+            <label for="days" class="mb-0">{% trans "بازه زمانی:" %}</label>
+            <select name="days" id="days" class="form-select" style="width: auto;" onchange="this.form.submit()">
+              <option value="7" {% if days == 7 %}selected{% endif %}>{% trans "۷ روز گذشته" %}</option>
+              <option value="30" {% if days == 30 %}selected{% endif %}>{% trans "۳۰ روز گذشته" %}</option>
+              <option value="90" {% if days == 90 %}selected{% endif %}>{% trans "۹۰ روز گذشته" %}</option>
+              <option value="180" {% if days == 180 %}selected{% endif %}>{% trans "۱۸۰ روز گذشته" %}</option>
+              <option value="365" {% if days == 365 %}selected{% endif %}>{% trans "یک سال گذشته" %}</option>
+            </select>
+            <span class="text-muted">{% trans "از تاریخ" %} {{ date_from|date:"Y/m/d" }} {% trans "تا امروز" %}</span>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overview Stats -->
+  <div class="row g-4 mb-4">
+    <!-- Total Visits -->
+    <div class="col-lg-3 col-md-6 col-sm-12">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h6 class="text-muted mb-1">{% trans "کل بازدیدها" %}</h6>
+              <h2 class="mb-0">{{ total_visits|default:0 }}</h2>
+            </div>
+            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+              <i class="fas fa-eye fa-2x text-primary"></i>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between">
+            <small class="text-muted">
+              <i class="fas fa-user me-1"></i>{% trans "کاربران منحصر به فرد:" %} {{ unique_visitors }}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logged In Visits -->
+    <div class="col-lg-3 col-md-6 col-sm-12">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h6 class="text-muted mb-1">{% trans "بازدیدهای لاگین شده" %}</h6>
+              <h2 class="mb-0">{{ logged_in_visits|default:0 }}</h2>
+            </div>
+            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+              <i class="fas fa-user-check fa-2x text-success"></i>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between">
+            <small class="text-muted">
+              <i class="fas fa-user-slash me-1"></i>{% trans "بازدیدهای ناشناس:" %} {{ anonymous_visits|default:0 }}
+            </small>
+          </div>
+          {% if total_anonymous_visitors > 0 %}
+            <div class="mt-2">
+              <a href="{% url 'accounts:analytics_anonymous_visitors' %}?days={{ days }}" class="btn btn-sm btn-outline-secondary w-100">
+                <i class="fas fa-users me-1"></i>{% trans "مشاهده بازدیدکنندگان ناشناس" %} ({{ total_anonymous_visitors }})
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Anonymous Visitors -->
+    <div class="col-lg-3 col-md-6 col-sm-12">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h6 class="text-muted mb-1">{% trans "بازدیدکنندگان ناشناس" %}</h6>
+              <h2 class="mb-0">{{ total_anonymous_visitors|default:0 }}</h2>
+            </div>
+            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+              <i class="fas fa-user-secret fa-2x text-warning"></i>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between">
+            <small class="text-muted">
+              <i class="fas fa-eye me-1"></i>{% trans "کل بازدیدها:" %} {{ total_anonymous_visitor_visits|default:0 }}
+            </small>
+          </div>
+          {% if total_anonymous_visitors > 0 %}
+            <div class="mt-2">
+              <a href="{% url 'accounts:analytics_anonymous_visitors' %}?days={{ days }}" class="btn btn-sm btn-warning w-100">
+                <i class="fas fa-list me-1"></i>{% trans "مشاهده لیست" %}
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- YouTube Clicks -->
+    <div class="col-lg-3 col-md-6 col-sm-12">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h6 class="text-muted mb-1">{% trans "کلیک‌های یوتیوب" %}</h6>
+              <h2 class="mb-0">{{ total_youtube_clicks|default:0 }}</h2>
+            </div>
+            <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+              <i class="fab fa-youtube fa-2x text-danger"></i>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between">
+            <small class="text-muted">
+              <i class="fas fa-users me-1"></i>{% trans "کلیک‌کنندگان منحصر به فرد:" %} {{ unique_youtube_clickers|default:0 }}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Device Stats -->
+    <div class="col-lg-6 col-md-6 col-sm-12">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h6 class="text-muted mb-1">{% trans "نوع دستگاه" %}</h6>
+              <div class="d-flex gap-2 flex-wrap mb-2">
+                <span class="badge bg-primary">
+                  <i class="fas fa-desktop me-1"></i>{% trans "دسکتاپ" %}: {{ desktop_visits|default:0 }}
+                </span>
+                <span class="badge bg-success">
+                  <i class="fas fa-mobile-alt me-1"></i>{% trans "موبایل" %}: {{ mobile_visits|default:0 }}
+                </span>
+                {% if tablet_visits > 0 %}
+                <span class="badge bg-info">
+                  <i class="fas fa-tablet-alt me-1"></i>{% trans "تبلت" %}: {{ tablet_visits|default:0 }}
+                </span>
+                {% endif %}
+                {% if unknown_device_visits > 0 %}
+                <span class="badge bg-secondary">
+                  <i class="fas fa-question me-1"></i>{% trans "نامشخص" %}: {{ unknown_device_visits|default:0 }}
+                </span>
+                {% endif %}
+              </div>
+              <div class="mt-2 small">
+                <div class="mb-1">
+                  <strong>{% trans "لاگین شده" %}:</strong>
+                  <span class="badge bg-primary ms-1">{% trans "دسکتاپ" %}: {{ logged_desktop_visits|default:0 }}</span>
+                  <span class="badge bg-success ms-1">{% trans "موبایل" %}: {{ logged_mobile_visits|default:0 }}</span>
+                  {% if logged_tablet_visits > 0 %}
+                  <span class="badge bg-info ms-1">{% trans "تبلت" %}: {{ logged_tablet_visits|default:0 }}</span>
+                  {% endif %}
+                </div>
+                <div>
+                  <strong>{% trans "ناشناس" %}:</strong>
+                  <span class="badge bg-primary ms-1">{% trans "دسکتاپ" %}: {{ anonymous_desktop_visits|default:0 }}</span>
+                  <span class="badge bg-success ms-1">{% trans "موبایل" %}: {{ anonymous_mobile_visits|default:0 }}</span>
+                  {% if anonymous_tablet_visits > 0 %}
+                  <span class="badge bg-info ms-1">{% trans "تبلت" %}: {{ anonymous_tablet_visits|default:0 }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="bg-info bg-opacity-10 rounded-circle p-3">
+              <i class="fas fa-mobile-alt fa-2x text-info"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Statistics -->
+  <div class="row g-4">
+    <!-- Visits by Day -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-chart-line me-2"></i>{% trans "بازدیدها به تفکیک روز" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if visits_by_day %}
+            <div class="table-responsive">
+              <table class="table table-sm table-hover">
+                <thead>
+                  <tr>
+                    <th>{% trans "تاریخ" %}</th>
+                    <th class="text-end">{% trans "تعداد بازدید" %}</th>
+                    <th class="text-end">{% trans "کاربران منحصر به فرد" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for day_data in visits_by_day %}
+                    <tr>
+                      <td>{{ day_data.day|date:"Y/m/d" }}</td>
+                      <td class="text-end">{{ day_data.count }}</td>
+                      <td class="text-end">{{ day_data.unique_ips|default:0 }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+              <p class="text-muted mb-0">{% trans "داده‌ای برای نمایش وجود ندارد" %}</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Pages -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-file-alt me-2"></i>{% trans "محبوب‌ترین صفحات" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if top_pages %}
+            <div class="table-responsive">
+              <table class="table table-sm table-hover">
+                <thead>
+                  <tr>
+                    <th>{% trans "آدرس صفحه" %}</th>
+                    <th class="text-end">{% trans "بازدید" %}</th>
+                    <th class="text-end">{% trans "کاربران منحصر به فرد" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for page in top_pages %}
+                    <tr>
+                      <td class="text-truncate" style="max-width: 300px;" title="{{ page.path }}">
+                        <a href="{{ page.path }}" target="_blank" class="text-decoration-none">
+                          {{ page.path }}
+                        </a>
+                      </td>
+                      <td class="text-end">{{ page.count }}</td>
+                      <td class="text-end">{{ page.unique_visitors|default:0 }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% if top_pages.has_other_pages %}
+              <div class="card-footer bg-transparent border-0 pt-3">
+                {% include "components/pagination.html" with page_obj=top_pages page_param="top_pages_page" %}
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+              <p class="text-muted mb-0">{% trans "داده‌ای برای نمایش وجود ندارد" %}</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Referrers -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-link me-2"></i>{% trans "منابع ورودی (Referrers)" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if top_referrers %}
+            <div class="table-responsive">
+              <table class="table table-sm table-hover">
+                <thead>
+                  <tr>
+                    <th>{% trans "منبع" %}</th>
+                    <th class="text-end">{% trans "تعداد" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for ref in top_referrers %}
+                    <tr>
+                      <td class="text-truncate" style="max-width: 400px;" title="{{ ref.referrer }}">
+                        <a href="{{ ref.referrer }}" target="_blank" class="text-decoration-none" rel="noopener">
+                          {{ ref.referrer|truncatechars:60 }}
+                        </a>
+                      </td>
+                      <td class="text-end">{{ ref.count }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% if top_referrers.has_other_pages %}
+              <div class="card-footer bg-transparent border-0 pt-3">
+                {% include "components/pagination.html" with page_obj=top_referrers page_param="top_referrers_page" %}
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+              <p class="text-muted mb-0">{% trans "داده‌ای برای نمایش وجود ندارد" %}</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Countries -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-globe me-2"></i>{% trans "بازدیدها به تفکیک کشور" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if top_countries %}
+            <div class="table-responsive">
+              <table class="table table-sm table-hover">
+                <thead>
+                  <tr>
+                    <th>{% trans "کشور" %}</th>
+                    <th class="text-end">{% trans "بازدید" %}</th>
+                    <th class="text-end">{% trans "آی‌پی‌های منحصر به فرد" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for country_data in top_countries %}
+                    <tr>
+                      <td>
+                        {% if country_data.country %}
+                          <span class="badge bg-info me-2">{{ country_data.country|upper }}</span>
+                          {{ country_data.country|get_country_name }}
+                        {% else %}
+                          <span class="text-muted">{% trans "نامشخص" %}</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-end">{{ country_data.count }}</td>
+                      <td class="text-end">{{ country_data.unique_ips|default:0 }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% if top_countries.has_other_pages %}
+              <div class="card-footer bg-transparent border-0 pt-3">
+                {% include "components/pagination.html" with page_obj=top_countries page_param="top_countries_page" %}
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+              <p class="text-muted mb-0">{% trans "داده‌ای برای نمایش وجود ندارد" %}</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Code Stats -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-warning text-dark">
+          <h5 class="mb-0">
+            <i class="fas fa-code me-2"></i>{% trans "کدهای وضعیت HTTP" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if status_code_stats %}
+            <div class="table-responsive">
+              <table class="table table-sm table-hover">
+                <thead>
+                  <tr>
+                    <th>{% trans "کد وضعیت" %}</th>
+                    <th class="text-end">{% trans "تعداد" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for stat in status_code_stats %}
+                    <tr>
+                      <td>
+                        <span class="badge bg-{% if stat.status_code == 200 %}success{% elif stat.status_code >= 400 %}danger{% else %}warning{% endif %}">
+                          {{ stat.status_code }}
+                        </span>
+                      </td>
+                      <td class="text-end">{{ stat.count }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+              <p class="text-muted mb-0">{% trans "داده‌ای برای نمایش وجود ندارد" %}</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- YouTube Analytics Section -->
+  <div class="row g-4 mt-2">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-danger text-white">
+          <h4 class="mb-0">
+            <i class="fab fa-youtube me-2"></i>{% trans "آمار کلیک‌های یوتیوب" %}
+          </h4>
+        </div>
+        <div class="card-body">
+          <!-- YouTube Overview -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-4">
+              <div class="text-center p-3 bg-light rounded">
+                <h3 class="text-danger mb-1">{{ total_youtube_clicks|default:0 }}</h3>
+                <p class="text-muted mb-0">{% trans "کل کلیک‌ها" %}</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="text-center p-3 bg-light rounded">
+                <h3 class="text-danger mb-1">{{ unique_youtube_clickers|default:0 }}</h3>
+                <p class="text-muted mb-0">{% trans "کلیک‌کنندگان منحصر به فرد" %}</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="text-center p-3 bg-light rounded">
+                <h3 class="text-danger mb-1">{{ logged_in_youtube_clicks|default:0 }}</h3>
+                <p class="text-muted mb-0">{% trans "کلیک‌های لاگین شده" %}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- YouTube Stats Grid -->
+          <div class="row g-4">
+            <!-- YouTube Clicks by Day -->
+            <div class="col-lg-6">
+              <div class="card border">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0">{% trans "کلیک‌ها به تفکیک روز" %}</h6>
+                </div>
+                <div class="card-body">
+                  {% if youtube_clicks_by_day %}
+                    <div class="table-responsive">
+                      <table class="table table-sm table-hover">
+                        <thead>
+                          <tr>
+                            <th>{% trans "تاریخ" %}</th>
+                            <th class="text-end">{% trans "تعداد کلیک" %}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for day_data in youtube_clicks_by_day %}
+                            <tr>
+                              <td>{{ day_data.day|date:"Y/m/d" }}</td>
+                              <td class="text-end">{{ day_data.count }}</td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  {% else %}
+                    <p class="text-muted mb-0 text-center py-3">{% trans "هنوز کلیکی ثبت نشده است" %}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Top YouTube Videos -->
+            <div class="col-lg-6">
+              <div class="card border">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0">{% trans "محبوب‌ترین ویدیوهای یوتیوب" %}</h6>
+                </div>
+                <div class="card-body">
+                  {% if top_youtube_videos %}
+                    <div class="table-responsive">
+                      <table class="table table-sm table-hover">
+                        <thead>
+                          <tr>
+                            <th>{% trans "ویدیو" %}</th>
+                            <th class="text-end">{% trans "کلیک" %}</th>
+                            <th class="text-end">{% trans "کاربران منحصر به فرد" %}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for video in top_youtube_videos %}
+                            <tr>
+                              <td>
+                                <div>
+                                  <strong>{{ video.source_title|default:"نامشخص" }}</strong>
+                                  <br>
+                                  <small class="text-muted">
+                                    {% if video.source_type == "video" %}
+                                      <i class="fas fa-video me-1"></i>{% trans "ویدیو" %}
+                                    {% elif video.source_type == "post" %}
+                                      <i class="fas fa-newspaper me-1"></i>{% trans "مقاله" %}
+                                    {% else %}
+                                      <i class="fas fa-link me-1"></i>{% trans "سایر" %}
+                                    {% endif %}
+                                  </small>
+                                  {% if video.youtube_id %}
+                                    <br>
+                                    <a href="https://www.youtube.com/watch?v={{ video.youtube_id }}" target="_blank" class="text-danger small" rel="noopener">
+                                      <i class="fab fa-youtube me-1"></i>{{ video.youtube_id }}
+                                    </a>
+                                  {% endif %}
+                                </div>
+                              </td>
+                              <td class="text-end">{{ video.count }}</td>
+                              <td class="text-end">{{ video.unique_clickers|default:0 }}</td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                    {% if top_youtube_videos.has_other_pages %}
+                      <div class="card-footer bg-transparent border-0 pt-3">
+                        {% include "components/pagination.html" with page_obj=top_youtube_videos page_param="top_youtube_videos_page" %}
+                      </div>
+                    {% endif %}
+                  {% else %}
+                    <p class="text-muted mb-0 text-center py-3">{% trans "هنوز کلیکی ثبت نشده است" %}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- YouTube Clicks by Source -->
+            <div class="col-lg-6">
+              <div class="card border">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0">{% trans "کلیک‌ها به تفکیک منبع" %}</h6>
+                </div>
+                <div class="card-body">
+                  {% if youtube_clicks_by_source %}
+                    <div class="table-responsive">
+                      <table class="table table-sm table-hover">
+                        <thead>
+                          <tr>
+                            <th>{% trans "نوع منبع" %}</th>
+                            <th class="text-end">{% trans "تعداد کلیک" %}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for source in youtube_clicks_by_source %}
+                            <tr>
+                              <td>
+                                {% if source.source_type == "video" %}
+                                  <i class="fas fa-video me-1 text-danger"></i>{% trans "ویدیو" %}
+                                {% elif source.source_type == "post" %}
+                                  <i class="fas fa-newspaper me-1 text-danger"></i>{% trans "مقاله" %}
+                                {% else %}
+                                  <i class="fas fa-link me-1 text-danger"></i>{% trans "سایر" %}
+                                {% endif %}
+                              </td>
+                              <td class="text-end">{{ source.count }}</td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  {% else %}
+                    <p class="text-muted mb-0 text-center py-3">{% trans "داده‌ای برای نمایش وجود ندارد" %}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Top YouTube Referrers -->
+            <div class="col-lg-6">
+              <div class="card border">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0">{% trans "مراجعانی که بیشترین کلیک روی یوتیوب داشته‌اند" %}</h6>
+                </div>
+                <div class="card-body">
+                  {% if top_youtube_referrers %}
+                    <div class="table-responsive">
+                      <table class="table table-sm table-hover">
+                        <thead>
+                          <tr>
+                            <th>{% trans "منبع ارجاع" %}</th>
+                            <th class="text-end">{% trans "تعداد کلیک" %}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for ref in top_youtube_referrers %}
+                            <tr>
+                              <td class="text-truncate" style="max-width: 300px;" title="{{ ref.referrer }}">
+                                {{ ref.referrer|truncatechars:50 }}
+                              </td>
+                              <td class="text-end">{{ ref.count }}</td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  {% else %}
+                    <p class="text-muted mb-0 text-center py-3">{% trans "داده‌ای برای نمایش وجود ندارد" %}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top YouTube Users -->
+          {% if top_youtube_users %}
+          <div class="row mt-4">
+            <div class="col-12">
+              <div class="card border">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0">{% trans "کاربرانی که بیشترین کلیک روی یوتیوب داشته‌اند" %}</h6>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                      <thead>
+                        <tr>
+                          <th>{% trans "نام کاربری" %}</th>
+                          <th>{% trans "ایمیل" %}</th>
+                          <th class="text-end">{% trans "تعداد کلیک" %}</th>
+                          <th class="text-end">{% trans "جزئیات" %}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for user_data in top_youtube_users %}
+                          <tr>
+                            <td>{{ user_data.user__username }}</td>
+                            <td>{{ user_data.user__email|default:"-" }}</td>
+                            <td class="text-end">{{ user_data.count }}</td>
+                            <td class="text-end">
+                              <a href="{% url 'accounts:analytics_user_detail' user_id=user_data.user__id %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-chart-line me-1"></i>{% trans "آمار کاربر" %}
+                              </a>
+                            </td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Latest YouTube Clicks -->
+          <div class="row mt-4">
+            <div class="col-12">
+              <div class="card border">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0">{% trans "آخرین کلیک‌های یوتیوب" %}</h6>
+                </div>
+                <div class="card-body">
+                  {% if latest_youtube_clicks %}
+                    <div class="table-responsive">
+                      <table class="table table-sm table-hover">
+                        <thead>
+                          <tr>
+                            <th>{% trans "زمان" %}</th>
+                            <th>{% trans "ویدیو یوتیوب" %}</th>
+                            <th>{% trans "منبع" %}</th>
+                            <th>{% trans "کاربر" %}</th>
+                            <th>{% trans "آی‌پی" %}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for click in latest_youtube_clicks %}
+                            <tr>
+                              <td>{{ click.created_at|date:"Y/m/d H:i" }}</td>
+                              <td>
+                                {% if click.youtube_id %}
+                                  <a href="https://www.youtube.com/watch?v={{ click.youtube_id }}" target="_blank" class="text-danger" rel="noopener">
+                                    <i class="fab fa-youtube me-1"></i>{{ click.youtube_id }}
+                                  </a>
+                                {% else %}
+                                  <span class="text-muted">-</span>
+                                {% endif %}
+                              </td>
+                              <td>
+                                {% if click.source_type == "video" %}
+                                  <i class="fas fa-video me-1"></i>{% trans "ویدیو" %}
+                                {% elif click.source_type == "post" %}
+                                  <i class="fas fa-newspaper me-1"></i>{% trans "مقاله" %}
+                                {% else %}
+                                  <i class="fas fa-link me-1"></i>{% trans "سایر" %}
+                                {% endif %}
+                                {% if click.source_title %}
+                                  <br><small class="text-muted">{{ click.source_title|truncatechars:30 }}</small>
+                                {% endif %}
+                              </td>
+                              <td>
+                                {% if click.user %}
+                                  {{ click.user.username }}
+                                {% else %}
+                                  <span class="text-muted">{% trans "ناشناس" %}</span>
+                                {% endif %}
+                              </td>
+                              <td><small class="text-muted">{{ click.ip_address|default:"-" }}</small></td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                    {% if latest_youtube_clicks.has_other_pages %}
+                      <div class="card-footer bg-transparent border-0 pt-3">
+                        {% include "components/pagination.html" with page_obj=latest_youtube_clicks page_param="youtube_clicks_page" %}
+                      </div>
+                    {% endif %}
+                  {% else %}
+                    <p class="text-muted mb-0 text-center py-3">{% trans "هنوز کلیکی ثبت نشده است" %}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Anonymous Visitors Section -->
+  <div class="row g-4 mt-2">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-warning text-dark">
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+              <i class="fas fa-user-secret me-2"></i>{% trans "بازدیدکنندگان ناشناس" %}
+            </h4>
+            <a href="{% url 'accounts:analytics_anonymous_visitors' %}?days={{ days }}" class="btn btn-sm btn-outline-dark">
+              <i class="fas fa-list me-1"></i>{% trans "مشاهده لیست کامل" %}
+            </a>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Anonymous Visitors Overview -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-4">
+              <div class="text-center p-3 bg-light rounded">
+                <h3 class="text-warning mb-1">{{ total_anonymous_visitors|default:0 }}</h3>
+                <p class="text-muted mb-0">{% trans "کل بازدیدکنندگان ناشناس" %}</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="text-center p-3 bg-light rounded">
+                <h3 class="text-warning mb-1">{{ total_anonymous_visitor_visits|default:0 }}</h3>
+                <p class="text-muted mb-0">{% trans "کل بازدیدهای ناشناس" %}</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="text-center p-3 bg-light rounded">
+                <h3 class="text-warning mb-1">{{ anonymous_visits|default:0 }}</h3>
+                <p class="text-muted mb-0">{% trans "بازدیدهای ناشناس" %}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Anonymous Visitors List -->
+          {% if anonymous_visitors_list %}
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>{% trans "شناسه نشست" %}</th>
+                    <th>{% trans "اولین آی‌پی" %}</th>
+                    <th>{% trans "آخرین آی‌پی" %}</th>
+                    <th>{% trans "اولین کشور" %}</th>
+                    <th>{% trans "آخرین کشور" %}</th>
+                    <th>{% trans "اولین بازدید" %}</th>
+                    <th>{% trans "آخرین بازدید" %}</th>
+                    <th class="text-end">{% trans "تعداد بازدیدها" %}</th>
+                    <th class="text-end">{% trans "کلیک‌های یوتیوب" %}</th>
+                    <th class="text-center">{% trans "عملیات" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% load core_extras %}
+                  {% for visitor in anonymous_visitors_list %}
+                    <tr>
+                      <td>
+                        <code class="small">{{ visitor.session_key|truncatechars:20 }}</code>
+                      </td>
+                      <td>
+                        <span class="badge bg-secondary">{{ visitor.first_ip|default:"-" }}</span>
+                      </td>
+                      <td>
+                        <span class="badge bg-info">{{ visitor.last_ip|default:"-" }}</span>
+                      </td>
+                      <td>
+                        {% if visitor.first_country %}
+                          <span class="badge bg-success">{{ visitor.first_country|upper }}</span>
+                          <br><small class="text-muted">{{ visitor.first_country|get_country_name }}</small>
+                        {% else %}
+                          <span class="text-muted">-</span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if visitor.last_country %}
+                          <span class="badge bg-primary">{{ visitor.last_country|upper }}</span>
+                          <br><small class="text-muted">{{ visitor.last_country|get_country_name }}</small>
+                        {% else %}
+                          <span class="text-muted">-</span>
+                        {% endif %}
+                      </td>
+                      <td>{{ visitor.first_seen|date:"Y/m/d H:i" }}</td>
+                      <td>{{ visitor.last_seen|date:"Y/m/d H:i" }}</td>
+                      <td class="text-end">
+                        <span class="badge bg-primary">{{ visitor.total_visits }}</span>
+                      </td>
+                      <td class="text-end">
+                        <span class="badge bg-danger">{{ visitor.total_youtube_clicks }}</span>
+                      </td>
+                      <td class="text-center">
+                        <a href="{% url 'accounts:analytics_anonymous_visitor_detail' visitor.id %}?days={{ days }}" class="btn btn-sm btn-outline-primary">
+                          <i class="fas fa-eye me-1"></i>{% trans "جزئیات" %}
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% if anonymous_visitors_list.has_other_pages %}
+              <div class="card-footer bg-transparent border-0 pt-3">
+                {% include "components/pagination.html" with page_obj=anonymous_visitors_list page_param="anonymous_visitors_list_page" %}
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="text-center py-5">
+              <i class="fas fa-user-secret fa-3x text-muted mb-3"></i>
+              <p class="text-muted mb-0">{% trans "هیچ بازدیدکننده ناشناسی در این بازه زمانی ثبت نشده است." %}</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

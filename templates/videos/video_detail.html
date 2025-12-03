@@ -340,7 +340,13 @@
                                             {% endif %}
                                             
                                             <div class="d-flex justify-content-between align-items-center">
-                                                <a href="{{ youtube_link.youtube_url }}" target="_blank" rel="noopener" class="btn btn-outline-danger btn-sm">
+                                                <a href="{{ youtube_link.youtube_url }}" 
+                                                   target="_blank" 
+                                                   rel="noopener" 
+                                                   class="btn btn-outline-danger btn-sm"
+                                                   data-source-type="video"
+                                                   data-source-id="{{ video.id }}"
+                                                   data-source-title="{{ video.title }} - {{ youtube_link.title }}">
                                                     <i class="fab fa-youtube me-1"></i>{% trans "مشاهده در یوتیوب" %}
                                                 </a>
                                                 <small class="text-muted">

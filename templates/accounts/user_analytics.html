@@ -1,0 +1,459 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load core_extras %}
+
+{% block title %}{% trans "آمار کاربر" %} - {{ target_user.username }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-1">
+            {% trans "آمار تفصیلی کاربر" %} - {{ target_user.get_full_name|default:target_user.username }}
+          </h1>
+          <p class="text-muted mb-0">
+            {{ target_user.email|default:"-" }}
+          </p>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'accounts:analytics_detail' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-right me-1"></i>{% trans "بازگشت به آمار کلی" %}
+          </a>
+          <a href="/admin/accounts/user/{{ target_user.id }}/change/" class="btn btn-primary btn-sm" target="_blank">
+            <i class="fas fa-user-cog me-1"></i>{% trans "ویرایش کاربر در ادمین" %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <form method="get" class="d-flex align-items-center gap-3 flex-wrap">
+            <label for="days" class="mb-0">{% trans "بازه زمانی:" %}</label>
+            <select name="days" id="days" class="form-select" style="width: auto;" onchange="this.form.submit()">
+              <option value="7" {% if days == 7 %}selected{% endif %}>{% trans "۷ روز گذشته" %}</option>
+              <option value="30" {% if days == 30 %}selected{% endif %}>{% trans "۳۰ روز گذشته" %}</option>
+              <option value="90" {% if days == 90 %}selected{% endif %}>{% trans "۹۰ روز گذشته" %}</option>
+              <option value="180" {% if days == 180 %}selected{% endif %}>{% trans "۱۸۰ روز گذشته" %}</option>
+              <option value="365" {% if days == 365 %}selected{% endif %}>{% trans "یک سال گذشته" %}</option>
+            </select>
+            <span class="text-muted small">
+              {% trans "از تاریخ" %} {{ date_from|date:"Y/m/d" }} {% trans "تا امروز" %}
+            </span>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overview -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-eye fa-2x text-primary mb-2"></i>
+          <h3 class="mb-1">{{ total_visits|default:0 }}</h3>
+          <p class="text-muted mb-0 small">{% trans "کل بازدیدهای این کاربر" %}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-network-wired fa-2x text-info mb-2"></i>
+          <h3 class="mb-1">{{ unique_ips|default:0 }}</h3>
+          <p class="text-muted mb-0 small">{% trans "آی‌پی‌های مختلف" %}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fab fa-youtube fa-2x text-danger mb-2"></i>
+          <h3 class="mb-1">{{ total_youtube_clicks|default:0 }}</h3>
+          <p class="text-muted mb-0 small">{% trans "کلیک‌های یوتیوب" %}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-user fa-2x text-success mb-2"></i>
+          <h3 class="mb-1">{{ target_user.date_joined|date:"Y/m/d" }}</h3>
+          <p class="text-muted mb-0 small">{% trans "تاریخ عضویت" %}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Visits by day & top pages -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-chart-line me-2"></i>{% trans "بازدیدها به تفکیک روز" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if visits_by_day %}
+            <div class="table-responsive">
+              <table class="table table-sm table-hover">
+                <thead>
+                  <tr>
+                    <th>{% trans "تاریخ" %}</th>
+                    <th class="text-end">{% trans "تعداد بازدید" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in visits_by_day %}
+                    <tr>
+                      <td>{{ row.day|date:"Y/m/d" }}</td>
+                      <td class="text-end">{{ row.count }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <p class="text-muted mb-0 text-center py-3">{% trans "هیچ بازدیدی در این بازه ثبت نشده است." %}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-file-alt me-2"></i>{% trans "مسیرهایی که کاربر بازدید کرده" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if top_pages %}
+            <div class="table-responsive">
+              <table class="table table-sm table-hover">
+                <thead>
+                  <tr>
+                    <th>{% trans "آدرس صفحه" %}</th>
+                    <th class="text-end">{% trans "تعداد" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for page in top_pages %}
+                    <tr>
+                      <td class="text-truncate" style="max-width: 300px;" title="{{ page.path }}">
+                        <a href="{{ page.path }}" target="_blank" class="text-decoration-none">
+                          {{ page.path }}
+                        </a>
+                      </td>
+                      <td class="text-end">{{ page.count }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% if top_pages.has_other_pages %}
+              <div class="card-footer bg-transparent border-0 pt-3">
+                {% include "components/pagination.html" with page_obj=top_pages page_param="user_top_pages_page" %}
+              </div>
+            {% endif %}
+          {% else %}
+            <p class="text-muted mb-0 text-center py-3">{% trans "هیچ مسیری ثبت نشده است." %}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- IPs & User Agents -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-network-wired me-2"></i>{% trans "آی‌پی‌های کاربر" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if recent_ips %}
+            <ul class="list-group list-group-flush small">
+              {% for ip in recent_ips %}
+                <li class="list-group-item px-0">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <span>{{ ip.ip_address|default:"-" }}</span>
+                      {% if ip.country %}
+                        <br><small class="text-muted">
+                          <span class="badge bg-info">{{ ip.country|upper }}</span>
+                          {{ ip.country|get_country_name }}
+                        </small>
+                      {% endif %}
+                    </div>
+                    <span class="badge bg-primary">{{ ip.count }}</span>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted mb-0 text-center py-3">{% trans "آی‌پی‌ای ثبت نشده است." %}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-desktop me-2"></i>{% trans "دستگاه‌ها / مرورگرها" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if recent_user_agents %}
+            <ul class="list-group list-group-flush small">
+              {% for ua in recent_user_agents %}
+                <li class="list-group-item px-0">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <span class="text-truncate d-block" style="max-width: 260px;" title="{{ ua.user_agent }}">
+                        {{ ua.user_agent|truncatechars:60 }}
+                      </span>
+                      {% if ua.device_type %}
+                        <small class="text-muted">
+                          <span class="badge bg-info">{{ ua.device_type|get_device_type_display }}</span>
+                        </small>
+                      {% endif %}
+                    </div>
+                    <span class="badge bg-secondary">{{ ua.count }}</span>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted mb-0 text-center py-3">{% trans "دستگاهی ثبت نشده است." %}</p>
+          {% endif %}
+        </div>
+      </div>
+      
+      {% if user_top_countries %}
+        <div class="card border-0 shadow-sm mt-4">
+          <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-globe me-2"></i>{% trans "بازدیدها به تفکیک کشور" %}
+            </h5>
+          </div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush small">
+              {% for country in user_top_countries %}
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                  <span>
+                    <span class="badge bg-info me-2">{{ country.country|upper }}</span>
+                    {{ country.country|get_country_name }}
+                  </span>
+                  <span class="badge bg-primary">{{ country.count }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- YouTube Clicks & Latest Activity -->
+  <div class="row g-4 mt-2">
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-danger text-white">
+          <h5 class="mb-0">
+            <i class="fab fa-youtube me-2"></i>{% trans "کلیک‌های یوتیوب به تفکیک روز" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if youtube_clicks_by_day %}
+            <div class="table-responsive">
+              <table class="table table-sm table-hover">
+                <thead>
+                  <tr>
+                    <th>{% trans "تاریخ" %}</th>
+                    <th class="text-end">{% trans "تعداد کلیک" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in youtube_clicks_by_day %}
+                    <tr>
+                      <td>{{ row.day|date:"Y/m/d" }}</td>
+                      <td class="text-end">{{ row.count }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <p class="text-muted mb-0 text-center py-3">{% trans "هیچ کلیک یوتیوبی ثبت نشده است." %}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">
+            <i class="fas fa-play-circle me-2"></i>{% trans "ویدیوهای یوتیوبی که بیشتر کلیک شده‌اند" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if youtube_top_videos %}
+            <div class="table-responsive">
+              <table class="table table-sm table-hover">
+                <thead>
+                  <tr>
+                    <th>{% trans "عنوان" %}</th>
+                    <th class="text-end">{% trans "کلیک" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for v in youtube_top_videos %}
+                    <tr>
+                      <td>
+                        <div>
+                          <strong>{{ v.source_title|default:"-" }}</strong>
+                          {% if v.youtube_id %}
+                            <br>
+                            <a href="https://www.youtube.com/watch?v={{ v.youtube_id }}" target="_blank" rel="noopener" class="small text-danger">
+                              <i class="fab fa-youtube me-1"></i>{{ v.youtube_id }}
+                            </a>
+                          {% endif %}
+                        </div>
+                      </td>
+                      <td class="text-end">{{ v.count }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% if youtube_top_videos.has_other_pages %}
+              <div class="card-footer bg-transparent border-0 pt-3">
+                {% include "components/pagination.html" with page_obj=youtube_top_videos page_param="user_youtube_top_videos_page" %}
+              </div>
+            {% endif %}
+          {% else %}
+            <p class="text-muted mb-0 text-center py-3">{% trans "هیچ کلیک یوتیوبی ثبت نشده است." %}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Latest Visits and Clicks -->
+  <div class="row g-4 mt-2">
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">
+            <i class="fas fa-history me-2"></i>{% trans "آخرین بازدیدها" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if latest_visits %}
+            <div class="table-responsive">
+              <table class="table table-sm table-hover">
+                <thead>
+                  <tr>
+                    <th>{% trans "زمان" %}</th>
+                    <th>{% trans "مسیر" %}</th>
+                    <th class="text-end">{% trans "آی‌پی" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for v in latest_visits %}
+                    <tr>
+                      <td>{{ v.created_at|date:"Y/m/d H:i" }}</td>
+                      <td class="text-truncate" style="max-width: 260px;" title="{{ v.path }}">{{ v.path }}</td>
+                      <td class="text-end"><small class="text-muted">{{ v.ip_address|default:"-" }}</small></td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% if latest_visits.has_other_pages %}
+              <div class="card-footer bg-transparent border-0 pt-3">
+                {% include "components/pagination.html" with page_obj=latest_visits page_param="user_visits_page" %}
+              </div>
+            {% endif %}
+          {% else %}
+            <p class="text-muted mb-0 text-center py-3">{% trans "هیچ بازدیدی ثبت نشده است." %}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">
+            <i class="fab fa-youtube me-2"></i>{% trans "آخرین کلیک‌های یوتیوب" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if latest_youtube_clicks %}
+            <div class="table-responsive">
+              <table class="table table-sm table-hover">
+                <thead>
+                  <tr>
+                    <th>{% trans "زمان" %}</th>
+                    <th>{% trans "ویدیو" %}</th>
+                    <th>{% trans "منبع" %}</th>
+                    <th class="text-end">{% trans "آی‌پی" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for c in latest_youtube_clicks %}
+                    <tr>
+                      <td>{{ c.created_at|date:"Y/m/d H:i" }}</td>
+                      <td>
+                        {% if c.youtube_id %}
+                          <a href="https://www.youtube.com/watch?v={{ c.youtube_id }}" target="_blank" rel="noopener" class="text-danger small">
+                            <i class="fab fa-youtube me-1"></i>{{ c.youtube_id }}
+                          </a>
+                        {% else %}
+                          <span class="text-muted small">-</span>
+                        {% endif %}
+                      </td>
+                      <td class="small">
+                        {% if c.source_type == "video" %}
+                          <i class="fas fa-video me-1"></i>{% trans "ویدیو" %}
+                        {% elif c.source_type == "post" %}
+                          <i class="fas fa-newspaper me-1"></i>{% trans "مقاله" %}
+                        {% else %}
+                          <i class="fas fa-link me-1"></i>{% trans "سایر" %}
+                        {% endif %}
+                        {% if c.source_title %}
+                          <br><span class="text-muted">{{ c.source_title|truncatechars:40 }}</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-end"><small class="text-muted">{{ c.ip_address|default:"-" }}</small></td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% if latest_youtube_clicks.has_other_pages %}
+              <div class="card-footer bg-transparent border-0 pt-3">
+                {% include "components/pagination.html" with page_obj=latest_youtube_clicks page_param="user_youtube_clicks_page" %}
+              </div>
+            {% endif %}
+          {% else %}
+            <p class="text-muted mb-0 text-center py-3">{% trans "هیچ کلیکی ثبت نشده است." %}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

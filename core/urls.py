@@ -1,6 +1,6 @@
 from django.urls import path
 from django.views.generic import TemplateView
-from .views import HomeView, AboutView, ContactView
+from .views import HomeView, AboutView, ContactView, YouTubeClickView
 
 app_name = "core"
 
@@ -10,6 +10,7 @@ urlpatterns = [
     path("contact/", ContactView.as_view(), name="contact"),
     path("test-header/", TemplateView.as_view(template_name="test-header.html"), name="test_header"),
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
+    path("api/youtube-click/", YouTubeClickView.as_view(), name="youtube_click"),
 ]
 
 

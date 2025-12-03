@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "بازدیدکنندگان ناشناس" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h2 mb-2">{% trans "بازدیدکنندگان ناشناس" %}</h1>
+          <p class="text-muted mb-0">{% trans "لیست بازدیدکنندگانی که لاگ این نکرده‌اند" %}</p>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'accounts:analytics_detail' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-right me-2"></i>{% trans "بازگشت به آمار کلی" %}
+          </a>
+          <a href="/admin/core/anonymousvisitor/" class="btn btn-primary" target="_blank">
+            <i class="fas fa-cog me-2"></i>{% trans "مدیریت در ادمین" %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <form method="get" class="d-flex align-items-center gap-3 flex-wrap">
+            <label for="days" class="mb-0">{% trans "بازه زمانی:" %}</label>
+            <select name="days" id="days" class="form-select" style="width: auto;" onchange="this.form.submit()">
+              <option value="7" {% if days == 7 %}selected{% endif %}>{% trans "۷ روز گذشته" %}</option>
+              <option value="30" {% if days == 30 %}selected{% endif %}>{% trans "۳۰ روز گذشته" %}</option>
+              <option value="90" {% if days == 90 %}selected{% endif %}>{% trans "۹۰ روز گذشته" %}</option>
+              <option value="180" {% if days == 180 %}selected{% endif %}>{% trans "۱۸۰ روز گذشته" %}</option>
+              <option value="365" {% if days == 365 %}selected{% endif %}>{% trans "یک سال گذشته" %}</option>
+            </select>
+            <span class="text-muted small">
+              {% trans "از تاریخ" %} {{ date_from|date:"Y/m/d" }} {% trans "تا امروز" %}
+            </span>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overview Stats -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-6 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-users fa-2x text-primary mb-2"></i>
+          <h3 class="mb-1">{{ total_anonymous_visitors|default:0 }}</h3>
+          <p class="text-muted mb-0 small">{% trans "کل بازدیدکنندگان ناشناس" %}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-eye fa-2x text-info mb-2"></i>
+          <h3 class="mb-1">{{ total_anonymous_visits|default:0 }}</h3>
+          <p class="text-muted mb-0 small">{% trans "کل بازدیدهای ناشناس" %}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visitors List -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-list me-2"></i>{% trans "لیست بازدیدکنندگان ناشناس" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if visitors %}
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>{% trans "شناسه نشست" %}</th>
+                    <th>{% trans "اولین آی‌پی" %}</th>
+                    <th>{% trans "آخرین آی‌پی" %}</th>
+                    <th>{% trans "اولین بازدید" %}</th>
+                    <th>{% trans "آخرین بازدید" %}</th>
+                    <th class="text-end">{% trans "تعداد بازدیدها" %}</th>
+                    <th class="text-end">{% trans "کلیک‌های یوتیوب" %}</th>
+                    <th class="text-center">{% trans "عملیات" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for visitor in visitors %}
+                    <tr>
+                      <td>
+                        <code class="small">{{ visitor.session_key|truncatechars:20 }}</code>
+                      </td>
+                      <td>
+                        <span class="badge bg-secondary">{{ visitor.first_ip|default:"-" }}</span>
+                      </td>
+                      <td>
+                        <span class="badge bg-info">{{ visitor.last_ip|default:"-" }}</span>
+                      </td>
+                      <td>{{ visitor.first_seen|date:"Y/m/d H:i" }}</td>
+                      <td>{{ visitor.last_seen|date:"Y/m/d H:i" }}</td>
+                      <td class="text-end">
+                        <span class="badge bg-primary">{{ visitor.total_visits }}</span>
+                      </td>
+                      <td class="text-end">
+                        <span class="badge bg-danger">{{ visitor.total_youtube_clicks }}</span>
+                      </td>
+                      <td class="text-center">
+                        <a href="{% url 'accounts:analytics_anonymous_visitor_detail' visitor.id %}" class="btn btn-sm btn-outline-primary">
+                          <i class="fas fa-eye me-1"></i>{% trans "جزئیات" %}
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% if visitors.has_other_pages %}
+              <div class="card-footer bg-transparent border-0 pt-3">
+                {% include "components/pagination.html" with page_obj=visitors page_param="visitors_page" %}
+              </div>
+            {% endif %}
+          {% else %}
+            <p class="text-muted mb-0 text-center py-5">{% trans "هیچ بازدیدکننده ناشناسی در این بازه زمانی ثبت نشده است." %}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

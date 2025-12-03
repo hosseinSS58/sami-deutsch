@@ -1,6 +1,15 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import SignUpView, ProfileView, ProfileEditView
+from .views import (
+    SignUpView,
+    ProfileView,
+    ProfileEditView,
+    AdminDashboardView,
+    AnalyticsDetailView,
+    AnalyticsUserDetailView,
+    AnalyticsAnonymousVisitorsView,
+    AnalyticsAnonymousVisitorDetailView,
+)
 from .forms import CustomAuthForm
 
 app_name = "accounts"
@@ -11,6 +20,11 @@ urlpatterns = [
     path("signup/", SignUpView.as_view(), name="signup"),
     path("profile/", ProfileView.as_view(), name="profile"),
     path("profile/edit/", ProfileEditView.as_view(), name="profile_edit"),
+    path("admin/dashboard/", AdminDashboardView.as_view(), name="admin_dashboard"),
+    path("admin/analytics/", AnalyticsDetailView.as_view(), name="analytics_detail"),
+    path("admin/analytics/user/<int:user_id>/", AnalyticsUserDetailView.as_view(), name="analytics_user_detail"),
+    path("admin/analytics/anonymous-visitors/", AnalyticsAnonymousVisitorsView.as_view(), name="analytics_anonymous_visitors"),
+    path("admin/analytics/anonymous-visitor/<int:visitor_id>/", AnalyticsAnonymousVisitorDetailView.as_view(), name="analytics_anonymous_visitor_detail"),
     # Password reset views with security best practices
     path("password-reset/", auth_views.PasswordResetView.as_view(
         template_name="accounts/password_reset.html",

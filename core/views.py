@@ -1,8 +1,14 @@
-from django.views.generic import TemplateView, FormView
+from django.views.generic import TemplateView, FormView, View
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.utils import timezone
+from urllib.parse import urlparse, parse_qs
 from .forms import ContactForm
+from .models import YouTubeClick
 from courses.models import Video
 from blog.models import Post
 from shop.models import Product
@@ -194,6 +200,111 @@ class ContactView(FormView):
         form.save()
         messages.success(self.request, _("پیام شما با موفقیت ارسال شد!"))
         return super().form_valid(form)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class YouTubeClickView(View):
+    """API endpoint برای ثبت کلیک‌های یوتیوب"""
+    
+    def post(self, request):
+        try:
+            youtube_url = request.POST.get("youtube_url", "").strip()
+            source_type = request.POST.get("source_type", "other")
+            source_id = request.POST.get("source_id")
+            source_title = request.POST.get("source_title", "").strip()
+            
+            if not youtube_url:
+                return JsonResponse({"success": False, "error": "youtube_url is required"}, status=400)
+            
+            # استخراج شناسه ویدیو یوتیوب
+            youtube_id = self._extract_youtube_id(youtube_url)
+            
+            # دریافت اطلاعات کاربر و درخواست
+            user = request.user if request.user.is_authenticated else None
+            ip_address = self._get_client_ip(request)
+            user_agent = request.META.get("HTTP_USER_AGENT", "")
+            referrer = request.META.get("HTTP_REFERER", "")
+            
+            # تشخیص کشور بر اساس IP
+            from .utils import get_country_from_ip
+            country = get_country_from_ip(ip_address) if ip_address else ""
+            
+            # مدیریت بازدیدکنندگان ناشناس
+            anonymous_visitor = None
+            if not user:
+                from .models import AnonymousVisitor
+                # اطمینان از وجود session
+                if not request.session.session_key:
+                    request.session.create()
+                session_key = request.session.session_key
+                if session_key:
+                    anonymous_visitor, _ = AnonymousVisitor.objects.get_or_create(
+                        session_key=session_key,
+                        defaults={
+                            "first_ip": ip_address or "",
+                            "first_country": country,
+                            "first_user_agent": user_agent,
+                        }
+                    )
+                    # به‌روزرسانی اطلاعات آخرین بازدید
+                    anonymous_visitor.last_ip = ip_address or ""
+                    anonymous_visitor.last_country = country
+                    anonymous_visitor.last_user_agent = user_agent
+                    anonymous_visitor.save(update_fields=["last_ip", "last_country", "last_user_agent", "last_seen"])
+            
+            # ثبت کلیک
+            click = YouTubeClick.objects.create(
+                user=user,
+                anonymous_visitor=anonymous_visitor,
+                youtube_url=youtube_url,
+                youtube_id=youtube_id or "",
+                source_type=source_type,
+                source_id=int(source_id) if source_id and source_id.isdigit() else None,
+                source_title=source_title,
+                ip_address=ip_address,
+                country=country,
+                user_agent=user_agent,
+                referrer=referrer,
+            )
+            
+            return JsonResponse({
+                "success": True,
+                "click_id": click.id,
+                "youtube_id": youtube_id,
+            })
+            
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+    
+    def _extract_youtube_id(self, url):
+        """استخراج شناسه ویدیو از URL یوتیوب"""
+        if not url:
+            return None
+        try:
+            parsed = urlparse(url)
+            if parsed.netloc in {"youtu.be", "www.youtu.be"}:
+                return parsed.path.lstrip("/") or None
+            if "youtube.com" in parsed.netloc:
+                if parsed.path.startswith("/watch"):
+                    q = parse_qs(parsed.query)
+                    vid = q.get("v", [None])[0]
+                    return vid
+                if parsed.path.startswith("/embed/"):
+                    return parsed.path.split("/embed/")[-1]
+                if parsed.path.startswith("/shorts/"):
+                    return parsed.path.split("/shorts/")[-1]
+        except Exception:
+            return None
+        return None
+    
+    def _get_client_ip(self, request):
+        """دریافت IP کاربر"""
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(",")[0].strip()
+        else:
+            ip = request.META.get("REMOTE_ADDR", "")
+        return ip
 
 
 # Create your views here.

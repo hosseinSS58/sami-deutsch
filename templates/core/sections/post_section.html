@@ -92,7 +92,14 @@
                       <i class="fas fa-book-open me-1"></i>مطالعه
                     </a>
                     {% if post.youtube_watch_url %}
-                      <a href="{{ post.youtube_watch_url }}" class="btn btn-danger btn-sm" target="_blank" rel="noopener" title="مشاهده در یوتیوب">
+                      <a href="{{ post.youtube_watch_url }}" 
+                         class="btn btn-danger btn-sm" 
+                         target="_blank" 
+                         rel="noopener" 
+                         title="مشاهده در یوتیوب"
+                         data-source-type="post"
+                         data-source-id="{{ post.id }}"
+                         data-source-title="{{ post.title }}">
                         <i class="fab fa-youtube"></i>
                       </a>
                     {% endif %}
