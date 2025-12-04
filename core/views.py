@@ -12,7 +12,7 @@ from .models import YouTubeClick
 from courses.models import Video
 from blog.models import Post
 from shop.models import Product
-from siteconfig.models import HomePageSection, HomeSlider, Slide
+from siteconfig.models import HomePageSection, HomeSlider, Slide, SocialLink
 
 
 class HomeView(TemplateView):
@@ -195,6 +195,14 @@ class ContactView(FormView):
     template_name = "core/contact.html"
     form_class = ContactForm
     success_url = reverse_lazy("core:contact")
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["contact_social_links"] = SocialLink.objects.filter(
+            location=SocialLink.Location.CONTACT,
+            is_active=True,
+        ).order_by("order", "id")
+        return ctx
 
     def form_valid(self, form):
         form.save()

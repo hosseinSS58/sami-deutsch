@@ -75,6 +75,18 @@
               <span>آزمون‌ها</span>
             </a>
           </li>
+          <li class="nav-item">
+            <a href="/shop/" class="nav-link{% if current_path|slice:":6" == '/shop/' %} active{% endif %}">
+              <i class="fas fa-shopping-bag"></i>
+              <span>فروشگاه</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'core:contact' %}" class="nav-link{% if current_path == '/contact/' %} active{% endif %}">
+              <i class="fas fa-envelope"></i>
+              <span>تماس با ما</span>
+            </a>
+          </li>
         {% elif nav_links %}
           {% for link in nav_links %}
             <li class="nav-item">
@@ -101,6 +113,16 @@
         <i class="fas fa-search"></i>
       </button>
 
+      <!-- Social Links -->
+      {% if header_social_links %}
+      <div class="header-social-links d-none d-lg-flex">
+        {% for link in header_social_links %}
+          <a href="{{ link.url }}" class="action-btn social-link" aria-label="{{ link.title }}" target="_blank" rel="noopener">
+            {% if link.icon_class %}<i class="{{ link.icon_class }}"></i>{% else %}<i class="fas fa-link"></i>{% endif %}
+          </a>
+        {% endfor %}
+      </div>
+      {% endif %}
 
       <!-- Primary CTA -->
 
@@ -215,6 +237,8 @@
             <li><a href="/videos/" class="mobile-link{% if current_path|slice:":8" == '/videos/' %} active{% endif %}"><i class="fas fa-video"></i>ویدیوها</a></li>
             <li><a href="/blog/" class="mobile-link{% if current_path|slice:":6" == '/blog/' %} active{% endif %}"><i class="fas fa-newspaper"></i>وبلاگ</a></li>
             <li><a href="/assessments/" class="mobile-link{% if current_path|slice:":12" == '/assessments/' %} active{% endif %}"><i class="fas fa-clipboard-check"></i>آزمون‌ها</a></li>
+            <li><a href="/shop/" class="mobile-link{% if current_path|slice:":6" == '/shop/' %} active{% endif %}"><i class="fas fa-shopping-bag"></i>فروشگاه</a></li>
+            <li><a href="{% url 'core:contact' %}" class="mobile-link{% if current_path == '/contact/' %} active{% endif %}"><i class="fas fa-envelope"></i>تماس با ما</a></li>
           {% elif nav_links %}
             {% for link in nav_links %}
               <li>
@@ -252,6 +276,19 @@
             <a href="mailto:support@samideutsch.com">support@samideutsch.com</a>
           </div>
         </div>
+
+        {% if header_social_links %}
+        <div class="mobile-social-links d-lg-none">
+          <div class="mobile-social-title">شبکه‌های اجتماعی</div>
+          <div class="mobile-social-icons">
+            {% for link in header_social_links %}
+              <a href="{{ link.url }}" class="mobile-social-icon" aria-label="{{ link.title }}" target="_blank" rel="noopener">
+                {% if link.icon_class %}<i class="{{ link.icon_class }}"></i>{% else %}<i class="fas fa-link"></i>{% endif %}
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
 
         {% if user.is_authenticated %}
         <div class="mobile-user-card d-lg-none">

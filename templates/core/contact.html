@@ -45,22 +45,26 @@
             </div>
             
             <div class="text-center">
-              <button class="btn btn-primary btn-lg">ارسال پیام</button>
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-paper-plane me-2"></i>ارسال پیام
+              </button>
             </div>
           </form>
           
+          {% if contact_social_links %}
           <hr class="my-4"/>
           <div class="text-center">
             <p class="text-muted mb-2">شبکه‌های اجتماعی</p>
-            <div class="d-flex justify-content-center gap-3">
-              <a href="#" class="btn btn-outline-primary btn-sm">
-                <i class="fab fa-instagram me-2"></i>Instagram
-              </a>
-              <a href="#" class="btn btn-outline-danger btn-sm">
-                <i class="fab fa-youtube me-2"></i>YouTube
-              </a>
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+              {% for link in contact_social_links %}
+                <a href="{{ link.url }}" class="btn btn-outline-primary btn-sm" target="_blank" rel="noopener">
+                  {% if link.icon_class %}<i class="{{ link.icon_class }} me-2"></i>{% endif %}
+                  {{ link.title }}
+                </a>
+              {% endfor %}
             </div>
           </div>
+          {% endif %}
         </div>
       </div>
     </div>

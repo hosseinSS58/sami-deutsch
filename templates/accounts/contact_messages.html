@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "پیام‌های تماس با ما" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h3 mb-1">
+            {% trans "پیام‌های تماس با ما" %}
+          </h1>
+          <p class="text-muted mb-0">
+            {% trans "مشاهده و مدیریت پیام‌هایی که از طریق فرم تماس با ما ارسال شده‌اند" %}
+          </p>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'accounts:admin_dashboard' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-right me-1"></i>{% trans "بازگشت به داشبورد" %}
+          </a>
+          <a href="/admin/core/contactmessage/" class="btn btn-primary btn-sm" target="_blank">
+            <i class="fas fa-cog me-1"></i>{% trans "مدیریت در ادمین" %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats & Filters -->
+  <div class="row mb-4 g-3">
+    <div class="col-lg-4 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-envelope fa-2x text-primary mb-2"></i>
+          <h3 class="mb-1">{{ total_messages|default:0 }}</h3>
+          <p class="text-muted mb-0 small">{% trans "کل پیام‌ها" %}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-calendar-week fa-2x text-success mb-2"></i>
+          <h3 class="mb-1">{{ messages_last_7_days|default:0 }}</h3>
+          <p class="text-muted mb-0 small">{% trans "پیام‌های ۷ روز گذشته" %}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-12">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <form method="get" class="d-flex align-items-center gap-2">
+            <input
+              type="text"
+              name="q"
+              value="{{ query }}"
+              class="form-control"
+              placeholder="{% trans 'جستجو بر اساس نام، ایمیل یا متن پیام' %}"
+            >
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-search me-1"></i>{% trans "جستجو" %}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages Table -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">
+            <i class="fas fa-envelope-open-text me-2"></i>{% trans "لیست پیام‌ها" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if messages %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>{% trans "نام" %}</th>
+                    <th>{% trans "ایمیل" %}</th>
+                    <th>{% trans "تاریخ" %}</th>
+                    <th>{% trans "خلاصه پیام" %}</th>
+                    <th class="text-end">{% trans "عملیات" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for msg in messages %}
+                    <tr>
+                      <td>{{ msg.name|default:"-" }}</td>
+                      <td>
+                        {% if msg.email %}
+                          <a href="mailto:{{ msg.email }}" class="text-decoration-none">
+                            {{ msg.email }}
+                          </a>
+                        {% else %}
+                          <span class="text-muted">-</span>
+                        {% endif %}
+                      </td>
+                      <td>{{ msg.created_at|date:"Y/m/d H:i" }}</td>
+                      <td class="text-truncate" style="max-width: 360px;" title="{{ msg.message }}">
+                        {{ msg.message|truncatechars:120 }}
+                      </td>
+                      <td class="text-end">
+                        <a href="/admin/core/contactmessage/{{ msg.id }}/change/" class="btn btn-outline-primary btn-sm" target="_blank">
+                          <i class="fas fa-external-link-alt me-1"></i>{% trans "مشاهده در ادمین" %}
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% if messages.has_other_pages %}
+              <div class="card-footer bg-transparent border-0 pt-3">
+                {% include "components/pagination.html" with page_obj=messages page_param="page" %}
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="text-center py-5">
+              <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+              <p class="text-muted mb-0">{% trans "هیچ پیامی برای نمایش وجود ندارد." %}</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

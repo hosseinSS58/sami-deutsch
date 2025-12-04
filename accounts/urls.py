@@ -9,6 +9,7 @@ from .views import (
     AnalyticsUserDetailView,
     AnalyticsAnonymousVisitorsView,
     AnalyticsAnonymousVisitorDetailView,
+    ContactMessagesAdminView,
 )
 from .forms import CustomAuthForm
 
@@ -25,6 +26,7 @@ urlpatterns = [
     path("admin/analytics/user/<int:user_id>/", AnalyticsUserDetailView.as_view(), name="analytics_user_detail"),
     path("admin/analytics/anonymous-visitors/", AnalyticsAnonymousVisitorsView.as_view(), name="analytics_anonymous_visitors"),
     path("admin/analytics/anonymous-visitor/<int:visitor_id>/", AnalyticsAnonymousVisitorDetailView.as_view(), name="analytics_anonymous_visitor_detail"),
+    path("admin/messages/", ContactMessagesAdminView.as_view(), name="admin_contact_messages"),
     # Password reset views with security best practices
     path("password-reset/", auth_views.PasswordResetView.as_view(
         template_name="accounts/password_reset.html",

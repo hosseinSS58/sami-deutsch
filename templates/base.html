@@ -135,6 +135,33 @@
     
     /* Custom CSS from admin */
     {{ site_settings.custom_css|safe }}
+    
+    /* Footer Social Links */
+    .footer-social-links {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .footer-social-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--site-footer-text-color);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 1.1rem;
+    }
+    
+    .footer-social-link:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      color: var(--site-footer-text-color);
+    }
   </style>
 </head>
 <body>
@@ -168,14 +195,33 @@
   </main>
 
   <!-- Footer -->
-  <footer class="border-top mt-4 py-4" role="contentinfo" aria-label="Site footer">
-    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-      <div class="text-muted small">{{ site_settings.footer_text }}</div>
-      <ul class="nav">
-        {% for link in footer_links %}
-          <li class="nav-item"><a class="nav-link" href="{{ link.url }}">{{ link.title }}</a></li>
-        {% endfor %}
-      </ul>
+  <footer class="border-top mt-4 py-4" role="contentinfo" aria-label="Site footer" style="background-color: var(--site-footer-bg-color); color: var(--site-footer-text-color);">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-12 col-md-4 mb-3 mb-md-0">
+          <div class="text-muted small">{{ site_settings.footer_text }}</div>
+        </div>
+        <div class="col-12 col-md-4 mb-3 mb-md-0">
+          {% if footer_links %}
+          <ul class="nav justify-content-center">
+            {% for link in footer_links %}
+              <li class="nav-item"><a class="nav-link" href="{{ link.url }}" style="color: var(--site-footer-text-color);">{{ link.title }}</a></li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        <div class="col-12 col-md-4">
+          {% if footer_social_links %}
+          <div class="footer-social-links d-flex justify-content-center justify-content-md-end gap-2">
+            {% for link in footer_social_links %}
+              <a href="{{ link.url }}" class="footer-social-link" aria-label="{{ link.title }}" target="_blank" rel="noopener" style="color: var(--site-footer-text-color);">
+                {% if link.icon_class %}<i class="{{ link.icon_class }}"></i>{% else %}<i class="fas fa-link"></i>{% endif %}
+              </a>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
   </footer>
 

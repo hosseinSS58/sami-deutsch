@@ -57,7 +57,7 @@ class AdminDashboardView(LoginRequiredMixin, TemplateView):
         from blog.models import Post
         from shop.models import Product, Order
         from siteconfig.models import HomePageSection, Slide
-        from core.models import SiteVisit
+        from core.models import SiteVisit, ContactMessage
         
         # آمار کلی
         total_users = User.objects.count()
@@ -81,6 +81,9 @@ class AdminDashboardView(LoginRequiredMixin, TemplateView):
             total=Sum("total_amount")
         )["total"] or 0
         
+        # آمار پیام‌های تماس
+        total_contact_messages = ContactMessage.objects.count()
+        
         # آمار هفته گذشته
         week_ago = timezone.now() - timedelta(days=7)
         recent_users = User.objects.filter(date_joined__gte=week_ago).count()
@@ -93,6 +96,7 @@ class AdminDashboardView(LoginRequiredMixin, TemplateView):
         posts_qs = Post.objects.order_by("-published_at")
         orders_qs = Order.objects.order_by("-created_at")
         users_qs = User.objects.order_by("-date_joined")
+        messages_qs = ContactMessage.objects.order_by("-created_at")
         
         # Pagination برای ویدیوها
         videos_paginator = Paginator(videos_qs, 10)
@@ -125,6 +129,14 @@ class AdminDashboardView(LoginRequiredMixin, TemplateView):
             latest_users = users_paginator.page(users_page)
         except (PageNotAnInteger, EmptyPage):
             latest_users = users_paginator.page(1)
+        
+        # Pagination برای پیام‌های تماس (خلاصه داشبورد)
+        messages_paginator = Paginator(messages_qs, 5)
+        messages_page = self.request.GET.get('messages_page', 1)
+        try:
+            latest_messages = messages_paginator.page(messages_page)
+        except (PageNotAnInteger, EmptyPage):
+            latest_messages = messages_paginator.page(1)
         
         # تعداد بخش‌های صفحه هوم
         home_sections_count = HomePageSection.objects.filter(is_active=True).count()
@@ -195,6 +207,11 @@ class AdminDashboardView(LoginRequiredMixin, TemplateView):
             "posts_paginator": posts_paginator,
             "orders_paginator": orders_paginator,
             "users_paginator": users_paginator,
+            
+            # پیام‌های تماس
+            "total_contact_messages": total_contact_messages,
+            "latest_messages": latest_messages,
+            "messages_paginator": messages_paginator,
             
             # تنظیمات صفحه هوم
             "home_sections_count": home_sections_count,
@@ -877,4 +894,58 @@ class AnalyticsAnonymousVisitorDetailView(LoginRequiredMixin, TemplateView):
         return context
 
 
-# Create your views here.
+class ContactMessagesAdminView(LoginRequiredMixin, TemplateView):
+    """لیست پیام‌های تماس با ما برای مدیر سایت"""
+    template_name = "accounts/contact_messages.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        # فقط مدیران سایت
+        profile, _ = Profile.objects.get_or_create(user=request.user)
+        if profile.user_category != Profile.UserCategory.ADMIN:
+            from django.shortcuts import redirect
+            return redirect("accounts:login")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        from core.models import ContactMessage
+        from django.db.models import Q
+
+        # پارامترهای فیلتر
+        q = self.request.GET.get("q", "").strip()
+
+        messages_qs = ContactMessage.objects.all().order_by("-created_at")
+
+        if q:
+            messages_qs = messages_qs.filter(
+                Q(name__icontains=q)
+                | Q(email__icontains=q)
+                | Q(message__icontains=q)
+            )
+
+        # آمار کلی
+        total_messages = ContactMessage.objects.count()
+        week_ago = timezone.now() - timedelta(days=7)
+        messages_last_7_days = ContactMessage.objects.filter(created_at__gte=week_ago).count()
+
+        # Pagination
+        paginator = Paginator(messages_qs, 25)
+        page = self.request.GET.get("page", 1)
+        try:
+            messages_page = paginator.page(page)
+        except (PageNotAnInteger, EmptyPage):
+            messages_page = paginator.page(1)
+
+        context.update(
+            {
+                "total_messages": total_messages,
+                "messages_last_7_days": messages_last_7_days,
+                "messages": messages_page,
+                "messages_paginator": paginator,
+                "query": q,
+            }
+        )
+
+        return context
+

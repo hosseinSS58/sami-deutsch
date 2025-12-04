@@ -227,3 +227,4 @@ du -sh /home/sami/sami_deutsch/*
 
 
 
+

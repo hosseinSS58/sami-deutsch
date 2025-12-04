@@ -1,5 +1,5 @@
 from django.db import DatabaseError
-from .models import SiteSettings, NavLink, FooterLink, HomeFeature, HomeSlider, Slide, Menu
+from .models import SiteSettings, NavLink, FooterLink, HomeFeature, HomeSlider, Slide, Menu, SocialLink
 
 
 def site_settings(request):
@@ -18,6 +18,14 @@ def site_settings(request):
         "home_features": HomeFeature.objects.filter(is_active=True).order_by("order"),
         "home_slider": slider,
         "slides": slides_qs,
+        "header_social_links": SocialLink.objects.filter(
+            location=SocialLink.Location.HEADER,
+            is_active=True,
+        ).order_by("order", "id"),
+        "footer_social_links": SocialLink.objects.filter(
+            location=SocialLink.Location.FOOTER,
+            is_active=True,
+        ).order_by("order", "id"),
     }
 
 

@@ -50,6 +50,9 @@
   
   .logo-title {
     font-size: 1rem;
+    /* اطمینان از نمایش عنوان روی موبایل */
+    display: block !important;
+    color: #212529 !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -57,6 +60,8 @@
   
   .logo-subtitle {
     font-size: 0.75rem;
+    /* اطمینان از نمایش زیرعنوان روی موبایل */
+    display: block !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -316,6 +321,49 @@
   .mobile-contact-row a {
     color: inherit;
     text-decoration: none;
+  }
+
+  /* Mobile Social Links */
+  .mobile-social-links {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    background: rgba(15, 23, 42, 0.04);
+  }
+
+  .mobile-social-title {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0.75rem;
+    text-align: center;
+  }
+
+  .mobile-social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .mobile-social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: rgba(13, 110, 253, 0.1);
+    border-radius: 50%;
+    color: #0d6efd;
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-social-icon:hover {
+    background: #0d6efd;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
   }
 
   .mobile-search {
@@ -615,6 +663,9 @@
   
   .logo-title {
     font-size: 0.875rem;
+    /* اطمینان از نمایش عنوان روی موبایل‌های خیلی کوچک */
+    display: block !important;
+    color: #212529 !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -622,6 +673,8 @@
   
   .logo-subtitle {
     font-size: 0.65rem;
+    /* اطمینان از نمایش زیرعنوان روی موبایل‌های خیلی کوچک */
+    display: block !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -776,6 +829,9 @@
   
   .logo-title {
     font-size: 0.875rem;
+    /* اطمینان از نمایش عنوان در حالت افقی موبایل */
+    display: block !important;
+    color: #212529 !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -783,6 +839,8 @@
   
   .logo-subtitle {
     font-size: 0.65rem;
+    /* اطمینان از نمایش زیرعنوان در حالت افقی موبایل */
+    display: block !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -1,5 +1,16 @@
 from django.contrib import admin
-from .models import SiteSettings, NavLink, FooterLink, HomeFeature, HomeSlider, Slide, Menu, MenuItem, HomePageSection
+from .models import (
+    SiteSettings,
+    NavLink,
+    FooterLink,
+    HomeFeature,
+    HomeSlider,
+    Slide,
+    Menu,
+    MenuItem,
+    HomePageSection,
+    SocialLink,
+)
 
 
 @admin.register(SiteSettings)
@@ -241,3 +252,11 @@ class HomePageSectionAdmin(admin.ModelAdmin):
                 fieldsets = [fs for fs in fieldsets if "فیلترهای ویدیو" not in fs[0] and "فیلترهای محصول" not in fs[0]]
         
         return fieldsets
+
+
+@admin.register(SocialLink)
+class SocialLinkAdmin(admin.ModelAdmin):
+    list_display = ("title", "location", "url", "order", "is_active")
+    list_editable = ("order", "is_active")
+    list_filter = ("location", "is_active")
+    search_fields = ("title", "url", "icon_class")

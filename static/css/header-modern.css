@@ -361,6 +361,25 @@
   box-shadow: var(--header-shadow-hover);
 }
 
+/* ===== HEADER SOCIAL LINKS ===== */
+.header-social-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-social-links .social-link {
+  width: 36px;
+  height: 36px;
+  font-size: 0.9rem;
+}
+
+.header-social-links .social-link:hover {
+  background: var(--header-primary);
+  color: var(--header-text-light);
+  border-color: var(--header-primary);
+}
+
 body.sidebar-open .sidebar-toggle {
   background: var(--header-primary);
   color: var(--header-text-light);

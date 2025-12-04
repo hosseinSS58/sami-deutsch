@@ -535,3 +535,41 @@ class HomePageSection(models.Model):
             "posts": "همه مقالات",
         }
         return text_map.get(self.section_type, "مشاهده همه")
+
+
+class SocialLink(models.Model):
+    """
+    لینک‌های شبکه‌های اجتماعی که از ادمین قابل مدیریت هستند.
+    می‌توان برای هر بخشِ سایت (مثل صفحه تماس) لینک‌های جدا تعریف کرد.
+    """
+
+    class Location(models.TextChoices):
+        CONTACT = "contact", _("صفحه تماس")
+        HEADER = "header", _("هدر")
+        FOOTER = "footer", _("فوتر")
+
+    title = models.CharField(max_length=50, verbose_name=_("عنوان"))
+    url = models.CharField(max_length=300, verbose_name=_("لینک"))
+    icon_class = models.CharField(
+        max_length=80,
+        blank=True,
+        default="",
+        verbose_name=_("کلاس آیکون (FontAwesome)"),
+        help_text=_("مثلاً: fab fa-instagram، fab fa-telegram، fab fa-whatsapp"),
+    )
+    location = models.CharField(
+        max_length=20,
+        choices=Location.choices,
+        default=Location.CONTACT,
+        verbose_name=_("محل نمایش"),
+    )
+    order = models.PositiveSmallIntegerField(default=0, verbose_name=_("ترتیب"))
+    is_active = models.BooleanField(default=True, verbose_name=_("فعال"))
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = _("لینک شبکه اجتماعی")
+        verbose_name_plural = _("لینک‌های شبکه اجتماعی")
+
+    def __str__(self) -> str:
+        return f"{self.title} ({self.get_location_display()})"
