@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, TemplateView, View, FormView
 from django.http import Http404
+from django.contrib import messages
 from .models import Product, Order, OrderItem
 from .forms import AddToCartForm, CheckoutForm
 
@@ -69,11 +70,23 @@ class AddToCartView(View):
 
 class RemoveFromCartView(View):
     def post(self, request, *args, **kwargs):
-        product_id = str(request.POST.get("product_id"))
+        try:
+            product_id = int(request.POST.get("product_id"))
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid product ID")
+            return redirect("shop:cart")
+        
+        # بررسی وجود product
+        if not Product.objects.filter(id=product_id, is_active=True).exists():
+            messages.error(request, "Product not found")
+            return redirect("shop:cart")
+        
         cart = request.session.get("cart", {})
-        if product_id in cart:
-            cart.pop(product_id)
+        if str(product_id) in cart:
+            cart.pop(str(product_id))
             request.session["cart"] = cart
+            messages.success(request, "Product removed from cart")
+        
         return redirect("shop:cart")
 
 
@@ -92,7 +105,7 @@ class CheckoutView(FormView):
             address=form.cleaned_data.get("address", ""),
         )
         for product_id, qty in cart.items():
-            product = get_object_or_404(Product, id=int(product_id))
+            product = get_object_or_404(Product, id=int(product_id), is_active=True)
             unit_price = product.price
             OrderItem.objects.create(
                 order=order,

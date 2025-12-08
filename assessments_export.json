@@ -1,0 +1,1306 @@
+{
+  "assessments": [
+    {
+      "export_id": 1,
+      "title": "General Test A1",
+      "level": "A1",
+      "is_active": true,
+      "time_limit_seconds": 600,
+      "attempt_limit": 3,
+      "created_at": "2025-09-28T12:49:24.577519+00:00"
+    },
+    {
+      "export_id": 2,
+      "title": "General Test A2",
+      "level": "A2",
+      "is_active": true,
+      "time_limit_seconds": 600,
+      "attempt_limit": 3,
+      "created_at": "2025-09-28T12:49:24.591930+00:00"
+    },
+    {
+      "export_id": 3,
+      "title": "General Test B1",
+      "level": "B1",
+      "is_active": true,
+      "time_limit_seconds": 600,
+      "attempt_limit": 3,
+      "created_at": "2025-09-28T12:49:24.601802+00:00"
+    },
+    {
+      "export_id": 4,
+      "title": "General Test B2",
+      "level": "B2",
+      "is_active": true,
+      "time_limit_seconds": 600,
+      "attempt_limit": 3,
+      "created_at": "2025-09-28T12:49:24.607085+00:00"
+    }
+  ],
+  "questions": [
+    {
+      "export_id": 1,
+      "assessment_export_id": 1,
+      "text": "Wir ___ in Köln.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "easy",
+      "weight": 1,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 2,
+      "assessment_export_id": 1,
+      "text": "„Ich heiße Ali. Ich komme aus dem Iran und ich wohne in Berlin.“ – Wo wohnt Ali?",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "easy",
+      "weight": 1,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 3,
+      "assessment_export_id": 1,
+      "text": "Ich komme ___ Deutschland.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "easy",
+      "weight": 1,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 4,
+      "assessment_export_id": 1,
+      "text": "___ ist das? – Das ist meine Mutter.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "easy",
+      "weight": 1,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 5,
+      "assessment_export_id": 1,
+      "text": "Welche Zahl ist richtig? „siebenundsiebzig“",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "medium",
+      "weight": 2,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 6,
+      "assessment_export_id": 1,
+      "text": "Das ist ___ Auto.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "easy",
+      "weight": 1,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 7,
+      "assessment_export_id": 1,
+      "text": "Das ist ___ Tisch.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "easy",
+      "weight": 1,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 8,
+      "assessment_export_id": 1,
+      "text": "Ich kaufe ___ Tisch.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "easy",
+      "weight": 1,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 9,
+      "assessment_export_id": 1,
+      "text": "Hast du Kinder? – Nein, ich habe ___ Kinder.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "easy",
+      "weight": 1,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 10,
+      "assessment_export_id": 1,
+      "text": "Wie spät ist es? – 8:30 Uhr",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "hard",
+      "weight": 3,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 11,
+      "assessment_export_id": 1,
+      "text": "Wir gehen ___ Kino.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "medium",
+      "weight": 2,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 12,
+      "assessment_export_id": 1,
+      "text": "Welcher Satz ist richtig?",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "medium",
+      "weight": 2,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 13,
+      "assessment_export_id": 1,
+      "text": "Ich habe gestern einen Brief ___.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "hard",
+      "weight": 3,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 14,
+      "assessment_export_id": 1,
+      "text": "Wo ist das Buch? – Das Buch liegt ___ dem Tisch.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "hard",
+      "weight": 3,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 15,
+      "assessment_export_id": 1,
+      "text": "Ich _____ gern nach Deutschland fliegen.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "hard",
+      "weight": 3,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 16,
+      "assessment_export_id": 2,
+      "text": "CLOZE: Antworten را به‌صورت جفت عدد=کلمه در هر خط وارد کنید (نمونه: 1=meiner).\\nText: Letztes Wochenende war ich bei ___(1)___ Freundin. Wir sind zusammen in ___(2)___ Park gegangen und haben dort ___(3)___ Kaffee getrunken. Ich war sehr glücklich, ___(4)___ das Wetter schön war. Sie hat mir erzählt, ___(5)___ sie nächste Woche nach Berlin fährt. Das Hotel, ___(6)___ sie gebucht hat, liegt in der Nähe vom Bahnhof. Ich habe ihr gesagt, dass ich sie besuchen möchte, ___(7)___ ich Zeit habe.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "hard",
+      "weight": 3,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 17,
+      "assessment_export_id": 2,
+      "text": "Ich möchte gern wissen, ___ du denkst.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "medium",
+      "weight": 2,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 18,
+      "assessment_export_id": 2,
+      "text": "Der Brief _______ jeden Tag von der Sekretärin geschrieben.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "medium",
+      "weight": 2,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 19,
+      "assessment_export_id": 2,
+      "text": "Ich habe gestern einen _______ Film gesehen.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "medium",
+      "weight": 2,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 20,
+      "assessment_export_id": 2,
+      "text": "Am Morgen _______ ich ______ immer schnell.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "medium",
+      "weight": 2,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 21,
+      "assessment_export_id": 2,
+      "text": "Ich schenke _______ Mutter _______ Blumen.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "easy",
+      "weight": 1,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 22,
+      "assessment_export_id": 2,
+      "text": "Wir fahren heute Nachmittag _______ Strand.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "medium",
+      "weight": 2,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 23,
+      "assessment_export_id": 2,
+      "text": "Letztes Jahr _______ ich jeden Tag im Park spazieren.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "easy",
+      "weight": 1,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 24,
+      "assessment_export_id": 3,
+      "text": "را به‌صورت جفت عدد=کلمه وارد کنید \r\n(نمونه: 1=damit).\r\n\r\nLisa interessiert sich sehr für Fotografie. Sie hat sich eine neue Kamera gekauft, ___1___ sie bessere Bilder machen kann. ___2___ ist sie oft draußen, um Landschaften zu fotografieren. ___3___ das Wetter schlecht ist, bleibt sie zu Hause und bearbeitet ihre Fotos. Ihre Freundin Julia, die ___4___ ihrer großen Erfahrung in diesem Bereich hilft, unterstützt sie manchmal. Lisa möchte bald einen Kurs besuchen, ___5___ mehr über Licht und Farben zu lernen. Sie findet Fotografie spannend, weil sie ___6___  Kunstform  als auch Ausdruck ihrer Gefühle sieht. Julia macht nicht nur Porträts, ___7___ Naturfotos sehr gut. Lisa ist ___8___ noch Anfängerin, ___8___ sie lernt schnell. ___9___ des Kurses will sie eine kleine Ausstellung organisieren.",
+      "type": "fill",
+      "target_level": "A1",
+      "difficulty": "medium",
+      "weight": 9,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 25,
+      "assessment_export_id": 4,
+      "text": "Das Problem muss schnell ___ werden.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "easy",
+      "weight": 1,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 26,
+      "assessment_export_id": 4,
+      "text": "Er hat viel gearbeitet, ___ er müde ist.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "medium",
+      "weight": 2,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 27,
+      "assessment_export_id": 4,
+      "text": "Was bedeutet „ausnahmsweise“?",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "hard",
+      "weight": 3,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 28,
+      "assessment_export_id": 4,
+      "text": "Text: „Viele Menschen kaufen heute im Internet ein, weil es schneller und bequemer ist. Allerdings gibt es auch Risiken, zum Beispiel Betrug.“\nFrage: Was bedeutet das Wort „Betrug“?",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "medium",
+      "weight": 2,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 29,
+      "assessment_export_id": 4,
+      "text": "Hätte ich gestern mehr gelernt, ___ ich die Prüfung bestanden.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "easy",
+      "weight": 1,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 30,
+      "assessment_export_id": 4,
+      "text": "Er hat so getan, ___ er nichts gehört hätte.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "easy",
+      "weight": 1,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 31,
+      "assessment_export_id": 4,
+      "text": "Kaum hatte er das Haus verlassen, ___ es zu regnen.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "hard",
+      "weight": 3,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 32,
+      "assessment_export_id": 4,
+      "text": "Kaum war die Tür zu, ___ klingelte das Telefon.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "hard",
+      "weight": 3,
+      "explanation": "",
+      "correct_boolean": null
+    },
+    {
+      "export_id": 33,
+      "assessment_export_id": 4,
+      "text": "------- er ankommt, beginnen wir das Essen.",
+      "type": "mcq",
+      "target_level": "A1",
+      "difficulty": "medium",
+      "weight": 2,
+      "explanation": "",
+      "correct_boolean": null
+    }
+  ],
+  "choices": [
+    {
+      "export_id": 1,
+      "question_export_id": 1,
+      "text": "wohnen",
+      "is_correct": true
+    },
+    {
+      "export_id": 2,
+      "question_export_id": 1,
+      "text": "wohne",
+      "is_correct": false
+    },
+    {
+      "export_id": 3,
+      "question_export_id": 1,
+      "text": "wohnt",
+      "is_correct": false
+    },
+    {
+      "export_id": 4,
+      "question_export_id": 1,
+      "text": "wohntest",
+      "is_correct": false
+    },
+    {
+      "export_id": 5,
+      "question_export_id": 2,
+      "text": "In Köln",
+      "is_correct": false
+    },
+    {
+      "export_id": 6,
+      "question_export_id": 2,
+      "text": "In Hamburg",
+      "is_correct": false
+    },
+    {
+      "export_id": 7,
+      "question_export_id": 2,
+      "text": "In Berlin",
+      "is_correct": true
+    },
+    {
+      "export_id": 8,
+      "question_export_id": 2,
+      "text": "In München",
+      "is_correct": false
+    },
+    {
+      "export_id": 9,
+      "question_export_id": 3,
+      "text": "in",
+      "is_correct": false
+    },
+    {
+      "export_id": 10,
+      "question_export_id": 3,
+      "text": "auf",
+      "is_correct": false
+    },
+    {
+      "export_id": 11,
+      "question_export_id": 3,
+      "text": "aus",
+      "is_correct": true
+    },
+    {
+      "export_id": 12,
+      "question_export_id": 3,
+      "text": "an",
+      "is_correct": false
+    },
+    {
+      "export_id": 13,
+      "question_export_id": 4,
+      "text": "Wo",
+      "is_correct": false
+    },
+    {
+      "export_id": 14,
+      "question_export_id": 4,
+      "text": "Wer",
+      "is_correct": true
+    },
+    {
+      "export_id": 15,
+      "question_export_id": 4,
+      "text": "Wie",
+      "is_correct": false
+    },
+    {
+      "export_id": 16,
+      "question_export_id": 4,
+      "text": "Wann",
+      "is_correct": false
+    },
+    {
+      "export_id": 17,
+      "question_export_id": 5,
+      "text": "17",
+      "is_correct": false
+    },
+    {
+      "export_id": 18,
+      "question_export_id": 5,
+      "text": "77",
+      "is_correct": true
+    },
+    {
+      "export_id": 19,
+      "question_export_id": 5,
+      "text": "70",
+      "is_correct": false
+    },
+    {
+      "export_id": 20,
+      "question_export_id": 5,
+      "text": "707",
+      "is_correct": false
+    },
+    {
+      "export_id": 21,
+      "question_export_id": 6,
+      "text": "meiner",
+      "is_correct": false
+    },
+    {
+      "export_id": 22,
+      "question_export_id": 6,
+      "text": "meine",
+      "is_correct": false
+    },
+    {
+      "export_id": 23,
+      "question_export_id": 6,
+      "text": "mein",
+      "is_correct": true
+    },
+    {
+      "export_id": 24,
+      "question_export_id": 6,
+      "text": "meines",
+      "is_correct": false
+    },
+    {
+      "export_id": 25,
+      "question_export_id": 7,
+      "text": "eine",
+      "is_correct": false
+    },
+    {
+      "export_id": 26,
+      "question_export_id": 7,
+      "text": "ein",
+      "is_correct": true
+    },
+    {
+      "export_id": 27,
+      "question_export_id": 7,
+      "text": "einen",
+      "is_correct": false
+    },
+    {
+      "export_id": 28,
+      "question_export_id": 7,
+      "text": "einem",
+      "is_correct": false
+    },
+    {
+      "export_id": 29,
+      "question_export_id": 8,
+      "text": "ein",
+      "is_correct": false
+    },
+    {
+      "export_id": 30,
+      "question_export_id": 8,
+      "text": "einen",
+      "is_correct": true
+    },
+    {
+      "export_id": 31,
+      "question_export_id": 8,
+      "text": "eine",
+      "is_correct": false
+    },
+    {
+      "export_id": 32,
+      "question_export_id": 8,
+      "text": "einer",
+      "is_correct": false
+    },
+    {
+      "export_id": 33,
+      "question_export_id": 9,
+      "text": "keine",
+      "is_correct": true
+    },
+    {
+      "export_id": 34,
+      "question_export_id": 9,
+      "text": "nicht",
+      "is_correct": false
+    },
+    {
+      "export_id": 35,
+      "question_export_id": 9,
+      "text": "nichts",
+      "is_correct": false
+    },
+    {
+      "export_id": 36,
+      "question_export_id": 9,
+      "text": "keinen",
+      "is_correct": false
+    },
+    {
+      "export_id": 37,
+      "question_export_id": 10,
+      "text": "halb neun",
+      "is_correct": true
+    },
+    {
+      "export_id": 38,
+      "question_export_id": 10,
+      "text": "halb acht",
+      "is_correct": false
+    },
+    {
+      "export_id": 39,
+      "question_export_id": 10,
+      "text": "viertel nach acht",
+      "is_correct": false
+    },
+    {
+      "export_id": 40,
+      "question_export_id": 10,
+      "text": "viertel vor acht",
+      "is_correct": false
+    },
+    {
+      "export_id": 41,
+      "question_export_id": 11,
+      "text": "auf",
+      "is_correct": false
+    },
+    {
+      "export_id": 42,
+      "question_export_id": 11,
+      "text": "ins",
+      "is_correct": true
+    },
+    {
+      "export_id": 43,
+      "question_export_id": 11,
+      "text": "im",
+      "is_correct": false
+    },
+    {
+      "export_id": 44,
+      "question_export_id": 11,
+      "text": "nach",
+      "is_correct": false
+    },
+    {
+      "export_id": 45,
+      "question_export_id": 12,
+      "text": "Ich kann gut schwimmen.",
+      "is_correct": true
+    },
+    {
+      "export_id": 46,
+      "question_export_id": 12,
+      "text": "Ich kann schwimmt gut.",
+      "is_correct": false
+    },
+    {
+      "export_id": 47,
+      "question_export_id": 12,
+      "text": "Ich schwimmen gut kann.",
+      "is_correct": false
+    },
+    {
+      "export_id": 48,
+      "question_export_id": 12,
+      "text": "Ich kann schwimmen gut.",
+      "is_correct": false
+    },
+    {
+      "export_id": 49,
+      "question_export_id": 13,
+      "text": "schreibt",
+      "is_correct": false
+    },
+    {
+      "export_id": 50,
+      "question_export_id": 13,
+      "text": "schreiben",
+      "is_correct": false
+    },
+    {
+      "export_id": 51,
+      "question_export_id": 13,
+      "text": "geschrieben",
+      "is_correct": true
+    },
+    {
+      "export_id": 52,
+      "question_export_id": 13,
+      "text": "schreibe",
+      "is_correct": false
+    },
+    {
+      "export_id": 53,
+      "question_export_id": 14,
+      "text": "zwischen",
+      "is_correct": false
+    },
+    {
+      "export_id": 54,
+      "question_export_id": 14,
+      "text": "in",
+      "is_correct": false
+    },
+    {
+      "export_id": 55,
+      "question_export_id": 14,
+      "text": "auf",
+      "is_correct": true
+    },
+    {
+      "export_id": 56,
+      "question_export_id": 14,
+      "text": "über",
+      "is_correct": false
+    },
+    {
+      "export_id": 57,
+      "question_export_id": 15,
+      "text": "war",
+      "is_correct": false
+    },
+    {
+      "export_id": 58,
+      "question_export_id": 15,
+      "text": "bin",
+      "is_correct": false
+    },
+    {
+      "export_id": 59,
+      "question_export_id": 15,
+      "text": "würde",
+      "is_correct": true
+    },
+    {
+      "export_id": 60,
+      "question_export_id": 15,
+      "text": "würden",
+      "is_correct": false
+    },
+    {
+      "export_id": 61,
+      "question_export_id": 17,
+      "text": "was",
+      "is_correct": true
+    },
+    {
+      "export_id": 62,
+      "question_export_id": 17,
+      "text": "wer",
+      "is_correct": false
+    },
+    {
+      "export_id": 63,
+      "question_export_id": 17,
+      "text": "ob",
+      "is_correct": false
+    },
+    {
+      "export_id": 64,
+      "question_export_id": 17,
+      "text": "wo",
+      "is_correct": false
+    },
+    {
+      "export_id": 65,
+      "question_export_id": 18,
+      "text": "wird",
+      "is_correct": true
+    },
+    {
+      "export_id": 66,
+      "question_export_id": 18,
+      "text": "ist",
+      "is_correct": false
+    },
+    {
+      "export_id": 67,
+      "question_export_id": 18,
+      "text": "war",
+      "is_correct": false
+    },
+    {
+      "export_id": 68,
+      "question_export_id": 18,
+      "text": "wurde",
+      "is_correct": false
+    },
+    {
+      "export_id": 69,
+      "question_export_id": 19,
+      "text": "interessanter",
+      "is_correct": false
+    },
+    {
+      "export_id": 70,
+      "question_export_id": 19,
+      "text": "interessanten",
+      "is_correct": true
+    },
+    {
+      "export_id": 71,
+      "question_export_id": 19,
+      "text": "interessante",
+      "is_correct": false
+    },
+    {
+      "export_id": 72,
+      "question_export_id": 19,
+      "text": "interessantes",
+      "is_correct": false
+    },
+    {
+      "export_id": 73,
+      "question_export_id": 20,
+      "text": "wasche….  mich",
+      "is_correct": true
+    },
+    {
+      "export_id": 74,
+      "question_export_id": 20,
+      "text": "wäscht….. dich",
+      "is_correct": false
+    },
+    {
+      "export_id": 75,
+      "question_export_id": 20,
+      "text": "gewaschen…   sich",
+      "is_correct": false
+    },
+    {
+      "export_id": 76,
+      "question_export_id": 20,
+      "text": "wusch…..mich",
+      "is_correct": false
+    },
+    {
+      "export_id": 77,
+      "question_export_id": 21,
+      "text": "die / einen",
+      "is_correct": false
+    },
+    {
+      "export_id": 78,
+      "question_export_id": 21,
+      "text": "meiner / die",
+      "is_correct": false
+    },
+    {
+      "export_id": 79,
+      "question_export_id": 21,
+      "text": "meiner / einen",
+      "is_correct": true
+    },
+    {
+      "export_id": 80,
+      "question_export_id": 21,
+      "text": "die / einen",
+      "is_correct": false
+    },
+    {
+      "export_id": 81,
+      "question_export_id": 22,
+      "text": "an den",
+      "is_correct": true
+    },
+    {
+      "export_id": 82,
+      "question_export_id": 22,
+      "text": "an dem",
+      "is_correct": false
+    },
+    {
+      "export_id": 83,
+      "question_export_id": 22,
+      "text": "auf  den",
+      "is_correct": false
+    },
+    {
+      "export_id": 84,
+      "question_export_id": 22,
+      "text": "auf dem",
+      "is_correct": false
+    },
+    {
+      "export_id": 85,
+      "question_export_id": 23,
+      "text": "gehe",
+      "is_correct": false
+    },
+    {
+      "export_id": 86,
+      "question_export_id": 23,
+      "text": "ging",
+      "is_correct": true
+    },
+    {
+      "export_id": 87,
+      "question_export_id": 23,
+      "text": "gingst",
+      "is_correct": false
+    },
+    {
+      "export_id": 88,
+      "question_export_id": 23,
+      "text": "gegangen",
+      "is_correct": false
+    },
+    {
+      "export_id": 89,
+      "question_export_id": 25,
+      "text": "lösen",
+      "is_correct": false
+    },
+    {
+      "export_id": 90,
+      "question_export_id": 25,
+      "text": "gelöst",
+      "is_correct": true
+    },
+    {
+      "export_id": 91,
+      "question_export_id": 25,
+      "text": "löst",
+      "is_correct": false
+    },
+    {
+      "export_id": 92,
+      "question_export_id": 25,
+      "text": "wurde",
+      "is_correct": false
+    },
+    {
+      "export_id": 93,
+      "question_export_id": 26,
+      "text": "sodass",
+      "is_correct": true
+    },
+    {
+      "export_id": 94,
+      "question_export_id": 26,
+      "text": "obwohl",
+      "is_correct": false
+    },
+    {
+      "export_id": 95,
+      "question_export_id": 26,
+      "text": "dass",
+      "is_correct": false
+    },
+    {
+      "export_id": 96,
+      "question_export_id": 26,
+      "text": "aber",
+      "is_correct": false
+    },
+    {
+      "export_id": 97,
+      "question_export_id": 27,
+      "text": "immer",
+      "is_correct": false
+    },
+    {
+      "export_id": 98,
+      "question_export_id": 27,
+      "text": "zufällig",
+      "is_correct": false
+    },
+    {
+      "export_id": 99,
+      "question_export_id": 27,
+      "text": "nur in einem besonderen Fall",
+      "is_correct": true
+    },
+    {
+      "export_id": 100,
+      "question_export_id": 27,
+      "text": "normal",
+      "is_correct": false
+    },
+    {
+      "export_id": 101,
+      "question_export_id": 28,
+      "text": "ein Sonderangebot",
+      "is_correct": false
+    },
+    {
+      "export_id": 102,
+      "question_export_id": 28,
+      "text": "eine Lüge oder Täuschung",
+      "is_correct": true
+    },
+    {
+      "export_id": 103,
+      "question_export_id": 28,
+      "text": "ein Rabatt",
+      "is_correct": false
+    },
+    {
+      "export_id": 104,
+      "question_export_id": 28,
+      "text": "eine Lieferung",
+      "is_correct": false
+    },
+    {
+      "export_id": 105,
+      "question_export_id": 29,
+      "text": "werde",
+      "is_correct": false
+    },
+    {
+      "export_id": 106,
+      "question_export_id": 29,
+      "text": "hätte",
+      "is_correct": true
+    },
+    {
+      "export_id": 107,
+      "question_export_id": 29,
+      "text": "würde",
+      "is_correct": false
+    },
+    {
+      "export_id": 108,
+      "question_export_id": 29,
+      "text": "war",
+      "is_correct": false
+    },
+    {
+      "export_id": 109,
+      "question_export_id": 30,
+      "text": "als ob",
+      "is_correct": true
+    },
+    {
+      "export_id": 110,
+      "question_export_id": 30,
+      "text": "wenn",
+      "is_correct": false
+    },
+    {
+      "export_id": 111,
+      "question_export_id": 30,
+      "text": "obwohl",
+      "is_correct": false
+    },
+    {
+      "export_id": 112,
+      "question_export_id": 30,
+      "text": "weil",
+      "is_correct": false
+    },
+    {
+      "export_id": 113,
+      "question_export_id": 31,
+      "text": "beginnt",
+      "is_correct": false
+    },
+    {
+      "export_id": 114,
+      "question_export_id": 31,
+      "text": "begann",
+      "is_correct": true
+    },
+    {
+      "export_id": 115,
+      "question_export_id": 31,
+      "text": "beginnen",
+      "is_correct": false
+    },
+    {
+      "export_id": 116,
+      "question_export_id": 31,
+      "text": "begann hat",
+      "is_correct": false
+    },
+    {
+      "export_id": 117,
+      "question_export_id": 32,
+      "text": "dann",
+      "is_correct": false
+    },
+    {
+      "export_id": 118,
+      "question_export_id": 32,
+      "text": "schon",
+      "is_correct": true
+    },
+    {
+      "export_id": 119,
+      "question_export_id": 32,
+      "text": "daher",
+      "is_correct": false
+    },
+    {
+      "export_id": 120,
+      "question_export_id": 32,
+      "text": "so",
+      "is_correct": false
+    },
+    {
+      "export_id": 121,
+      "question_export_id": 33,
+      "text": "sobald",
+      "is_correct": true
+    },
+    {
+      "export_id": 122,
+      "question_export_id": 33,
+      "text": "sowohl",
+      "is_correct": false
+    },
+    {
+      "export_id": 123,
+      "question_export_id": 33,
+      "text": "dafür",
+      "is_correct": false
+    },
+    {
+      "export_id": 124,
+      "question_export_id": 33,
+      "text": "sodass",
+      "is_correct": false
+    }
+  ],
+  "answer_patterns": [],
+  "ordering_items": [],
+  "match_pairs": [
+    {
+      "export_id": 1,
+      "question_export_id": 16,
+      "left_text": "1",
+      "right_text": "meiner"
+    },
+    {
+      "export_id": 2,
+      "question_export_id": 16,
+      "left_text": "2",
+      "right_text": "den"
+    },
+    {
+      "export_id": 3,
+      "question_export_id": 16,
+      "left_text": "3",
+      "right_text": "einen"
+    },
+    {
+      "export_id": 4,
+      "question_export_id": 16,
+      "left_text": "4",
+      "right_text": "weil"
+    },
+    {
+      "export_id": 5,
+      "question_export_id": 16,
+      "left_text": "5",
+      "right_text": "dass"
+    },
+    {
+      "export_id": 6,
+      "question_export_id": 16,
+      "left_text": "6",
+      "right_text": "das"
+    },
+    {
+      "export_id": 7,
+      "question_export_id": 16,
+      "left_text": "7",
+      "right_text": "wenn"
+    },
+    {
+      "export_id": 8,
+      "question_export_id": 24,
+      "left_text": "1",
+      "right_text": "damit"
+    },
+    {
+      "export_id": 9,
+      "question_export_id": 24,
+      "left_text": "2",
+      "right_text": "daher"
+    },
+    {
+      "export_id": 10,
+      "question_export_id": 24,
+      "left_text": "3",
+      "right_text": "während"
+    },
+    {
+      "export_id": 11,
+      "question_export_id": 24,
+      "left_text": "4",
+      "right_text": "aufgrund"
+    },
+    {
+      "export_id": 12,
+      "question_export_id": 24,
+      "left_text": "5",
+      "right_text": "um"
+    },
+    {
+      "export_id": 13,
+      "question_export_id": 24,
+      "left_text": "6",
+      "right_text": "sowohl"
+    },
+    {
+      "export_id": 14,
+      "question_export_id": 24,
+      "left_text": "7",
+      "right_text": "sondern auch"
+    },
+    {
+      "export_id": 15,
+      "question_export_id": 24,
+      "left_text": "8",
+      "right_text": "zwar … aber"
+    },
+    {
+      "export_id": 16,
+      "question_export_id": 24,
+      "left_text": "9",
+      "right_text": "während"
+    }
+  ],
+  "question_media": [
+    {
+      "export_id": 1,
+      "question_export_id": 1,
+      "media_type": "image",
+      "file_path": "assessments/media/2025/12/07/khodroo.jpg",
+      "file_url": "/media/assessments/media/2025/12/07/khodroo.jpg",
+      "caption": "",
+      "order": 0,
+      "created_at": "2025-12-07T14:00:40.761080+00:00"
+    }
+  ],
+  "id_mapping": {
+    "assessments": {
+      "1": 1,
+      "2": 2,
+      "3": 3,
+      "4": 4
+    },
+    "questions": {
+      "233": 1,
+      "234": 2,
+      "235": 3,
+      "236": 4,
+      "237": 5,
+      "238": 6,
+      "239": 7,
+      "240": 8,
+      "241": 9,
+      "242": 10,
+      "243": 11,
+      "244": 12,
+      "245": 13,
+      "246": 14,
+      "247": 15,
+      "248": 16,
+      "249": 17,
+      "250": 18,
+      "251": 19,
+      "252": 20,
+      "253": 21,
+      "254": 22,
+      "255": 23,
+      "256": 24,
+      "257": 25,
+      "258": 26,
+      "259": 27,
+      "260": 28,
+      "261": 29,
+      "262": 30,
+      "263": 31,
+      "264": 32,
+      "265": 33
+    }
+  }
+}

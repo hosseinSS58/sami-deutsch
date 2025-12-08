@@ -3,8 +3,6 @@ from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 from django.utils import timezone
 from urllib.parse import urlparse, parse_qs
 from .forms import ContactForm
@@ -210,7 +208,6 @@ class ContactView(FormView):
         return super().form_valid(form)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
 class YouTubeClickView(View):
     """API endpoint برای ثبت کلیک‌های یوتیوب"""
     

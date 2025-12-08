@@ -132,6 +132,37 @@ class SiteSettings(SingletonModel):
     # Custom CSS
     custom_css = models.TextField(blank=True, verbose_name=_("CSS سفارشی"), help_text=_("کدهای CSS اضافی برای شخصی‌سازی بیشتر"))
 
+    @property
+    def safe_css(self):
+        """
+        Return sanitized CSS to prevent XSS attacks
+        Removes dangerous CSS patterns that could execute JavaScript
+        """
+        if not self.custom_css:
+            return ''
+        
+        css = self.custom_css
+        
+        # Remove dangerous CSS patterns that could execute JavaScript
+        import re
+        
+        # Block javascript: URLs
+        css = re.sub(r'javascript\s*:', '', css, flags=re.IGNORECASE)
+        
+        # Block expression() (IE-specific but dangerous)
+        css = re.sub(r'expression\s*\([^)]*\)', '', css, flags=re.IGNORECASE)
+        
+        # Block -moz-binding (Firefox-specific, can execute code)
+        css = re.sub(r'-moz-binding\s*:[^;]*;?', '', css, flags=re.IGNORECASE)
+        
+        # Block @import with javascript
+        css = re.sub(r'@import\s+.*javascript.*', '', css, flags=re.IGNORECASE)
+        
+        # Block data: URLs in url() that contain javascript
+        css = re.sub(r'url\s*\(\s*["\']?data:.*javascript.*["\']?\s*\)', '', css, flags=re.IGNORECASE)
+        
+        return css.strip()
+
     def __str__(self) -> str:
         return "Site settings"
 

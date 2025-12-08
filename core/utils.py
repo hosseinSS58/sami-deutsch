@@ -3,9 +3,42 @@ Utility functions for core app
 """
 import logging
 import requests
+import ipaddress
+import re
 from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
+
+
+def validate_ip_address(ip_str):
+    """
+    Validate and clean IP address to prevent SSRF attacks
+    
+    Args:
+        ip_str: IP address string (may contain port, path, etc.)
+        
+    Returns:
+        Clean IP address string or None if invalid
+    """
+    if not ip_str:
+        return None
+    
+    # Extract only IP part (remove port, path, etc.)
+    ip_match = re.match(r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', str(ip_str))
+    if not ip_match:
+        return None
+    
+    clean_ip = ip_match.group(1)
+    
+    # Validate IP format
+    try:
+        ip_obj = ipaddress.ip_address(clean_ip)
+        # Block private/internal IPs for security (SSRF prevention)
+        if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local:
+            return None
+        return clean_ip
+    except ValueError:
+        return None
 
 
 def get_country_from_ip(ip_address):
@@ -22,8 +55,13 @@ def get_country_from_ip(ip_address):
     if not ip_address or ip_address in ['127.0.0.1', 'localhost', '::1']:
         return ''
     
+    # Validate and clean IP address to prevent SSRF
+    clean_ip = validate_ip_address(ip_address)
+    if not clean_ip:
+        return ''
+    
     # بررسی cache برای جلوگیری از درخواست‌های تکراری
-    cache_key = f'country_ip_{ip_address}'
+    cache_key = f'country_ip_{clean_ip}'
     cached_country = cache.get(cache_key)
     if cached_country is not None:
         return cached_country
@@ -32,7 +70,7 @@ def get_country_from_ip(ip_address):
         # استفاده از ipapi.co API
         # می‌توانید از API های دیگر مثل ip-api.com هم استفاده کنید
         response = requests.get(
-            f'https://ipapi.co/{ip_address}/country_code/',
+            f'https://ipapi.co/{clean_ip}/country_code/',
             timeout=3,
             headers={'User-Agent': 'Django-GeoIP/1.0'}
         )
@@ -46,13 +84,13 @@ def get_country_from_ip(ip_address):
                 return country_code
         
         # در صورت خطا، از API جایگزین استفاده کن
-        return _get_country_from_ip_api(ip_address)
+        return _get_country_from_ip_api(clean_ip)
         
     except Exception as e:
-        logger.warning(f"خطا در تشخیص کشور برای IP {ip_address}: {str(e)}")
+        logger.warning(f"خطا در تشخیص کشور برای IP {clean_ip}: {str(e)}")
         # تلاش با API جایگزین
         try:
-            return _get_country_from_ip_api(ip_address)
+            return _get_country_from_ip_api(clean_ip)
         except Exception:
             return ''
 
@@ -61,9 +99,14 @@ def _get_country_from_ip_api(ip_address):
     """
     API جایگزین: ip-api.com
     """
+    # Validate IP before making request
+    clean_ip = validate_ip_address(ip_address)
+    if not clean_ip:
+        return ''
+    
     try:
         response = requests.get(
-            f'http://ip-api.com/json/{ip_address}?fields=countryCode',
+            f'http://ip-api.com/json/{clean_ip}?fields=countryCode',
             timeout=3
         )
         
@@ -71,11 +114,11 @@ def _get_country_from_ip_api(ip_address):
             data = response.json()
             country_code = data.get('countryCode', '')
             if len(country_code) == 2 and country_code.isalpha():
-                cache_key = f'country_ip_{ip_address}'
+                cache_key = f'country_ip_{clean_ip}'
                 cache.set(cache_key, country_code, 86400)
                 return country_code
     except Exception as e:
-        logger.warning(f"خطا در API جایگزین برای IP {ip_address}: {str(e)}")
+        logger.warning(f"خطا در API جایگزین برای IP {clean_ip}: {str(e)}")
     
     return ''
 

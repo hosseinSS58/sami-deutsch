@@ -27,13 +27,28 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY", default="django-insecure-dev-secret-key")
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG", default=True)
+DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1", "192.168.1.104"]) 
+# SECURITY WARNING: keep the secret key used in production secret!
+# در production حتماً SECRET_KEY را در .env تنظیم کنید
+if DEBUG:
+    SECRET_KEY = env("SECRET_KEY", default="django-insecure-dev-secret-key")
+else:
+    SECRET_KEY = env("SECRET_KEY", default=None)
+    if not SECRET_KEY:
+        raise ValueError("SECRET_KEY environment variable must be set in production")
+
+# ALLOWED_HOSTS: در production فقط domain واقعی را اضافه کنید
+if DEBUG:
+    ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
+else:
+    ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[
+          "https://www.samideutsch.ir",
+          "https://samideutsch.ir",
+      ])
+    if not ALLOWED_HOSTS:
+        raise ValueError("ALLOWED_HOSTS must be set in production") 
 
 
 # Application definition
@@ -108,9 +123,15 @@ WSGI_APPLICATION = "sami.wsgi.application"
 DATABASES = {
     "default": env.db(
         "DATABASE_URL",
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}" if DEBUG else None,
     )
 }
+
+# Validation: در production نباید از SQLite استفاده شود
+if not DEBUG:
+    db_engine = DATABASES["default"].get("ENGINE", "")
+    if "sqlite" in db_engine.lower():
+        raise ValueError("SQLite database is not allowed in production. Please use PostgreSQL or MySQL.")
 
 
 # Password validation
@@ -122,6 +143,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": 8,
+        },
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
@@ -199,13 +223,23 @@ PAYMENT_HOST = env("PAYMENT_HOST", default="127.0.0.1:8000")
 PAYMENT_USES_HTTPS = env.bool("PAYMENT_USES_HTTPS", default=False)
 
 ############################
-# Email (development defaults)
+# Email Configuration
 ############################
 
 EMAIL_BACKEND = env(
     "EMAIL_BACKEND",
-    default="django.core.mail.backends.console.EmailBackend",
+    default="django.core.mail.backends.console.EmailBackend" if DEBUG else "django.core.mail.backends.smtp.EmailBackend",
 )
+
+# SMTP Settings (برای production)
+EMAIL_HOST = env("EMAIL_HOST", default="")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@samideutsch.ir")
+SERVER_EMAIL = env("SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 
 # Auth redirects
 LOGIN_REDIRECT_URL = "/"
@@ -369,3 +403,12 @@ ADMIN_INDEX_TITLE = "پنل مدیریت سامی دویچ"
 # Password reset settings
 PASSWORD_RESET_TIMEOUT = 86400  # 24 hours (default)
 PASSWORD_RESET_EMAIL_SUBJECT = "بازیابی رمز عبور - Sami Deutsch"
+
+# Admin email settings (برای logging و error reporting)
+ADMINS = [
+    (env("ADMIN_NAME", default="Admin"), env("ADMIN_EMAIL", default="admin@example.com")),
+]
+
+# File upload permissions
+FILE_UPLOAD_PERMISSIONS = 0o644
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
