@@ -43,10 +43,7 @@ else:
 if DEBUG:
     ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 else:
-    ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[
-          "https://www.samideutsch.ir",
-          "https://samideutsch.ir",
-      ])
+    ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["samideutsch.ir", "www.samideutsch.ir"])
     if not ALLOWED_HOSTS:
         raise ValueError("ALLOWED_HOSTS must be set in production") 
 
@@ -120,15 +117,38 @@ WSGI_APPLICATION = "sami.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    "default": env.db(
-        "DATABASE_URL",
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}" if DEBUG else None,
-    )
-}
+# Database
+try:
+    DATABASES = {
+        "default": env.db(
+            "DATABASE_URL",
+            default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}" if DEBUG else None,
+        )
+    }
+    
+    # Fix PostgreSQL connection issues:
+    # 1. Force IPv4 instead of IPv6 (localhost -> 127.0.0.1)
+    # 2. Enable SSL for secure connections
+    if DATABASES.get("default") and "postgresql" in DATABASES["default"].get("ENGINE", "").lower():
+        # Replace localhost with 127.0.0.1 to force IPv4
+        if DATABASES["default"].get("HOST") == "localhost":
+            DATABASES["default"]["HOST"] = "127.0.0.1"
+        
+        # Add SSL options for PostgreSQL
+        DATABASES["default"]["OPTIONS"] = {
+            **DATABASES["default"].get("OPTIONS", {}),
+            "sslmode": "prefer",  # Try SSL, fallback to non-SSL if not available
+        }
+        
+except Exception as e:
+    if not DEBUG:
+        raise ValueError(f"DATABASE_URL is required in production. Error: {e}")
+    raise
 
 # Validation: در production نباید از SQLite استفاده شود
 if not DEBUG:
+    if not DATABASES.get("default") or not DATABASES["default"].get("ENGINE"):
+        raise ValueError("DATABASE_URL must be set in production")
     db_engine = DATABASES["default"].get("ENGINE", "")
     if "sqlite" in db_engine.lower():
         raise ValueError("SQLite database is not allowed in production. Please use PostgreSQL or MySQL.")

@@ -299,3 +299,5 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.WARNING(
                     f'Note: You will need to manually upload these files to the new server.'
                 ))
+
+
