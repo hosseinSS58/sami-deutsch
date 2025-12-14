@@ -158,3 +158,4 @@ python manage.py import_assessments assessments_data.json --clear-existing --med
 اگر مشکل Encoding داشتید، مطمئن شوید که از UTF-8 استفاده می‌کنید.
 
 
+

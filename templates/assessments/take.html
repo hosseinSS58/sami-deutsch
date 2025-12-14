@@ -104,6 +104,56 @@
                       <span class="badge bg-primary-subtle text-primary">{{ forloop.counter }}</span>
                       <label class="form-label m-0">{{ grp.question.text }}</label>
                     </div>
+                  {% if grp.media %}
+                  <div class="mb-2">
+                    {% for media in grp.media %}
+                      {% if media.media_type == "image" %}
+                        <div class="mb-2">
+                          {% if media.file %}
+                            <img src="{{ media.file.url }}" alt="{{ media.caption }}" class="img-fluid rounded">
+                          {% elif media.url %}
+                            <img src="{{ media.url }}" alt="{{ media.caption }}" class="img-fluid rounded">
+                          {% endif %}
+                          {% if media.caption %}<div class="small text-muted mt-1">{{ media.caption }}</div>{% endif %}
+                        </div>
+                      {% elif media.media_type == "audio" %}
+                        <div class="mb-2">
+                          {% if media.file %}
+                            <audio controls class="w-100">
+                              <source src="{{ media.file.url }}">
+                            </audio>
+                          {% elif media.url %}
+                            <a href="{{ media.url }}" target="_blank" rel="noopener">{% trans "گوش کنید" %}</a>
+                          {% endif %}
+                          {% if media.caption %}<div class="small text-muted mt-1">{{ media.caption }}</div>{% endif %}
+                        </div>
+                      {% elif media.media_type == "video" %}
+                        <div class="mb-2">
+                          {% if media.file %}
+                            <video controls class="w-100 rounded" style="max-height:320px;">
+                              <source src="{{ media.file.url }}">
+                            </video>
+                          {% elif media.url %}
+                            <a href="{{ media.url }}" target="_blank" rel="noopener">{% trans "مشاهده ویدیو" %}</a>
+                          {% endif %}
+                          {% if media.caption %}<div class="small text-muted mt-1">{{ media.caption }}</div>{% endif %}
+                        </div>
+                      {% elif media.media_type == "text" %}
+                        <div class="mb-2 p-2 bg-light border rounded small">
+                          {{ media.caption|default:media.url }}
+                        </div>
+                      {% elif media.media_type == "file" %}
+                        <div class="mb-2">
+                          {% if media.file %}
+                            <a href="{{ media.file.url }}" class="link-primary" target="_blank" rel="noopener">{{ media.caption|default:media.file.name }}</a>
+                          {% elif media.url %}
+                            <a href="{{ media.url }}" class="link-primary" target="_blank" rel="noopener">{{ media.caption|default:media.url }}</a>
+                          {% endif %}
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                  {% endif %}
                     <div class="mt-2">
                       {% for field in grp.fields %}
                         <div class="mb-2">{{ field }}</div>

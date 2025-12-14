@@ -4,8 +4,14 @@ from django.core.management.base import BaseCommand
 from django.core.files.storage import default_storage
 from django.conf import settings
 from assessments.models import (
-    Assessment, Question, Choice, AnswerPattern, 
-    OrderingItem, MatchPair, QuestionMedia
+    Assessment,
+    Question,
+    Choice,
+    AnswerPattern,
+    OrderingItem,
+    MatchPair,
+    QuestionMedia,
+    HintResource,
 )
 
 
@@ -53,6 +59,7 @@ class Command(BaseCommand):
             'ordering_items': [],
             'match_pairs': [],
             'question_media': [],
+            'hint_resources': [],
             'id_mapping': {}
         }
 
@@ -96,6 +103,8 @@ class Command(BaseCommand):
                 'weight': question.weight,
                 'explanation': question.explanation,
                 'correct_boolean': question.correct_boolean,
+                'hint_text': question.hint_text,
+                'hint_links': question.hint_links,
             })
 
         data['id_mapping']['questions'] = question_id_map
@@ -190,6 +199,19 @@ class Command(BaseCommand):
             })
             media_idx += 1
 
+        # Export HintResources
+        hint_resources = HintResource.objects.all().order_by('question_id', 'order', 'id')
+        hint_idx = 1
+        for hint in hint_resources:
+            data['hint_resources'].append({
+                'export_id': hint_idx,
+                'question_export_id': question_id_map.get(hint.question_id),
+                'title': hint.title,
+                'url': hint.url,
+                'order': hint.order,
+            })
+            hint_idx += 1
+
         # Optionally include submissions
         if include_submissions:
             from assessments.models import Submission, SubmissionItem
@@ -209,7 +231,6 @@ class Command(BaseCommand):
                 data['submissions'].append({
                     'export_id': new_id,
                     'assessment_export_id': assessment_id_map.get(submission.assessment_id),
-                    'user_id': submission.user_id,  # May not exist in new DB
                     'user_identifier': submission.user_identifier,
                     'full_name': submission.full_name,
                     'email': submission.email,
@@ -261,6 +282,9 @@ class Command(BaseCommand):
         ))
         self.stdout.write(self.style.SUCCESS(
             f'✓ Exported {len(data["question_media"])} media files'
+        ))
+        self.stdout.write(self.style.SUCCESS(
+            f'✓ Exported {len(data["hint_resources"])} hint resources'
         ))
         
         if include_submissions:

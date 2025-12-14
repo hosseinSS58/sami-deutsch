@@ -7,10 +7,25 @@ class AssessmentStartForm(forms.Form):
     assessment = forms.ModelChoiceField(queryset=Assessment.objects.filter(is_active=True))
 
 
-def build_assessment_form(assessment: Assessment, questions=None):
+def build_assessment_form(assessment: Assessment, questions=None, user=None):
     class _AssessmentForm(forms.Form):
-        full_name = forms.CharField(max_length=150, required=False, label="نام")
-        email = forms.EmailField(required=False, label="ایمیل")
+        if user and getattr(user, "is_authenticated", False):
+            full_name = forms.CharField(
+                max_length=150,
+                required=False,
+                initial=user.get_full_name() or user.username,
+                widget=forms.HiddenInput,
+                label="نام",
+            )
+            email = forms.EmailField(
+                required=False,
+                initial=user.email,
+                widget=forms.HiddenInput,
+                label="ایمیل",
+            )
+        else:
+            full_name = forms.CharField(max_length=150, required=True, label="نام")
+            email = forms.EmailField(required=True, label="ایمیل")
 
     qs = questions if questions is not None else assessment.questions.all()
     for question in qs:

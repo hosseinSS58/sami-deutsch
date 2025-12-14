@@ -149,6 +149,51 @@
           {% endif %}
         </div>
       </div>
+
+      <!-- Assessment history -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-warning text-dark">
+          <h5 class="mb-0">
+            <i class="fas fa-clipboard-check me-2"></i>آزمون‌های من
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if user_submissions %}
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>آزمون</th>
+                  <th>امتیاز</th>
+                  <th>درصد</th>
+                  <th>سطح پیشنهادی</th>
+                  <th>تاریخ</th>
+                  <th>مشاهده</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for sub in user_submissions %}
+                <tr>
+                  <td>{{ sub.assessment.title }}</td>
+                  <td>{{ sub.score|floatformat:1 }} / {{ sub.total_weight|floatformat:1 }}</td>
+                  <td>{{ sub.ratio|floatformat:2 }}</td>
+                  <td><span class="badge bg-primary">{{ sub.recommended_level }}</span></td>
+                  <td>{{ sub.created_at|date:"Y/m/d H:i" }}</td>
+                  <td>
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'assessments:result' %}?submission_id={{ sub.id }}">
+                      <i class="fas fa-eye"></i>
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-muted small">{% trans "هنوز آزمونی تکمیل نشده است." %}</div>
+          {% endif %}
+        </div>
+      </div>
     </div>
 
     <!-- Sidebar -->
@@ -189,6 +234,9 @@
              </a>
              <a href="{% url 'assessments:intro' %}" class="btn btn-outline-warning btn-sm">
                <i class="fas fa-clipboard-check me-2"></i>{% trans "آزمون تعیین سطح" %}
+             </a>
+             <a href="{% url 'assessments:result' %}" class="btn btn-outline-success btn-sm">
+               <i class="fas fa-poll me-2"></i>{% trans "مشاهده نتیجه آزمون" %}
              </a>
              <a href="{% url 'blog:list' %}" class="btn btn-outline-success btn-sm">
                <i class="fas fa-book me-2"></i>{% trans "مقالات آموزشی" %}

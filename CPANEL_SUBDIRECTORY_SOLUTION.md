@@ -226,3 +226,4 @@ RewriteRule ^(.*)$ /django_app/$1 [L]
 
 
 
+

@@ -293,3 +293,4 @@ ADMIN_URL=secret-admin-2024/
 **نکته مهم:** بعد از ایجاد یا تغییر `.env`، حتماً Django را restart کنید!
 
 
+

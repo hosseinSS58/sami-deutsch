@@ -2,19 +2,38 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView, FormView
+from django.db.models import Prefetch
 import re
 import time
 from .models import Assessment, Question, Choice, Submission, SubmissionItem
 from .forms import build_assessment_form
 
 
+def user_identifier_for_request(request) -> str:
+    if request.user.is_authenticated:
+        return f"user-{request.user.id}"
+    if not request.session.session_key:
+        request.session.create()
+    return f"anon-{request.session.session_key}"
+
+
 class AssessmentIntroView(TemplateView):
     template_name = "assessments/intro.html"
+
+    def get(self, request, *args, **kwargs):
+        active_assessments = Assessment.objects.filter(is_active=True)
+        if active_assessments.count() == 1:
+            # If only one assessment, go to classic mode for it
+            request.session["assessment_id"] = active_assessments.first().id
+            request.session["adaptive"] = False
+            return redirect("assessments:take")
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         active_assessments = Assessment.objects.filter(is_active=True).order_by("level", "title")
         ctx["levels_available"] = sorted(set(active_assessments.values_list("level", flat=True)))
+        ctx["assessments"] = active_assessments
         return ctx
 
 
@@ -24,7 +43,8 @@ class AssessmentTakeView(FormView):
     started_initial = False
 
     def _get_user_identifier(self) -> str:
-        return str(self.request.user.id or self.request.session.session_key)
+        # Ensure stable identifier per user/guest
+        return user_identifier_for_request(self.request)
 
     def _attempts_exceeded(self) -> bool:
         limit = getattr(self.assessment, "attempt_limit", 0) or 0
@@ -57,17 +77,64 @@ class AssessmentTakeView(FormView):
         self.request.session["adaptive"] = False
 
     def dispatch(self, request, *args, **kwargs):
-        # Always use adaptive engine
+        # Determine mode
+        mode = request.GET.get("mode")
+        if mode == "classic":
+            request.session["adaptive"] = False
+        elif mode == "adaptive":
+            request.session["adaptive"] = True
+
+        adaptive = request.session.get("adaptive", True)
+
+        # Classic mode: allow explicit assessment selection
+        assessment_id = request.GET.get("assessment_id") or request.session.get("assessment_id")
+        if not adaptive:
+            # fallback to first active assessment if none specified
+            if not assessment_id:
+                first_assessment = Assessment.objects.filter(is_active=True).order_by("id").first()
+                if first_assessment:
+                    assessment_id = first_assessment.id
+            if not assessment_id:
+                messages.error(request, _("هیچ آزمون فعالی یافت نشد."))
+                return redirect("assessments:intro")
+            self.assessment = get_object_or_404(Assessment, id=assessment_id, is_active=True)
+            request.session["assessment_id"] = self.assessment.id
+            media_qs = self.assessment.questions.model.media_items.rel.related_model.objects.order_by("order", "id")
+            self.questions = list(
+                self.assessment.questions.order_by("id").prefetch_related(
+                    "choices",
+                    "answer_patterns",
+                    "ordering_items",
+                    "match_pairs",
+                    Prefetch("media_items", queryset=media_qs),
+                )
+            )
+            self.form_class = build_assessment_form(self.assessment, questions=self.questions, user=request.user)
+            if self._attempts_exceeded():
+                messages.warning(self.request, _("به حداکثر دفعات مجاز برای این آزمون رسیده‌اید."))
+                return redirect("assessments:result")
+            if self._time_limit_exceeded():
+                self._reset_assessment_progress()
+                messages.info(self.request, _("مهلت آزمون قبلی شما تمام شد. می‌توانید دوباره شروع کنید."))
+                return redirect("assessments:take")
+            # authenticated users skip identity
+            if request.user.is_authenticated and not request.session.get("identity"):
+                request.session["identity"] = {
+                    "full_name": request.user.get_full_name() or request.user.username,
+                    "email": request.user.email,
+                }
+            ident = request.session.get("identity", {})
+            self.started_initial = bool(ident.get("full_name") and ident.get("email")) or request.user.is_authenticated
+            request.session.setdefault("assessment_start", int(time.time()))
+            return super().dispatch(request, *args, **kwargs)
+
+        # Adaptive mode (default)
         level_order = ["A1", "A2", "B1", "B2"]
-        # Batch size increases with level
         level_batch_sizes = {"A1": 5, "A2": 7, "B1": 9, "B2": 12}
 
-        # Start or continue adaptive mode only
-        request.session.pop("assessment_id", None)
         request.session["adaptive"] = True
-        # Initialize adaptive state
+        request.session.pop("assessment_id", None)
         if "adaptive_state" not in request.session:
-            # Start from A1 by default
             request.session["adaptive_state"] = {
                 "current_level": "A1",
                 "asked_by_level": {lvl: [] for lvl in level_order},
@@ -77,14 +144,18 @@ class AssessmentTakeView(FormView):
         state = request.session["adaptive_state"]
         current_level = state.get("current_level", "A1")
 
-        # Load assessment for current level
         self.assessment = get_object_or_404(Assessment, level=current_level, is_active=True)
 
-        # Build next batch of questions (first ones not yet asked)
         asked_ids = set(state.get("asked_by_level", {}).get(current_level, []))
         qs = (
             self.assessment.questions.order_by("id")
-            .prefetch_related("choices", "answer_patterns", "ordering_items", "match_pairs")
+            .prefetch_related(
+                "choices",
+                "answer_patterns",
+                "ordering_items",
+                "match_pairs",
+                Prefetch("media_items", queryset=self.assessment.questions.model.media_items.rel.related_model.objects.order_by("order", "id")),
+            )
         )
         batch = []
         batch_size = level_batch_sizes.get(current_level, 5)
@@ -93,13 +164,11 @@ class AssessmentTakeView(FormView):
                 batch.append(q)
             if len(batch) >= batch_size:
                 break
-
-        # If we ran out of questions in this level, just reuse from the start (rare in dev)
         if not batch:
             batch = list(qs[:batch_size])
 
         self.questions = batch
-        self.form_class = build_assessment_form(self.assessment, questions=batch)
+        self.form_class = build_assessment_form(self.assessment, questions=batch, user=request.user)
         if self._attempts_exceeded():
             messages.warning(self.request, _("به حداکثر دفعات مجاز برای این آزمون رسیده‌اید."))
             return redirect("assessments:result")
@@ -107,9 +176,14 @@ class AssessmentTakeView(FormView):
             self._reset_assessment_progress()
             messages.info(self.request, _("مهلت آزمون قبلی شما تمام شد. می‌توانید دوباره شروع کنید."))
             return redirect("assessments:take")
-        # If identity already provided in adaptive mode, skip pre-start panel
+        # Identity handling
+        if request.user.is_authenticated:
+            request.session["identity"] = {
+                "full_name": request.user.get_full_name() or request.user.username,
+                "email": request.user.email,
+            }
         ident = request.session.get("identity", {})
-        self.started_initial = bool(ident.get("full_name") and ident.get("email"))
+        self.started_initial = bool(ident.get("full_name") and ident.get("email")) or request.user.is_authenticated
         request.session.setdefault("assessment_start", state.get("start_ts", int(time.time())))
         return super().dispatch(request, *args, **kwargs)
 
@@ -127,12 +201,22 @@ class AssessmentTakeView(FormView):
                     if name == base or name.startswith(f"{base}_blank_"):
                         q_fields.append(f)
                 if q_fields:
-                    groups.append({"question": q, "fields": q_fields})
+                    groups.append(
+                        {
+                            "question": q,
+                            "fields": q_fields,
+                            "media": list(getattr(q, "media_items", []).all()) if hasattr(q, "media_items") else [],
+                        }
+                    )
             context["question_groups"] = groups
             context["question_fields"] = [f for f in form if str(getattr(f, "name", "")).startswith("q_")]
         context["time_limit"] = self.assessment.time_limit_seconds
         # Adaptive identity form toggle
-        context["show_identity_form"] = not bool(self.request.session.get("identity", {}).get("full_name") and self.request.session.get("identity", {}).get("email"))
+        has_identity = bool(
+            self.request.user.is_authenticated
+            or (self.request.session.get("identity", {}).get("full_name") and self.request.session.get("identity", {}).get("email"))
+        )
+        context["show_identity_form"] = not has_identity
         context["started_initial"] = self.started_initial
         return context
 
@@ -154,8 +238,8 @@ class AssessmentTakeView(FormView):
             submission = Submission.objects.create(
                 assessment=self.assessment,
                 user_identifier=self._get_user_identifier(),
-                full_name=form.cleaned_data.get("full_name", ""),
-                email=form.cleaned_data.get("email", ""),
+                full_name=self.request.user.get_full_name() or form.cleaned_data.get("full_name", ""),
+                email=self.request.user.email if self.request.user.is_authenticated else form.cleaned_data.get("email", ""),
             )
             for question in self.questions:
                 field = form.cleaned_data.get(f"q_{question.id}")
@@ -264,10 +348,9 @@ class AssessmentTakeView(FormView):
             duration = elapsed
             ratio = gained_total / max(total_weight, 1)
             thresholds = [
-                (0.85, "C1"),
-                (0.7, "B2"),
-                (0.5, "B1"),
-                (0.3, "A2"),
+                (0.75, "B2"),
+                (0.55, "B1"),
+                (0.35, "A2"),
                 (0.0, "A1"),
             ]
             recommended = next(level for th, level in thresholds if ratio >= th)
@@ -528,37 +611,63 @@ class AssessmentResultView(TemplateView):
         ctx["batch_history"] = list(self.request.session.get("adaptive_history", []))
         
         # Get the latest submission for this user
-        user_identifier = str(self.request.user.id or self.request.session.session_key)
+        user_identifier = user_identifier_for_request(self.request)
+        submission_id = self.request.GET.get("submission_id")
         try:
-            latest_submission = Submission.objects.filter(
-                user_identifier=user_identifier
-            ).order_by('-created_at').first()
-            
+            qs = Submission.objects.filter(user_identifier=user_identifier)
+            if submission_id:
+                latest_submission = qs.filter(id=submission_id).first()
+            else:
+                latest_submission = qs.order_by("-created_at").first()
+
             if latest_submission:
-                ctx.update({
-                    'submission': latest_submission,
-                    'score': latest_submission.score,
-                    'total_weight': latest_submission.total_weight,
-                    'ratio': latest_submission.ratio,
-                    'percentage': round(latest_submission.ratio * 100, 1),
-                    'duration_minutes': round(latest_submission.duration_seconds / 60, 1),
-                    'recommended_level': latest_submission.recommended_level,
-                    'created_at': latest_submission.created_at,
-                })
-                
+                ctx.update(
+                    {
+                        "submission": latest_submission,
+                        "score": latest_submission.score,
+                        "total_weight": latest_submission.total_weight,
+                        "ratio": latest_submission.ratio,
+                        "percentage": round(latest_submission.ratio * 100, 1) if latest_submission.total_weight else 0,
+                        "duration_minutes": round(latest_submission.duration_seconds / 60, 1),
+                        "recommended_level": latest_submission.recommended_level,
+                        "created_at": latest_submission.created_at,
+                    }
+                )
+
+                # Build incorrect questions hints (only for classic mode submissions with items)
+                incorrect_details = []
+                submission_items = list(
+                    latest_submission.items.select_related("question").prefetch_related("question__hint_resources")
+                )
+                for item in submission_items:
+                    if item.is_correct:
+                        continue
+                    q = item.question
+                    incorrect_details.append(
+                        {
+                            "question": q,
+                            "hint_text": q.hint_text,
+                            "hint_links": q.hint_links or [],
+                            "hint_resources": list(q.hint_resources.all()),
+                        }
+                    )
+                ctx["incorrect_details"] = incorrect_details
+
                 # Get recommended videos based on the user's level
                 try:
                     from courses.models import Video
-                    recommended_videos = Video.objects.filter(
-                        level=latest_submission.recommended_level
-                    ).order_by('-is_featured', '-created_at')[:6]
-                    ctx['recommended_videos'] = recommended_videos
+
+                    recommended_videos = (
+                        Video.objects.filter(level=latest_submission.recommended_level)
+                        .order_by("-is_featured", "-created_at")[:6]
+                    )
+                    ctx["recommended_videos"] = recommended_videos
                 except ImportError:
-                    ctx['recommended_videos'] = []
-                    
+                    ctx["recommended_videos"] = []
+
         except Submission.DoesNotExist:
             pass
-            
+
         return ctx
 
 

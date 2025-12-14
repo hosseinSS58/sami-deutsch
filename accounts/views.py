@@ -23,6 +23,30 @@ class SignUpView(CreateView):
 class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = "accounts/profile.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from assessments.models import Submission
+
+        user_identifier = f"user-{self.request.user.id}"
+        submissions_qs = Submission.objects.filter(user_identifier=user_identifier).order_by("-created_at")
+        context["user_submissions"] = submissions_qs[:10]
+        context["completed_assessments"] = submissions_qs.count()
+        context.setdefault("completed_videos", 0)
+        context.setdefault("completed_posts", 0)
+        # Recent activities placeholder
+        recent = []
+        for submission in submissions_qs[:5]:
+            recent.append(
+                {
+                    "type": "assessment",
+                    "title": f"آزمون: {submission.assessment.title}",
+                    "created_at": submission.created_at,
+                    "url": "#",
+                }
+            )
+        context["recent_activities"] = recent
+        return context
+
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
     model = Profile

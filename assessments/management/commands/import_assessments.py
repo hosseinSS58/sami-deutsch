@@ -4,8 +4,14 @@ from django.core.management.base import BaseCommand
 from django.core.files import File
 from django.db import transaction
 from assessments.models import (
-    Assessment, Question, Choice, AnswerPattern,
-    OrderingItem, MatchPair, QuestionMedia
+    Assessment,
+    Question,
+    Choice,
+    AnswerPattern,
+    OrderingItem,
+    MatchPair,
+    QuestionMedia,
+    HintResource,
 )
 
 
@@ -54,6 +60,7 @@ class Command(BaseCommand):
         if clear_existing:
             self.stdout.write(self.style.WARNING('Clearing existing data...'))
             QuestionMedia.objects.all().delete()
+            HintResource.objects.all().delete()
             # Import Submission models only if needed
             if 'submissions' in data:
                 from assessments.models import Submission, SubmissionItem
@@ -102,6 +109,8 @@ class Command(BaseCommand):
                         weight=question_data.get('weight', 1),
                         explanation=question_data.get('explanation', ''),
                         correct_boolean=question_data.get('correct_boolean'),
+                        hint_text=question_data.get('hint_text', ''),
+                        hint_links=question_data.get('hint_links', []),
                     )
                     question_map[question_data['export_id']] = question.id
 
@@ -258,6 +267,22 @@ class Command(BaseCommand):
                             'No media files were copied. You may need to upload them manually.'
                         ))
 
+                # Import HintResources
+                hint_count = 0
+                for hint_data in data.get('hint_resources', []):
+                    question_id = question_map.get(hint_data['question_export_id'])
+                    if not question_id:
+                        continue
+                    HintResource.objects.create(
+                        question_id=question_id,
+                        title=hint_data.get('title', ''),
+                        url=hint_data.get('url', ''),
+                        order=hint_data.get('order', 0),
+                    )
+                    hint_count += 1
+                if hint_count:
+                    self.stdout.write(self.style.SUCCESS(f'✓ Imported {hint_count} hint resources'))
+
                 # Import Submissions if available and not skipped
                 if 'submissions' in data and not skip_submissions:
                     from assessments.models import Submission, SubmissionItem
@@ -272,7 +297,6 @@ class Command(BaseCommand):
 
                         submission = Submission.objects.create(
                             assessment_id=assessment_id,
-                            user_id=submission_data.get('user_id'),  # May be None
                             user_identifier=submission_data['user_identifier'],
                             full_name=submission_data.get('full_name', ''),
                             email=submission_data.get('email', ''),

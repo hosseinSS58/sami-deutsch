@@ -47,6 +47,8 @@ class Question(models.Model):
     weight = models.PositiveSmallIntegerField(default=1)
     explanation = models.TextField(blank=True)
     correct_boolean = models.BooleanField(null=True, blank=True, verbose_name=_("پاسخ صحیح (برای درست/نادرست)"))
+    hint_text = models.TextField(blank=True, verbose_name=_("نکته/توضیح پس از پاسخ نادرست"))
+    hint_links = models.JSONField(default=list, blank=True, verbose_name=_("لینک‌های پیشنهادی پس از پاسخ نادرست"))
 
     def __str__(self) -> str:
         return self.text[:50]
@@ -94,6 +96,42 @@ class MatchPair(models.Model):
 
     def __str__(self) -> str:
         return f"{self.left_text} ↔ {self.right_text}"
+
+
+class QuestionMedia(models.Model):
+    class MediaType(models.TextChoices):
+        IMAGE = "image", _("تصویر")
+        AUDIO = "audio", _("صوت")
+        VIDEO = "video", _("ویدیو")
+        TEXT = "text", _("متن")
+        FILE = "file", _("فایل")
+
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="media_items")
+    media_type = models.CharField(max_length=10, choices=MediaType.choices, default=MediaType.IMAGE)
+    file = models.FileField(upload_to="assessments/media/", blank=True, null=True)
+    url = models.URLField(blank=True)
+    caption = models.CharField(max_length=200, blank=True)
+    order = models.PositiveSmallIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["question_id", "order", "id"]
+
+    def __str__(self) -> str:
+        return f"{self.question_id}-{self.media_type}"
+
+
+class HintResource(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="hint_resources")
+    title = models.CharField(max_length=200, blank=True)
+    url = models.URLField(blank=True)
+    order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self) -> str:
+        return self.title or self.url or f"Hint {self.id}"
 
 
 class Submission(models.Model):

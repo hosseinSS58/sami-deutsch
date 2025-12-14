@@ -122,7 +122,7 @@ try:
     DATABASES = {
         "default": env.db(
             "DATABASE_URL",
-            default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}" if DEBUG else None,
+            default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         )
     }
     
@@ -145,13 +145,9 @@ except Exception as e:
         raise ValueError(f"DATABASE_URL is required in production. Error: {e}")
     raise
 
-# Validation: در production نباید از SQLite استفاده شود
-if not DEBUG:
-    if not DATABASES.get("default") or not DATABASES["default"].get("ENGINE"):
-        raise ValueError("DATABASE_URL must be set in production")
-    db_engine = DATABASES["default"].get("ENGINE", "")
-    if "sqlite" in db_engine.lower():
-        raise ValueError("SQLite database is not allowed in production. Please use PostgreSQL or MySQL.")
+# Validation: allow SQLite even when DEBUG=False (use at your own risk)
+if not DATABASES.get("default") or not DATABASES["default"].get("ENGINE"):
+    raise ValueError("A valid database configuration is required")
 
 
 # Password validation

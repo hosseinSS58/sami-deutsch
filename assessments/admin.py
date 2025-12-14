@@ -1,5 +1,16 @@
 from django.contrib import admin
-from .models import Assessment, Question, Choice, Submission, AnswerPattern, SubmissionItem, OrderingItem, MatchPair
+from .models import (
+    Assessment,
+    Question,
+    Choice,
+    Submission,
+    AnswerPattern,
+    SubmissionItem,
+    OrderingItem,
+    MatchPair,
+    QuestionMedia,
+    HintResource,
+)
 
 
 class ChoiceInline(admin.TabularInline):
@@ -12,6 +23,16 @@ class QuestionInline(admin.TabularInline):
     extra = 1
 
 
+class QuestionMediaInline(admin.TabularInline):
+    model = QuestionMedia
+    extra = 1
+
+
+class HintResourceInline(admin.TabularInline):
+    model = HintResource
+    extra = 1
+
+
 @admin.register(Assessment)
 class AssessmentAdmin(admin.ModelAdmin):
     list_display = ("title", "level", "is_active", "created_at")
@@ -21,7 +42,7 @@ class AssessmentAdmin(admin.ModelAdmin):
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
     list_display = ("assessment", "text", "type", "difficulty", "weight")
-    inlines = [ChoiceInline]
+    inlines = [ChoiceInline, QuestionMediaInline, HintResourceInline]
 
 
 @admin.register(OrderingItem)

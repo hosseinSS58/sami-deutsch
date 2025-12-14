@@ -143,6 +143,64 @@
               </div>
             </div>
             {% endif %}
+
+            {% if incorrect_details %}
+            <div class="mt-4">
+              <h6 class="mb-2 d-flex align-items-center gap-2">
+                <i class="fas fa-lightbulb text-warning"></i>
+                <span>نکات آموزشی برای سوالات غلط</span>
+              </h6>
+              <div class="row g-3">
+                {% for detail in incorrect_details %}
+                <div class="col-12">
+                  <div class="border rounded-3 p-3 bg-warning-subtle">
+                    <div class="d-flex align-items-start gap-2">
+                      <i class="fas fa-times-circle text-danger mt-1"></i>
+                      <div>
+                        <div class="fw-semibold mb-1">{{ detail.question.text }}</div>
+                        {% if detail.hint_text %}
+                          <div class="text-muted small mb-2">{{ detail.hint_text }}</div>
+                        {% endif %}
+                        {% if detail.hint_links %}
+                          <div class="mb-2">
+                            <div class="fw-semibold small mb-1">لینک‌های پیشنهادی:</div>
+                            <ul class="list-unstyled mb-0 small">
+                              {% for link in detail.hint_links %}
+                                <li>
+                                  <a href="{{ link }}" target="_blank" rel="noopener" class="link-primary">
+                                    {{ link }}
+                                  </a>
+                                </li>
+                              {% endfor %}
+                            </ul>
+                          </div>
+                        {% endif %}
+                        {% if detail.hint_resources %}
+                          <div>
+                            <div class="fw-semibold small mb-1">منابع بیشتر:</div>
+                            <ul class="list-unstyled mb-0 small">
+                              {% for res in detail.hint_resources %}
+                                <li>
+                                  {% if res.url %}
+                                    <a href="{{ res.url }}" target="_blank" rel="noopener" class="link-info">
+                                      {{ res.title|default:res.url }}
+                                    </a>
+                                  {% else %}
+                                    {{ res.title }}
+                                  {% endif %}
+                                </li>
+                              {% endfor %}
+                            </ul>
+                          </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
         <!-- Recommended Videos -->
         {% if recommended_videos %}
         <div class="card border-0 shadow-sm mb-4">
