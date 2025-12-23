@@ -74,7 +74,8 @@ class AssessmentTakeView(FormView):
         keys = ["assessment_start", "adaptive_state", "adaptive_history", "identity"]
         for key in keys:
             self.request.session.pop(key, None)
-        self.request.session["adaptive"] = False
+        # Keep the current mode; default to adaptive if not set
+        self.request.session["adaptive"] = self.request.session.get("adaptive", True)
 
     def dispatch(self, request, *args, **kwargs):
         # Determine mode
@@ -83,6 +84,13 @@ class AssessmentTakeView(FormView):
             request.session["adaptive"] = False
         elif mode == "adaptive":
             request.session["adaptive"] = True
+        else:
+            # If no explicit mode is provided, default to adaptive
+            request.session.setdefault("adaptive", True)
+            # If a previous classic run forced non-adaptive, reset to adaptive when starting fresh
+            if request.session.get("adaptive") is False and not request.session.get("adaptive_state") and not request.GET.get("assessment_id"):
+                request.session["adaptive"] = True
+                request.session.pop("assessment_id", None)
 
         adaptive = request.session.get("adaptive", True)
 
@@ -133,6 +141,7 @@ class AssessmentTakeView(FormView):
         level_batch_sizes = {"A1": 5, "A2": 7, "B1": 9, "B2": 12}
 
         request.session["adaptive"] = True
+        # Clear any previous classic assessment selection to avoid sticking to a fixed test
         request.session.pop("assessment_id", None)
         if "adaptive_state" not in request.session:
             request.session["adaptive_state"] = {
