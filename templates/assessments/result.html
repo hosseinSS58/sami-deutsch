@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load core_extras %}
 {% block title %}{% trans "نتیجه تعیین سطح" %}{% endblock %}
 {% block content %}
 <div class="container py-5">
@@ -164,33 +165,45 @@
                         {% if detail.hint_links %}
                           <div class="mb-2">
                             <div class="fw-semibold small mb-1">لینک‌های پیشنهادی:</div>
-                            <ul class="list-unstyled mb-0 small">
+                            <div class="d-flex flex-wrap gap-2">
                               {% for link in detail.hint_links %}
-                                <li>
-                                  <a href="{{ link }}" target="_blank" rel="noopener" class="link-primary">
-                                    {{ link }}
+                                {% if link|is_youtube_link %}
+                                  <a href="{{ link }}" target="_blank" rel="noopener" class="btn btn-danger btn-sm d-inline-flex align-items-center gap-2">
+                                    <i class="fab fa-youtube"></i>
+                                    <span>مشاهده در یوتیوب</span>
                                   </a>
-                                </li>
+                                {% else %}
+                                  <a href="{{ link }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-external-link-alt me-1"></i>
+                                    {{ link|truncatechars:40 }}
+                                  </a>
+                                {% endif %}
                               {% endfor %}
-                            </ul>
+                            </div>
                           </div>
                         {% endif %}
                         {% if detail.hint_resources %}
                           <div>
                             <div class="fw-semibold small mb-1">منابع بیشتر:</div>
-                            <ul class="list-unstyled mb-0 small">
+                            <div class="d-flex flex-wrap gap-2">
                               {% for res in detail.hint_resources %}
-                                <li>
-                                  {% if res.url %}
-                                    <a href="{{ res.url }}" target="_blank" rel="noopener" class="link-info">
-                                      {{ res.title|default:res.url }}
+                                {% if res.url %}
+                                  {% if res.url|is_youtube_link %}
+                                    <a href="{{ res.url }}" target="_blank" rel="noopener" class="btn btn-danger btn-sm d-inline-flex align-items-center gap-2">
+                                      <i class="fab fa-youtube"></i>
+                                      <span>{{ res.title|default:"مشاهده در یوتیوب" }}</span>
                                     </a>
                                   {% else %}
-                                    {{ res.title }}
+                                    <a href="{{ res.url }}" target="_blank" rel="noopener" class="btn btn-outline-info btn-sm">
+                                      <i class="fas fa-external-link-alt me-1"></i>
+                                      {{ res.title|default:res.url|truncatechars:40 }}
+                                    </a>
                                   {% endif %}
-                                </li>
+                                {% else %}
+                                  <span class="badge bg-secondary">{{ res.title }}</span>
+                                {% endif %}
                               {% endfor %}
-                            </ul>
+                            </div>
                           </div>
                         {% endif %}
                       </div>
@@ -277,5 +290,6 @@
   </div>
 </div>
 {% endblock %}
+
 
 
