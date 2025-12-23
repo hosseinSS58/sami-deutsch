@@ -643,23 +643,61 @@ class AssessmentResultView(TemplateView):
                     }
                 )
 
-                # Build incorrect questions hints (only for classic mode submissions with items)
+                # Build incorrect questions hints
                 incorrect_details = []
+                
+                # For classic mode: get from submission items
                 submission_items = list(
                     latest_submission.items.select_related("question").prefetch_related("question__hint_resources")
                 )
-                for item in submission_items:
-                    if item.is_correct:
-                        continue
-                    q = item.question
-                    incorrect_details.append(
-                        {
-                            "question": q,
-                            "hint_text": q.hint_text,
-                            "hint_links": q.hint_links or [],
-                            "hint_resources": list(q.hint_resources.all()),
-                        }
-                    )
+                if submission_items:
+                    # Classic mode: use submission items
+                    for item in submission_items:
+                        if item.is_correct:
+                            continue
+                        q = item.question
+                        # Only include questions that have at least one hint
+                        hint_resources = list(q.hint_resources.all())
+                        hint_links = q.hint_links or []
+                        if q.hint_text or hint_links or hint_resources:
+                            incorrect_details.append(
+                                {
+                                    "question": q,
+                                    "hint_text": q.hint_text,
+                                    "hint_links": hint_links,
+                                    "hint_resources": hint_resources,
+                                }
+                            )
+                else:
+                    # Adaptive mode: get incorrect questions from batch_history
+                    batch_history = ctx.get("batch_history", [])
+                    incorrect_question_ids = set()
+                    for batch in batch_history:
+                        for q_data in batch.get("questions", []):
+                            if not q_data.get("correct", False):
+                                incorrect_question_ids.add(q_data.get("id"))
+                    
+                    if incorrect_question_ids:
+                        # Fetch questions with their hints
+                        from .models import Question
+                        incorrect_questions = Question.objects.filter(
+                            id__in=incorrect_question_ids
+                        ).prefetch_related("hint_resources")
+                        
+                        for q in incorrect_questions:
+                            # Only include questions that have at least one hint
+                            hint_resources = list(q.hint_resources.all())
+                            hint_links = q.hint_links or []
+                            if q.hint_text or hint_links or hint_resources:
+                                incorrect_details.append(
+                                    {
+                                        "question": q,
+                                        "hint_text": q.hint_text,
+                                        "hint_links": hint_links,
+                                        "hint_resources": hint_resources,
+                                    }
+                                )
+                
                 ctx["incorrect_details"] = incorrect_details
 
                 # Get recommended videos based on the user's level

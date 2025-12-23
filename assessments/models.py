@@ -40,7 +40,7 @@ class Question(models.Model):
         HARD = "hard", _("سخت")
 
     assessment = models.ForeignKey(Assessment, on_delete=models.CASCADE, related_name="questions")
-    text = models.CharField(max_length=400, verbose_name=_("سوال"))
+    text = models.CharField(max_length=700, verbose_name=_("سوال"))
     type = models.CharField(max_length=10, choices=QuestionType.choices, default=QuestionType.MCQ_SINGLE)
     target_level = models.CharField(max_length=2, choices=Assessment.LEVEL_CHOICES, default="A1")
     difficulty = models.CharField(max_length=6, choices=Difficulty.choices, default=Difficulty.MEDIUM)
