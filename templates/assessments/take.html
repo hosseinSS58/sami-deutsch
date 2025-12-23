@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n form_extras %}
+{% load i18n form_extras core_extras %}
 {% block title %}{% trans "آزمون" %}{% endblock %}
 {% block content %}
 <div class="container py-4">
@@ -134,7 +134,17 @@
                               <source src="{{ media.file.url }}">
                             </video>
                           {% elif media.url %}
-                            <a href="{{ media.url }}" target="_blank" rel="noopener">{% trans "مشاهده ویدیو" %}</a>
+                            {% if media.url|is_youtube_link %}
+                              {% with youtube_id=media.url|extract_youtube_id %}
+                                <div class="ratio ratio-16x9">
+                                  <iframe src="https://www.youtube.com/embed/{{ youtube_id }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="rounded"></iframe>
+                                </div>
+                              {% endwith %}
+                            {% else %}
+                              <video controls class="w-100 rounded" style="max-height:320px;">
+                                <source src="{{ media.url }}">
+                              </video>
+                            {% endif %}
                           {% endif %}
                           {% if media.caption %}<div class="small text-muted mt-1">{{ media.caption }}</div>{% endif %}
                         </div>

@@ -210,11 +210,15 @@ class AssessmentTakeView(FormView):
                     if name == base or name.startswith(f"{base}_blank_"):
                         q_fields.append(f)
                 if q_fields:
+                    # Get media items for this question
+                    media_items = []
+                    if hasattr(q, "media_items"):
+                        media_items = list(q.media_items.all())
                     groups.append(
                         {
                             "question": q,
                             "fields": q_fields,
-                            "media": list(getattr(q, "media_items", []).all()) if hasattr(q, "media_items") else [],
+                            "media": media_items,
                         }
                     )
             context["question_groups"] = groups
